@@ -50,7 +50,7 @@ const Register = () => {
       password: "",
       confirmPassword: "",
       userType: "buyer",
-      termsAccepted: false,
+      termsAccepted: false as any, // Cast to any to fix type error since it will be set to true when checked
     },
   });
 
