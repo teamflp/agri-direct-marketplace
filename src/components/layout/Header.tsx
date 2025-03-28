@@ -55,9 +55,11 @@ const Header = () => {
             </Link>
             
             <div className="hidden md:block">
-              <Button variant="default" className="bg-agrimarket-orange hover:bg-orange-600 text-white">
-                Connexion / Inscription
-              </Button>
+              <Link to="/login">
+                <Button variant="default" className="bg-agrimarket-orange hover:bg-orange-600 text-white">
+                  Connexion / Inscription
+                </Button>
+              </Link>
             </div>
             
             <div className="md:hidden">
@@ -80,9 +82,11 @@ const Header = () => {
               <Link to="/subscriptions" className="font-medium p-2 hover:bg-gray-50 rounded-md" onClick={toggleMenu}>Abonnements</Link>
               <Link to="/contact" className="font-medium p-2 hover:bg-gray-50 rounded-md" onClick={toggleMenu}>Contact</Link>
               <div className="pt-2 border-t">
-                <Button variant="default" className="w-full bg-agrimarket-orange hover:bg-orange-600 text-white">
-                  Connexion / Inscription
-                </Button>
+                <Link to="/login">
+                  <Button variant="default" className="w-full bg-agrimarket-orange hover:bg-orange-600 text-white">
+                    Connexion / Inscription
+                  </Button>
+                </Link>
               </div>
             </nav>
           </div>
