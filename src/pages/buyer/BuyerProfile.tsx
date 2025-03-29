@@ -1,191 +1,203 @@
 
 import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { User, Mail, MapPin, Phone, CreditCard, Lock, Bell, Settings } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  User, 
-  ShoppingCart, 
-  Heart, 
-  MessageSquare, 
-  FileText, 
-  Users,
-  Camera,
-  Mail,
-  Phone,
-  MapPin,
-  Shield
-} from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from "@/components/ui/tabs";
-import { Avatar } from "@/components/ui/avatar";
 
 const BuyerProfile = () => {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
-  
-  const menuItems = [
-    { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
-    { title: "Mes commandes", path: "/buyer-dashboard/orders", icon: <ShoppingCart size={20} /> },
-    { title: "Mes favoris", path: "/buyer-dashboard/favorites", icon: <Heart size={20} /> },
-    { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
-    { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
-  ];
-  
+
   const handleSaveProfile = () => {
     setIsEditing(false);
     toast({
       title: "Profil mis à jour",
-      description: "Vos informations de profil ont été mises à jour avec succès.",
+      description: "Vos informations personnelles ont été mises à jour avec succès.",
     });
   };
-  
-  const handleUploadImage = () => {
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
     toast({
-      title: "Téléchargement d'image",
-      description: "Fonctionnalité en cours de développement.",
+      title: "Mot de passe modifié",
+      description: "Votre mot de passe a été modifié avec succès.",
     });
   };
-  
-  const handleChangePassword = () => {
-    toast({
-      title: "Changement de mot de passe",
-      description: "Un email a été envoyé pour réinitialiser votre mot de passe.",
-    });
-  };
+
+  const dashboardMenuItems = [
+    {
+      title: "Tableau de bord",
+      path: "/buyer-dashboard",
+      icon: <User className="h-5 w-5" />,
+    },
+    {
+      title: "Mon profil",
+      path: "/buyer-dashboard/profile",
+      icon: <Settings className="h-5 w-5" />,
+    },
+    {
+      title: "Mes commandes",
+      path: "/buyer-dashboard/orders",
+      icon: <CreditCard className="h-5 w-5" />,
+    },
+    {
+      title: "Mes favoris",
+      path: "/buyer-dashboard/favorites",
+      icon: <Bell className="h-5 w-5" />,
+    },
+    {
+      title: "Ma messagerie",
+      path: "/buyer-dashboard/messages",
+      icon: <Mail className="h-5 w-5" />,
+    },
+    {
+      title: "Mes agriculteurs",
+      path: "/buyer-dashboard/farmers",
+      icon: <User className="h-5 w-5" />,
+    },
+    {
+      title: "Mes factures",
+      path: "/buyer-dashboard/invoices",
+      icon: <CreditCard className="h-5 w-5" />,
+    },
+  ];
 
   return (
     <DashboardLayout
-      name="Martin Pasquier"
-      email="martin.p@email.com"
+      name="Jean Dupont"
+      email="jean.dupont@example.com"
       avatar={
-        <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
-          MP
-        </div>
+        <AvatarFallback>JD</AvatarFallback>
       }
-      menuItems={menuItems}
+      menuItems={dashboardMenuItems}
     >
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Mon profil</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight">Mon profil</h1>
+          {activeTab === "profile" && !isEditing && (
+            <Button onClick={() => setIsEditing(true)} variant="default" className="bg-agrimarket-orange hover:bg-orange-600">
+              Modifier le profil
+            </Button>
+          )}
+          {activeTab === "profile" && isEditing && (
+            <div className="space-x-2">
+              <Button onClick={() => setIsEditing(false)} variant="outline">
+                Annuler
+              </Button>
+              <Button onClick={handleSaveProfile} variant="default" className="bg-agrimarket-orange hover:bg-orange-600">
+                Enregistrer
+              </Button>
+            </div>
+          )}
+        </div>
 
-        <Tabs defaultValue="info" className="w-full">
+        <Tabs defaultValue="profile" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="info">Informations personnelles</TabsTrigger>
+            <TabsTrigger value="profile">Informations personnelles</TabsTrigger>
             <TabsTrigger value="security">Sécurité</TabsTrigger>
-            <TabsTrigger value="preferences">Préférences</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="info">
+          <TabsContent value="profile">
             <Card>
               <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Mes informations</CardTitle>
-                    <CardDescription>Gérez vos informations personnelles</CardDescription>
-                  </div>
-                  <Button 
-                    onClick={() => setIsEditing(!isEditing)}
-                    variant={isEditing ? "outline" : "default"}
-                  >
-                    {isEditing ? "Annuler" : "Modifier"}
-                  </Button>
-                </div>
+                <CardTitle>Profil utilisateur</CardTitle>
+                <CardDescription>
+                  Gérez vos informations personnelles et vos coordonnées.
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid gap-6">
-                  <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
-                    <div className="relative">
-                      <Avatar className="w-24 h-24">
-                        <div className="bg-agrimarket-orange text-white text-2xl font-semibold flex items-center justify-center h-full">
-                          MP
-                        </div>
-                      </Avatar>
-                      {isEditing && (
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          className="absolute bottom-0 right-0 rounded-full bg-white"
-                          onClick={handleUploadImage}
-                        >
-                          <Camera size={16} />
-                        </Button>
-                      )}
+              <CardContent className="space-y-6">
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex flex-col items-center space-y-3">
+                    <Avatar className="h-32 w-32">
+                      <AvatarImage src="/placeholder.svg" alt="Jean Dupont" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    {isEditing && (
+                      <Button variant="outline" size="sm">
+                        Changer la photo
+                      </Button>
+                    )}
+                    <div className="text-center">
+                      <h3 className="font-medium text-lg">Jean Dupont</h3>
+                      <p className="text-muted-foreground">Client depuis Juin 2023</p>
+                      <Badge className="mt-2 bg-agrimarket-green">Client vérifié</Badge>
                     </div>
-                    
-                    <div className="space-y-4 flex-1">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">Prénom</Label>
+                  </div>
+                  
+                  <div className="flex-1 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">Prénom</Label>
+                        <div className="flex items-center gap-2">
+                          <User className="h-5 w-5 text-muted-foreground" />
                           <Input 
                             id="firstName" 
-                            defaultValue="Martin" 
-                            disabled={!isEditing} 
+                            defaultValue="Jean" 
+                            disabled={!isEditing}
+                            className="flex-1"
                           />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Nom</Label>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Nom</Label>
+                        <div className="flex items-center gap-2">
+                          <User className="h-5 w-5 text-muted-foreground" />
                           <Input 
                             id="lastName" 
-                            defaultValue="Pasquier" 
+                            defaultValue="Dupont" 
                             disabled={!isEditing}
+                            className="flex-1"
                           />
                         </div>
                       </div>
-                      
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
+                          <Mail className="h-5 w-5 text-muted-foreground" />
                           <Input 
                             id="email" 
-                            defaultValue="martin.p@email.com" 
+                            defaultValue="jean.dupont@example.com" 
                             disabled={!isEditing}
                             className="flex-1"
-                            icon={<Mail className="h-4 w-4 text-gray-500" />}
                           />
                         </div>
                       </div>
-                      
                       <div className="space-y-2">
                         <Label htmlFor="phone">Téléphone</Label>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-5 w-5 text-muted-foreground" />
                           <Input 
                             id="phone" 
-                            defaultValue="+221 77 123 45 67" 
+                            defaultValue="+33 6 12 34 56 78" 
                             disabled={!isEditing}
                             className="flex-1"
-                            icon={<Phone className="h-4 w-4 text-gray-500" />}
                           />
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Adresse</Label>
-                    <Textarea 
-                      id="address" 
-                      defaultValue="123 Rue Principale, 12345 Ville" 
-                      disabled={!isEditing}
-                      className="min-h-[80px]"
-                    />
-                  </div>
-                  
-                  {isEditing && (
-                    <div className="flex justify-end">
-                      <Button onClick={handleSaveProfile}>
-                        Enregistrer les modifications
-                      </Button>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Adresse</Label>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                        <Input 
+                          id="address" 
+                          defaultValue="123 Rue des Champs, 75001 Paris" 
+                          disabled={!isEditing}
+                          className="flex-1"
+                        />
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -195,120 +207,127 @@ const BuyerProfile = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Sécurité du compte</CardTitle>
-                <CardDescription>Gérez votre mot de passe et les paramètres de sécurité</CardDescription>
+                <CardDescription>
+                  Gérez votre mot de passe et les paramètres de sécurité.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-medium">Mot de passe</h3>
-                      <p className="text-sm text-gray-500">Dernière modification il y a 2 mois</p>
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-5 w-5 text-muted-foreground" />
+                      <Input id="currentPassword" type="password" className="flex-1" />
                     </div>
-                    <Button variant="outline" onClick={handleChangePassword}>
-                      Changer
-                    </Button>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-medium">Authentification à deux facteurs</h3>
-                      <p className="text-sm text-gray-500">Protégez votre compte avec une couche de sécurité supplémentaire</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-5 w-5 text-muted-foreground" />
+                      <Input id="newPassword" type="password" className="flex-1" />
                     </div>
-                    <Button variant="outline">
-                      Configurer
-                    </Button>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-lg font-medium">Sessions actives</h3>
-                      <p className="text-sm text-gray-500">Gérez les appareils connectés à votre compte</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                    <div className="flex items-center gap-2">
+                      <Lock className="h-5 w-5 text-muted-foreground" />
+                      <Input id="confirmPassword" type="password" className="flex-1" />
                     </div>
-                    <Button variant="outline">
-                      Gérer
-                    </Button>
+                  </div>
+                  <Button type="submit" className="bg-agrimarket-orange hover:bg-orange-600">
+                    Modifier le mot de passe
+                  </Button>
+                </form>
+                
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-medium text-lg">Connexions récentes</h3>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-muted p-3 rounded-md flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">Paris, France</p>
+                        <p className="text-sm text-muted-foreground">12 octobre 2023, 14:32</p>
+                      </div>
+                      <Badge>Cet appareil</Badge>
+                    </div>
+                    
+                    <div className="bg-muted p-3 rounded-md flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">Lyon, France</p>
+                        <p className="text-sm text-muted-foreground">10 octobre 2023, 09:15</p>
+                      </div>
+                      <Badge variant="outline">Appareil reconnu</Badge>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="preferences">
+          <TabsContent value="notifications">
             <Card>
               <CardHeader>
-                <CardTitle>Préférences</CardTitle>
-                <CardDescription>Personnalisez votre expérience</CardDescription>
+                <CardTitle>Paramètres de notifications</CardTitle>
+                <CardDescription>
+                  Personnalisez vos préférences de notifications.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Notifications</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Notifications par email</h4>
-                            <p className="text-sm text-gray-500">Recevoir des mises à jour par email</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm">Configurer</Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                <div className="space-y-4">
+                  <h3 className="font-medium">Notifications par email</h3>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Promotions et offres</p>
+                        <p className="text-sm text-muted-foreground">Recevez des offres exclusives de nos agriculteurs partenaires</p>
+                      </div>
+                      <Checkbox id="marketing" />
+                    </div>
                     
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Notifications sur le site</h4>
-                            <p className="text-sm text-gray-500">Recevoir des alertes sur le site</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm">Configurer</Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Mise à jour des commandes</p>
+                        <p className="text-sm text-muted-foreground">Soyez informé du statut de vos commandes</p>
+                      </div>
+                      <Checkbox id="orders" defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Nouveaux produits</p>
+                        <p className="text-sm text-muted-foreground">Découvrez les nouveaux produits de saison</p>
+                      </div>
+                      <Checkbox id="products" defaultChecked />
+                    </div>
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Préférences d'achat</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Catégories préférées</h4>
-                            <p className="text-sm text-gray-500">Personnaliser vos recommandations</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm">Choisir</Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-medium">Notifications mobiles</h3>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Rappels de commande</p>
+                        <p className="text-sm text-muted-foreground">Recevez des rappels pour les commandes programmées</p>
+                      </div>
+                      <Checkbox id="reminders" defaultChecked />
+                    </div>
                     
-                    <Card>
-                      <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Mode de paiement préféré</h4>
-                            <p className="text-sm text-gray-500">Définir votre méthode par défaut</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button variant="outline" size="sm">Définir</Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Messages des agriculteurs</p>
+                        <p className="text-sm text-muted-foreground">Soyez notifié des nouveaux messages</p>
+                      </div>
+                      <Checkbox id="messages" defaultChecked />
+                    </div>
                   </div>
                 </div>
+                
+                <Button className="mt-4 bg-agrimarket-orange hover:bg-orange-600">
+                  Enregistrer les préférences
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

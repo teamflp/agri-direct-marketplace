@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -24,6 +24,7 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 const Login = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -36,15 +37,40 @@ const Login = () => {
 
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
+    
     // Simulation d'une connexion
     setTimeout(() => {
       console.log("Login attempt with:", values);
+      
+      // Déterminer si l'utilisateur est un agriculteur ou un consommateur
+      // Dans une application réelle, cette logique serait basée sur la réponse de l'API
+      const userRole = determineUserRole(values.email);
+      
       toast({
         title: "Connexion réussie !",
         description: "Bienvenue sur AgriMarket",
       });
+      
+      // Rediriger vers le tableau de bord approprié
+      if (userRole === "farmer") {
+        navigate("/farmer-dashboard");
+      } else {
+        navigate("/buyer-dashboard");
+      }
+      
       setIsLoading(false);
     }, 1500);
+  };
+  
+  // Fonction pour déterminer le rôle de l'utilisateur (exemple simplifié)
+  const determineUserRole = (email: string): "farmer" | "buyer" => {
+    // Exemple : si l'email contient "farmer", on considère que c'est un agriculteur
+    // Dans une application réelle, cette logique serait remplacée par une vérification
+    // avec le backend ou avec les données utilisateur stockées
+    if (email.includes("farmer") || email.includes("agriculteur")) {
+      return "farmer";
+    }
+    return "buyer";
   };
 
   return (
