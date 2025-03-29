@@ -191,14 +191,15 @@ const FarmerDashboard = () => {
                     >
                       <MessageSquare className="w-4 h-4 mr-2" /> Messagerie
                     </Button>
-                    <Button 
-                      variant={selectedTab === "analytics" ? "default" : "ghost"} 
-                      className={`w-full justify-start ${selectedTab === "analytics" ? "bg-agrimarket-green hover:bg-agrimarket-green/90" : ""}`}
-                      as={Link}
-                      to="/farmer-dashboard/analytics"
-                    >
-                      <BarChart className="w-4 h-4 mr-2" /> Analyses
-                    </Button>
+                    {/* Fix for the Button component - Remove 'as' prop and wrap with Link */}
+                    <Link to="/farmer-dashboard/analytics">
+                      <Button 
+                        variant={selectedTab === "analytics" ? "default" : "ghost"} 
+                        className={`w-full justify-start ${selectedTab === "analytics" ? "bg-agrimarket-green hover:bg-agrimarket-green/90" : ""}`}
+                      >
+                        <BarChart className="w-4 h-4 mr-2" /> Analyses
+                      </Button>
+                    </Link>
                     <Button 
                       variant={selectedTab === "subscription" ? "default" : "ghost"} 
                       className={`w-full justify-start ${selectedTab === "subscription" ? "bg-agrimarket-green hover:bg-agrimarket-green/90" : ""}`}
