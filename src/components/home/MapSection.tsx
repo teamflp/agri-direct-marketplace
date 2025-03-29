@@ -1,13 +1,52 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, Navigation } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import InteractiveMap, { MapFarmer } from '@/components/map/InteractiveMap';
+
+// Exemple de données simplifiées pour la carte de la page d'accueil
+const homepageFarmers: MapFarmer[] = [
+  {
+    id: 1,
+    name: "Sophie Dubois",
+    farmName: "Ferme des Quatre Saisons",
+    location: { lat: 14.7167, lng: -17.4677 },
+    products: ["Tomates", "Aubergines", "Poivrons"],
+    categories: ["Légumes", "Fruits"],
+    distance: 3.2,
+    isCertified: true,
+    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop"
+  },
+  {
+    id: 2,
+    name: "Jean Leclerc",
+    farmName: "Les Ruches de Marie",
+    location: { lat: 14.7587, lng: -17.3887 },
+    products: ["Miel d'acacia", "Miel de fleurs"],
+    categories: ["Miel"],
+    distance: 8.5,
+    isCertified: true,
+    image: "https://images.unsplash.com/photo-1566753323558-f4e0952af115?w=150&h=150&fit=crop"
+  },
+  {
+    id: 3,
+    name: "Michel Blanc",
+    farmName: "Potager du Village",
+    location: { lat: 14.6527, lng: -17.4077 },
+    products: ["Carottes", "Pommes de terre"],
+    categories: ["Légumes"],
+    distance: 5.7,
+    isCertified: false,
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop"
+  }
+];
 
 const MapSection = () => {
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-4">Trouvez des agriculteurs près de chez vous</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Découvrez les producteurs locaux et leurs produits disponibles dans votre région.
@@ -32,17 +71,17 @@ const MapSection = () => {
           </div>
         </div>
         
-        <div className="bg-gray-200 rounded-lg overflow-hidden h-96 relative shadow-md">
-          {/* Placeholder pour la carte interactive */}
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-            <div className="text-center p-6">
-              <MapPin className="w-12 h-12 text-agrimarket-orange mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">Carte interactive des agriculteurs</p>
-              <Button variant="outline" className="border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange hover:text-white">
-                Activer la géolocalisation
-              </Button>
-            </div>
-          </div>
+        <div className="bg-white rounded-lg overflow-hidden shadow-md mb-8" style={{ height: '500px' }}>
+          <InteractiveMap farmers={homepageFarmers} />
+        </div>
+        
+        <div className="text-center">
+          <Button asChild className="bg-agrimarket-orange hover:bg-orange-600 text-white">
+            <Link to="/farmers-map" className="flex items-center gap-2">
+              <Navigation className="w-4 h-4" />
+              Explorer la carte complète
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
