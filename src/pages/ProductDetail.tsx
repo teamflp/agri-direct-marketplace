@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { AddToCartButton } from '@/components/products/AddToCartButton';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ProductSocialActions from '@/components/products/ProductSocialActions'; // Fixed: Changed from named to default import
+import ProductSocialActions from '@/components/products/ProductSocialActions';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { Star, MapPin, Truck, Store, Leaf, ChevronLeft, Plus, Minus } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -136,7 +136,7 @@ const ProductDetail = () => {
       <main className="flex-grow pt-20 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           {/* Chemin de navigation */}
-          <div className="mb-6">
+          <div className="mb-8">
             <Link to="/products" className="flex items-center text-agrimarket-green hover:text-agrimarket-orange transition-colors">
               <ChevronLeft className="w-4 h-4 mr-1" />
               Retour aux produits
@@ -185,25 +185,29 @@ const ProductDetail = () => {
               <div className="flex flex-col">
                 <div className="mb-auto">
                   {/* Producteur */}
-                  <Link to={`/farmers/${product.farmerId}`} className="inline-flex items-center mb-3 hover:text-agrimarket-orange transition-colors">
-                    <img 
-                      src={product.farmerProfile} 
-                      alt={product.farmerName} 
-                      className="w-8 h-8 rounded-full mr-2 object-cover"
-                    />
-                    <span className="text-gray-600">{product.farmerName}</span>
-                    {product.distance && (
-                      <div className="flex items-center ml-3 text-xs text-agrimarket-green">
-                        <MapPin className="w-3 h-3 mr-0.5" />
-                        {product.distance} km
+                  <div className="flex items-center mb-4">
+                    <Link to={`/farmers/${product.farmerId}`} className="flex items-center group">
+                      <img 
+                        src={product.farmerProfile} 
+                        alt={product.farmerName} 
+                        className="w-10 h-10 rounded-full mr-3 object-cover"
+                      />
+                      <div>
+                        <span className="text-lg font-medium group-hover:text-agrimarket-orange transition-colors">{product.farmerName}</span>
+                        {product.distance && (
+                          <div className="flex items-center text-sm text-agrimarket-green">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {product.distance} km
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </Link>
+                    </Link>
+                  </div>
                   
                   {/* Nom et note */}
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-4">
                     <h1 className="text-3xl font-bold">{product.name}</h1>
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-1">
                       <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                       <span className="ml-1 font-medium">{product.rating}</span>
                       <Link to="#reviews" className="ml-2 text-sm text-gray-500 hover:text-agrimarket-orange">
@@ -213,10 +217,10 @@ const ProductDetail = () => {
                   </div>
                   
                   {/* Description courte */}
-                  <p className="mb-6 text-gray-600">{product.description}</p>
+                  <p className="mb-8 text-gray-600 text-lg leading-relaxed">{product.description}</p>
                   
                   {/* Prix et unité */}
-                  <div className="flex items-baseline mb-6">
+                  <div className="flex items-baseline mb-8">
                     <span className="text-3xl font-bold text-agrimarket-orange">{product.price.toFixed(2)} €</span>
                     <span className="ml-2 text-gray-500">/ {product.unit}</span>
                     <span className="ml-4 text-sm text-green-600">
@@ -225,19 +229,19 @@ const ProductDetail = () => {
                   </div>
                   
                   {/* Quantité */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">Quantité</label>
+                  <div className="mb-8">
+                    <label className="block text-lg font-medium mb-3">Quantité</label>
                     <div className="flex items-center">
                       <Button 
                         variant="outline" 
                         size="icon" 
                         onClick={decrementQuantity}
                         disabled={quantity <= 1}
-                        className="rounded-l-md rounded-r-none"
+                        className="rounded-l-md rounded-r-none h-12 w-12"
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <div className="w-12 h-9 flex items-center justify-center border-y border-gray-200">
+                      <div className="w-16 h-12 flex items-center justify-center border-y border-gray-200 text-lg">
                         {quantity}
                       </div>
                       <Button 
@@ -245,7 +249,7 @@ const ProductDetail = () => {
                         size="icon" 
                         onClick={incrementQuantity}
                         disabled={quantity >= product.stock}
-                        className="rounded-r-md rounded-l-none"
+                        className="rounded-r-md rounded-l-none h-12 w-12"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -254,56 +258,65 @@ const ProductDetail = () => {
                 </div>
                 
                 {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                  <AddToCartButton 
-                    product={{
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      image: product.image,
-                      unit: product.unit,
-                      farmerName: product.farmerName,
-                      farmerId: product.farmerId
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                  <Button 
+                    variant="default"
+                    className="py-6 px-8 text-lg w-full bg-agrimarket-orange hover:bg-orange-600"
+                    onClick={() => {
+                      // Directly use the AddToCartButton's functionality
+                      const { addToCart } = require('@/contexts/CartContext').useCart();
+                      addToCart({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        image: product.image,
+                        unit: product.unit,
+                        farmerName: product.farmerName,
+                        farmerId: product.farmerId,
+                        quantity: quantity
+                      });
                     }}
-                    className="py-6 px-8 text-lg w-full"
-                    // Removed the quantity prop as it's not accepted by the component
-                  />
+                  >
+                    Ajouter au panier
+                  </Button>
+                  
                   <ProductSocialActions 
                     productId={product.id}
-                    // Added missing required props based on PropTypes
                     productName={product.name}
                     productImage={product.image}
                     farmerId={product.farmerId}
                     farmerName={product.farmerName}
-                    farmName={product.farmerName} // Using farmerName as fallback
-                    farmerProductCount={1} // Default value
+                    farmName={product.farmerName}
+                    farmerProductCount={1}
                     farmerRating={product.rating}
+                    layout="horizontal"
+                    className="flex-1"
                   />
                 </div>
               </div>
             </div>
             
             {/* Onglets d'informations supplémentaires */}
-            <div className="border-t mt-6">
-              <Tabs defaultValue="details" className="px-6 py-4">
-                <TabsList className="grid w-full md:w-2/3 grid-cols-3">
+            <div className="border-t mt-8">
+              <Tabs defaultValue="details" className="px-6 py-6">
+                <TabsList className="grid w-full md:w-2/3 grid-cols-3 mb-4">
                   <TabsTrigger value="details">Description</TabsTrigger>
                   <TabsTrigger value="nutritional">Informations nutritionnelles</TabsTrigger>
                   <TabsTrigger value="reviews" id="reviews">Avis ({product.reviews})</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="details" className="py-4">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">À propos de ce produit</h3>
-                    <p className="text-gray-700">{product.longDescription}</p>
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-medium">À propos de ce produit</h3>
+                    <p className="text-gray-700 leading-relaxed">{product.longDescription}</p>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                      <div className="border rounded-md p-4">
-                        <h4 className="font-medium mb-2">Origine</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                      <div className="border rounded-md p-5">
+                        <h4 className="font-medium mb-3">Origine</h4>
                         <p className="text-gray-600">{product.origin}</p>
                       </div>
-                      <div className="border rounded-md p-4">
-                        <h4 className="font-medium mb-2">Catégories</h4>
+                      <div className="border rounded-md p-5">
+                        <h4 className="font-medium mb-3">Catégories</h4>
                         <div className="flex flex-wrap gap-2">
                           {product.categories.map((category, index) => (
                             <Badge key={index} variant="outline" className="bg-gray-100">
@@ -317,16 +330,16 @@ const ProductDetail = () => {
                 </TabsContent>
                 
                 <TabsContent value="nutritional" className="py-4">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Informations nutritionnelles et allergènes</h3>
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-medium">Informations nutritionnelles et allergènes</h3>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="border rounded-md p-4">
-                        <h4 className="font-medium mb-2">Valeurs nutritionnelles</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="border rounded-md p-5">
+                        <h4 className="font-medium mb-3">Valeurs nutritionnelles</h4>
                         <p className="text-gray-600">{product.nutritionalInfo}</p>
                       </div>
-                      <div className="border rounded-md p-4">
-                        <h4 className="font-medium mb-2">Allergènes</h4>
+                      <div className="border rounded-md p-5">
+                        <h4 className="font-medium mb-3">Allergènes</h4>
                         <p className="text-gray-600">{product.allergens}</p>
                       </div>
                     </div>
@@ -334,7 +347,6 @@ const ProductDetail = () => {
                 </TabsContent>
                 
                 <TabsContent value="reviews" className="py-4">
-                  {/* Added productName prop to ProductReviews component */}
                   <ProductReviews productId={product.id} productName={product.name} />
                 </TabsContent>
               </Tabs>
