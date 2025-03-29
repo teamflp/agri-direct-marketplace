@@ -17,6 +17,7 @@ import NotFound from '@/pages/NotFound';
 import BuyerDashboard from '@/pages/BuyerDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import FarmerDashboard from '@/pages/FarmerDashboard';
+import NotificationsDemoPage from '@/pages/NotificationsDemo';
 
 // Buyer Dashboard
 import BuyerProfile from '@/pages/buyer/BuyerProfile';
@@ -48,63 +49,67 @@ import AdminReports from '@/pages/admin/AdminReports';
 
 import { CartProvider } from '@/contexts/CartContext';
 import { ReviewProvider } from '@/contexts/ReviewContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import '@/App.css';
 
 function App() {
   return (
     <ReviewProvider>
       <CartProvider>
-        <Router>
-          <Routes>
-            {/* Pages Publiques */}
-            <Route path="/" element={<Index />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/farmers" element={<Farmers />} />
-            <Route path="/farmers-map" element={<FarmersMap />} /> {/* Nouvelle page de carte */}
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/verify-email" element={<EmailVerification />} />
-            <Route path="/subscriptions" element={<Subscriptions />} />
-            <Route path="/checkout" element={<CheckoutProcess />} />
-            
-            {/* Dashboard Acheteur */}
-            <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
-            <Route path="/buyer-dashboard/profile" element={<BuyerProfile />} />
-            <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
-            <Route path="/buyer-dashboard/favorites" element={<BuyerFavorites />} />
-            <Route path="/buyer-dashboard/messages" element={<BuyerMessages />} />
-            <Route path="/buyer-dashboard/invoices" element={<BuyerInvoices />} />
-            <Route path="/buyer-dashboard/farmers" element={<BuyerFarmers />} />
-            <Route path="/buyer-dashboard/subscription" element={<BuyerSubscriptions />} />
-            
-            {/* Dashboard Agriculteur */}
-            <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
-            <Route path="/farmer-dashboard/profile" element={<FarmerProfile />} />
-            <Route path="/farmer-dashboard/products" element={<FarmerProducts />} />
-            <Route path="/farmer-dashboard/inventory" element={<FarmerInventory />} />
-            <Route path="/farmer-dashboard/orders" element={<FarmerOrders />} />
-            <Route path="/farmer-dashboard/analytics" element={<FarmerAnalytics />} />
-            <Route path="/farmer-dashboard/messages" element={<FarmerMessages />} />
-            <Route path="/farmer-dashboard/subscription" element={<FarmerSubscription />} />
-            <Route path="/farmer-dashboard/blog" element={<FarmerBlog />} />
+        <NotificationProvider>
+          <Router>
+            <Routes>
+              {/* Pages Publiques */}
+              <Route path="/" element={<Index />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/farmers" element={<Farmers />} />
+              <Route path="/farmers-map" element={<FarmersMap />} /> {/* Nouvelle page de carte */}
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/verify-email" element={<EmailVerification />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/checkout" element={<CheckoutProcess />} />
+              <Route path="/notifications-demo" element={<NotificationsDemoPage />} />
+              
+              {/* Dashboard Acheteur */}
+              <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+              <Route path="/buyer-dashboard/profile" element={<BuyerProfile />} />
+              <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
+              <Route path="/buyer-dashboard/favorites" element={<BuyerFavorites />} />
+              <Route path="/buyer-dashboard/messages" element={<BuyerMessages />} />
+              <Route path="/buyer-dashboard/invoices" element={<BuyerInvoices />} />
+              <Route path="/buyer-dashboard/farmers" element={<BuyerFarmers />} />
+              <Route path="/buyer-dashboard/subscription" element={<BuyerSubscriptions />} />
+              
+              {/* Dashboard Agriculteur */}
+              <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
+              <Route path="/farmer-dashboard/profile" element={<FarmerProfile />} />
+              <Route path="/farmer-dashboard/products" element={<FarmerProducts />} />
+              <Route path="/farmer-dashboard/inventory" element={<FarmerInventory />} />
+              <Route path="/farmer-dashboard/orders" element={<FarmerOrders />} />
+              <Route path="/farmer-dashboard/analytics" element={<FarmerAnalytics />} />
+              <Route path="/farmer-dashboard/messages" element={<FarmerMessages />} />
+              <Route path="/farmer-dashboard/subscription" element={<FarmerSubscription />} />
+              <Route path="/farmer-dashboard/blog" element={<FarmerBlog />} />
 
-            {/* Dashboard Admin */}
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/admin-dashboard/users" element={<AdminUsers />} />
-            <Route path="/admin-dashboard/farmers" element={<AdminFarmers />} />
-            <Route path="/admin-dashboard/messages" element={<AdminMessages />} />
-            <Route path="/admin-dashboard/disputes" element={<AdminDisputes />} />
-            <Route path="/admin-dashboard/subscriptions" element={<AdminSubscriptions />} />
-            <Route path="/admin-dashboard/finances" element={<AdminFinances />} />
-            <Route path="/admin-dashboard/reports" element={<AdminReports />} />
-            
-            {/* Page 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
+              {/* Dashboard Admin */}
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/admin-dashboard/users" element={<AdminUsers />} />
+              <Route path="/admin-dashboard/farmers" element={<AdminFarmers />} />
+              <Route path="/admin-dashboard/messages" element={<AdminMessages />} />
+              <Route path="/admin-dashboard/disputes" element={<AdminDisputes />} />
+              <Route path="/admin-dashboard/subscriptions" element={<AdminSubscriptions />} />
+              <Route path="/admin-dashboard/finances" element={<AdminFinances />} />
+              <Route path="/admin-dashboard/reports" element={<AdminReports />} />
+              
+              {/* Page 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+        </NotificationProvider>
       </CartProvider>
     </ReviewProvider>
   );

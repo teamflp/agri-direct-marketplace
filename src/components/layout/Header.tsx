@@ -1,179 +1,140 @@
 
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ShoppingCart, Menu, X, User, Search } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { MiniCart } from "@/components/cart/MiniCart";
-import { Menu, X, User, ChevronDown } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-const navItems = [
-  { name: "Accueil", path: "/" },
-  { name: "Produits", path: "/products" },
-  { name: "Agriculteurs", path: "/farmers" },
-  { name: "Abonnements", path: "/subscriptions" },
-  { name: "Contact", path: "/contact" },
-];
+import MiniCart from '@/components/cart/MiniCart';
+import { useCart } from '@/contexts/CartContext';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const location = useLocation();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  // Close mobile menu when changing routes
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
-
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const { cartItems } = useCart();
+  
   return (
-    <header 
-      className={`fixed w-full top-0 z-40 transition-all duration-300 ${
-        scrolled ? "bg-white shadow" : "bg-transparent"
-      }`}
-    >
+    <header className="bg-white shadow-sm fixed w-full z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold text-agrimarket-green">
-              Agri<span className="text-agrimarket-orange">Market</span>
-            </span>
+            <span className="text-xl font-bold text-agrimarket-orange">AgriMarket</span>
           </Link>
-
+          
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex">
-            <ul className="flex space-x-8">
-              {navItems.map((item) => (
-                <li key={item.path}>
-                  <Link 
-                    to={item.path}
-                    className={`text-gray-700 hover:text-agrimarket-green transition-colors py-2 ${
-                      location.pathname === item.path ? "border-b-2 border-agrimarket-green" : ""
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <nav className="hidden md:flex space-x-6">
+            <Link to="/" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Accueil
+            </Link>
+            <Link to="/products" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Produits
+            </Link>
+            <Link to="/farmers" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Agriculteurs
+            </Link>
+            <Link to="/farmers-map" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Carte
+            </Link>
+            <Link to="/subscriptions" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Abonnements
+            </Link>
+            <Link to="/contact" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Contact
+            </Link>
+            <Link to="/notifications-demo" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              Notifications Demo
+            </Link>
           </nav>
-
-          {/* Desktop Right Menu */}
-          <div className="hidden md:flex items-center space-x-2">
-            <MiniCart />
+          
+          {/* Actions */}
+          <div className="flex items-center space-x-3">
+            <Button variant="ghost" size="icon">
+              <Search className="h-5 w-5" />
+            </Button>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Compte
-                  <ChevronDown className="h-4 w-4 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/login">Se connecter</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/register">S'inscrire</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/buyer-dashboard">Espace acheteur</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/farmer-dashboard">Espace agriculteur</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="flex items-center md:hidden space-x-2">
-            <MiniCart />
+            {/* Notification Component */}
+            <NotificationCenter />
             
+            {/* Cart */}
+            <div className="relative">
+              <MiniCart />
+            </div>
+            
+            {/* Login/Profile */}
+            <Button asChild variant="outline" size="icon" className="rounded-full">
+              <Link to="/login">
+                <User className="h-5 w-5" />
+              </Link>
+            </Button>
+            
+            {/* Mobile Menu Button */}
             <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              variant="ghost" 
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMenuOpen(!menuOpen)}
             >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg">
-          <div className="container mx-auto px-4 py-4">
-            <nav>
-              <ul className="space-y-3">
-                {navItems.map((item) => (
-                  <li key={item.path}>
-                    <Link 
-                      to={item.path}
-                      className={`block py-2 text-gray-700 hover:text-agrimarket-green transition-colors ${
-                        location.pathname === item.path ? "font-medium text-agrimarket-green" : ""
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 pt-4 border-t space-y-3">
-                <Link 
-                  to="/login" 
-                  className="block py-2 text-gray-700 hover:text-agrimarket-green transition-colors"
-                >
-                  Se connecter
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="block py-2 text-gray-700 hover:text-agrimarket-green transition-colors"
-                >
-                  S'inscrire
-                </Link>
-                <Link 
-                  to="/buyer-dashboard" 
-                  className="block py-2 text-gray-700 hover:text-agrimarket-green transition-colors"
-                >
-                  Espace acheteur
-                </Link>
-                <Link 
-                  to="/farmer-dashboard" 
-                  className="block py-2 text-gray-700 hover:text-agrimarket-green transition-colors"
-                >
-                  Espace agriculteur
-                </Link>
-              </div>
+        
+        {/* Mobile Navigation */}
+        {menuOpen && (
+          <div className="md:hidden py-4 border-t">
+            <nav className="flex flex-col space-y-4">
+              <Link 
+                to="/" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Accueil
+              </Link>
+              <Link 
+                to="/products" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Produits
+              </Link>
+              <Link 
+                to="/farmers" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Agriculteurs
+              </Link>
+              <Link 
+                to="/farmers-map" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Carte
+              </Link>
+              <Link 
+                to="/subscriptions" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Abonnements
+              </Link>
+              <Link 
+                to="/contact" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Contact
+              </Link>
+              <Link 
+                to="/notifications-demo" 
+                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Notifications Demo
+              </Link>
             </nav>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 };
