@@ -99,7 +99,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-grow pt-24 sm:pt-28"> {/* Augmenter le padding-top pour éviter le chevauchement avec le header fixe */}
+      <main className="flex-grow pt-20 sm:pt-24">
         <HeroBanner />
         
         <FeaturesSection />

@@ -8,7 +8,7 @@ const SeasonalCalendar = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow pt-16 bg-gray-50">
+      <main className="flex-grow pt-20 sm:pt-24 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Calendrier saisonnier</h1>

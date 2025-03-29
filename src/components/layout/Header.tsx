@@ -45,7 +45,7 @@ const Header = () => {
         scrolled 
           ? 'bg-green-600/95 backdrop-blur-sm shadow-lg py-2' 
           : 'bg-green-600 py-3'
-      } text-white fixed w-full z-50 transition-all duration-300`}
+      } text-white fixed w-full z-50 transition-all duration-300 top-0 left-0`}
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between">
