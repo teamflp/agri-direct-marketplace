@@ -99,27 +99,30 @@ const Header = () => {
             {/* Recherche */}
             <div className="relative">
               {searchOpen ? (
-                <form onSubmit={handleSearch} className="absolute right-0 top-0 flex w-screen max-w-xs -mr-2">
-                  <Input
-                    type="text"
-                    placeholder={t('header.search.placeholder')}
-                    className="pl-3 pr-10 py-2 w-full text-black rounded-l-md focus:outline-none"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    autoFocus
-                  />
-                  <Button 
-                    type="submit" 
-                    className="rounded-l-none bg-green-500 hover:bg-green-400"
-                  >
-                    <Search className="h-5 w-5" />
-                  </Button>
+                <form onSubmit={handleSearch} className="absolute right-0 top-[-5px] flex items-center">
+                  <div className="relative flex items-center bg-white rounded-md shadow-md overflow-hidden transition-all duration-300 animate-fade-in w-screen max-w-xs">
+                    <Input
+                      type="text"
+                      placeholder={t('header.search.placeholder')}
+                      className="pl-3 pr-10 py-2 w-full text-gray-800 border-0 focus:ring-0 focus:outline-none"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      autoFocus
+                    />
+                    <Button 
+                      type="submit" 
+                      className="absolute right-0 top-0 h-full rounded-l-none bg-green-500 hover:bg-green-400 transition-colors"
+                    >
+                      <Search className="h-5 w-5" />
+                    </Button>
+                  </div>
                   <Button 
                     type="button"
                     variant="ghost" 
                     size="icon" 
-                    className="absolute right-[-45px] text-white hover:bg-green-500"
+                    className="ml-2 text-white hover:bg-green-500 transition-colors"
                     onClick={() => setSearchOpen(false)}
+                    aria-label="Fermer la recherche"
                   >
                     <X className="h-5 w-5" />
                   </Button>
@@ -128,7 +131,7 @@ const Header = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="text-white hover:bg-green-500"
+                  className="text-white hover:bg-green-500 transition-colors"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Rechercher"
                 >
