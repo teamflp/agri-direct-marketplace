@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const HeroBanner = () => {
   return (
@@ -24,11 +25,11 @@ const HeroBanner = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-agrimarket-orange hover:bg-orange-600 text-white text-lg py-6 px-8">
-              Découvrir les produits
+            <Button asChild className="bg-agrimarket-orange hover:bg-orange-600 text-white text-lg py-6 px-8">
+              <Link to="/products">Découvrir les produits</Link>
             </Button>
-            <Button variant="outline" className="border-agrimarket-green text-agrimarket-green hover:bg-agrimarket-green hover:text-white text-lg py-6 px-8">
-              Rejoindre la plateforme
+            <Button asChild variant="outline" className="border-agrimarket-green text-agrimarket-green hover:bg-agrimarket-green hover:text-white text-lg py-6 px-8">
+              <Link to="/register">Rejoindre la plateforme</Link>
             </Button>
           </div>
         </div>
