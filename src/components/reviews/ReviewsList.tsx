@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -7,7 +6,7 @@ import { StarRating } from './StarRating';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { Review } from '@/contexts/ReviewContext';
+import { Review } from '@/contexts/reviews/types';
 
 interface ReviewsListProps {
   reviews: Review[];
