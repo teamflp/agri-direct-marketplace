@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,7 +52,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from '@/hooks/use-toast';
 
-// Mock data for messages
 const messages = [
   {
     id: 1,
@@ -207,7 +205,6 @@ const AdminMessages = () => {
         variant: "default",
       });
       setShowResolveDialog(false);
-      // Dans une vraie app, mise à jour de l'état
     }
   };
 
@@ -244,7 +241,7 @@ const AdminMessages = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Non résolu">Non résolu</SelectItem>
                 <SelectItem value="En traitement">En traitement</SelectItem>
                 <SelectItem value="Résolu">Résolu</SelectItem>
@@ -414,7 +411,6 @@ const AdminMessages = () => {
         </div>
       </div>
 
-      {/* Resolve message dialog */}
       <Dialog open={showResolveDialog} onOpenChange={setShowResolveDialog}>
         <DialogContent>
           <DialogHeader>
@@ -442,7 +438,6 @@ const AdminMessages = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Message detail dialog */}
       <Dialog open={showMessageDetail} onOpenChange={setShowMessageDetail}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
