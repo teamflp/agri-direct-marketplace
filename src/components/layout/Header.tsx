@@ -1,17 +1,29 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Search, User, Bell } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { MiniCart } from '@/components/cart/MiniCart';
 import { useCart } from '@/contexts/CartContext';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
-import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const { cart } = useCart();
-  const { t } = useTranslation();
+
+  // Temporary solution until i18next is fully implemented
+  const t = (key: string) => {
+    const translations: { [key: string]: string } = {
+      'header.home': 'Accueil',
+      'header.products': 'Produits',
+      'header.farmers': 'Agriculteurs',
+      'header.map': 'Carte',
+      'header.subscriptions': 'Abonnements',
+      'header.contact': 'Contact',
+      'header.notificationsDemo': 'Démo Notifications'
+    };
+    return translations[key] || key;
+  };
 
   return (
     <header className="bg-white shadow-sm fixed w-full z-50">
