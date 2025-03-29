@@ -46,9 +46,16 @@ const Login = () => {
       // Dans une application réelle, cette logique serait basée sur la réponse de l'API
       const userRole = determineUserRole(values.email);
       
+      // Exemple: Vérifier si l'email est vérifié (ceci sera remplacé par une vérification côté serveur)
+      if (values.email.includes("nonverifie")) {
+        navigate("/email-verification", { state: { email: values.email } });
+        return;
+      }
+      
       toast({
         title: "Connexion réussie !",
         description: "Bienvenue sur AgriMarket",
+        variant: "success",
       });
       
       // Rediriger vers le tableau de bord approprié

@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -39,6 +38,7 @@ const Register = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("buyer");
+  const navigate = useNavigate();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -54,7 +54,6 @@ const Register = () => {
     },
   });
 
-  // Update userType when tab changes
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     form.setValue("userType", value as "buyer" | "farmer");
@@ -62,13 +61,16 @@ const Register = () => {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
-    // Simulation d'une inscription
     setTimeout(() => {
       console.log("Registration attempt with:", values);
       toast({
         title: "Inscription réussie !",
-        description: "Votre compte a été créé avec succès",
+        description: "Veuillez vérifier votre email pour activer votre compte",
+        variant: "success",
       });
+      
+      navigate("/email-verification", { state: { email: values.email } });
+      
       setIsLoading(false);
     }, 1500);
   };

@@ -17,6 +17,8 @@ import Subscriptions from "./pages/Subscriptions";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import EmailVerification from "./pages/EmailVerification";
+import ForgotPassword from "./pages/ForgotPassword";
 import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 import BuyerDashboard from "./pages/BuyerDashboard";
@@ -72,6 +74,8 @@ const App = () => (
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
+                      <Route path="/email-verification" element={<EmailVerification />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/checkout" element={<CheckoutProcess />} />
                       
                       {/* Buyer Dashboard Routes */}
