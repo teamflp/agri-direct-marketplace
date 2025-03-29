@@ -30,6 +30,7 @@ import FarmerProducts from "./pages/farmer/FarmerProducts";
 import FarmerOrders from "./pages/farmer/FarmerOrders";
 import FarmerMessages from "./pages/farmer/FarmerMessages";
 import FarmerSubscription from "./pages/farmer/FarmerSubscription";
+import FarmerProfile from "./pages/farmer/FarmerProfile";
 
 // Admin Dashboard Pages
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -69,6 +70,7 @@ const App = () => (
           
           {/* Farmer Dashboard Routes */}
           <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
+          <Route path="/farmer-dashboard/profile" element={<FarmerProfile />} />
           <Route path="/farmer-dashboard/products" element={<FarmerProducts />} />
           <Route path="/farmer-dashboard/orders" element={<FarmerOrders />} />
           <Route path="/farmer-dashboard/messages" element={<FarmerMessages />} />

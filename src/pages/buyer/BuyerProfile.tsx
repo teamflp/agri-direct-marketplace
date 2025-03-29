@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { User, Mail, MapPin, Phone, CreditCard, Lock, Bell, Settings } from "lucide-react";
+import { User, Mail, MapPin, Phone, CreditCard, Lock, Bell, Settings, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
@@ -16,6 +16,8 @@ const BuyerProfile = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSaveProfile = () => {
     setIsEditing(false);
@@ -31,6 +33,26 @@ const BuyerProfile = () => {
       title: "Mot de passe modifié",
       description: "Votre mot de passe a été modifié avec succès.",
     });
+  };
+
+  const handleProfilePictureClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProfileImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      toast({
+        title: "Photo téléchargée",
+        description: "Votre photo de profil a été téléchargée. N'oubliez pas d'enregistrer vos modifications.",
+      });
+    }
   };
 
   const dashboardMenuItems = [
@@ -118,12 +140,24 @@ const BuyerProfile = () => {
               <CardContent className="space-y-6">
                 <div className="flex flex-col md:flex-row gap-6">
                   <div className="flex flex-col items-center space-y-3">
-                    <Avatar className="h-32 w-32">
-                      <AvatarImage src="/placeholder.svg" alt="Jean Dupont" />
+                    <Avatar className="h-32 w-32 cursor-pointer relative group" onClick={isEditing ? handleProfilePictureClick : undefined}>
+                      <AvatarImage src={profileImage || "/placeholder.svg"} alt="Jean Dupont" />
                       <AvatarFallback>JD</AvatarFallback>
+                      {isEditing && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                          <Upload className="h-8 w-8 text-white" />
+                        </div>
+                      )}
                     </Avatar>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
                     {isEditing && (
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" onClick={handleProfilePictureClick}>
                         Changer la photo
                       </Button>
                     )}
