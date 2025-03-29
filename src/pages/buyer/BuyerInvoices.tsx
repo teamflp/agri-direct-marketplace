@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, Download, Eye } from 'lucide-react';
+import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, Download, Eye, Search } from 'lucide-react';
 import { 
   Table,
   TableBody,
@@ -14,6 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import InvoiceDownloader from '@/components/buyer/InvoiceDownloader';
 
 // Mock data for invoices
 const invoices = [
@@ -61,9 +63,12 @@ const invoices = [
 
 const BuyerInvoices = () => {
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredInvoices, setFilteredInvoices] = useState(invoices);
   
   const menuItems = [
     { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
+    { title: "Mon profil", path: "/buyer-dashboard/profile", icon: <User size={20} /> },
     { title: "Mes commandes", path: "/buyer-dashboard/orders", icon: <ShoppingCart size={20} /> },
     { title: "Mes favoris", path: "/buyer-dashboard/favorites", icon: <Heart size={20} /> },
     { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
@@ -71,20 +76,36 @@ const BuyerInvoices = () => {
     { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
   ];
   
-  const handleDownloadInvoice = (invoiceId: string) => {
+  const handleDownloadAllInvoices = () => {
     toast({
-      title: "Téléchargement de facture",
-      description: `La facture ${invoiceId} a été téléchargée`,
+      title: "Téléchargement groupé",
+      description: "Toutes les factures ont été téléchargées en format ZIP",
     });
-    // Dans une application réelle, téléchargement du PDF
+    
+    // Dans une application réelle, créer et télécharger un fichier ZIP
+    const dummyLink = document.createElement('a');
+    dummyLink.href = `data:application/zip;base64,UEsDBBQAAAAAAMVtlFYAAAAAAAAAAAAAAAALAAAAZmFjdHVyZXMvLzUvUEsDBAoAAAAAAMVtlFYAAAAAAAAAAAAAAAAVAAAAZmFjdHVyZXMvRkFDLTIwMjMtMDA`;
+    dummyLink.download = "Toutes_les_factures.zip";
+    document.body.appendChild(dummyLink);
+    dummyLink.click();
+    document.body.removeChild(dummyLink);
   };
   
-  const handleViewInvoice = (invoiceId: string) => {
-    toast({
-      title: "Visualisation de facture",
-      description: `Affichage de la facture ${invoiceId}`,
-    });
-    // Dans une application réelle, ouvrir un modal avec le détail
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+    
+    if (term.trim() === "") {
+      setFilteredInvoices(invoices);
+    } else {
+      const filtered = invoices.filter(invoice => 
+        invoice.id.toLowerCase().includes(term) || 
+        invoice.orderRef.toLowerCase().includes(term) || 
+        invoice.farmer.toLowerCase().includes(term) ||
+        invoice.status.toLowerCase().includes(term)
+      );
+      setFilteredInvoices(filtered);
+    }
   };
 
   return (
@@ -99,7 +120,16 @@ const BuyerInvoices = () => {
       menuItems={menuItems}
     >
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Mes factures</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-3xl font-bold">Mes factures</h1>
+          <Button 
+            onClick={handleDownloadAllInvoices}
+            className="inline-flex items-center gap-2"
+          >
+            <Download size={16} />
+            Télécharger toutes les factures
+          </Button>
+        </div>
 
         <Card>
           <CardHeader>
@@ -107,6 +137,17 @@ const BuyerInvoices = () => {
             <CardDescription>
               Consultez et téléchargez vos factures
             </CardDescription>
+            <div className="mt-4">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+                <Input 
+                  placeholder="Rechercher une facture..." 
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -122,44 +163,35 @@ const BuyerInvoices = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.id}</TableCell>
-                    <TableCell>{invoice.orderRef}</TableCell>
-                    <TableCell>{invoice.date}</TableCell>
-                    <TableCell>{invoice.farmer}</TableCell>
-                    <TableCell>{invoice.amount.toLocaleString()} FCFA</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        invoice.status === "Payée" 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}>
-                        {invoice.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="inline-flex items-center gap-1"
-                        onClick={() => handleViewInvoice(invoice.id)}
-                      >
-                        <Eye size={16} />
-                        Voir
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="inline-flex items-center gap-1 ml-2"
-                        onClick={() => handleDownloadInvoice(invoice.id)}
-                      >
-                        <Download size={16} />
-                        PDF
-                      </Button>
+                {filteredInvoices.length > 0 ? (
+                  filteredInvoices.map((invoice) => (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">{invoice.id}</TableCell>
+                      <TableCell>{invoice.orderRef}</TableCell>
+                      <TableCell>{invoice.date}</TableCell>
+                      <TableCell>{invoice.farmer}</TableCell>
+                      <TableCell>{invoice.amount.toLocaleString()} FCFA</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          invoice.status === "Payée" 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}>
+                          {invoice.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <InvoiceDownloader invoiceId={invoice.id} invoiceNumber={invoice.id} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                      Aucune facture trouvée avec ces critères de recherche
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -194,7 +226,9 @@ const BuyerInvoices = () => {
               </div>
               
               <div className="flex justify-end">
-                <Button variant="outline">Modifier mes informations</Button>
+                <Button variant="outline" onClick={() => window.location.href = "/buyer-dashboard/profile"}>
+                  Modifier mes informations
+                </Button>
               </div>
             </div>
           </CardContent>

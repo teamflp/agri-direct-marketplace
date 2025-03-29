@@ -23,6 +23,7 @@ import BuyerFavorites from "./pages/buyer/BuyerFavorites";
 import BuyerMessages from "./pages/buyer/BuyerMessages";
 import BuyerFarmers from "./pages/buyer/BuyerFarmers";
 import BuyerInvoices from "./pages/buyer/BuyerInvoices";
+import BuyerProfile from "./pages/buyer/BuyerProfile";
 
 // Farmer Dashboard Pages
 import FarmerProducts from "./pages/farmer/FarmerProducts";
@@ -59,6 +60,7 @@ const App = () => (
           
           {/* Buyer Dashboard Routes */}
           <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+          <Route path="/buyer-dashboard/profile" element={<BuyerProfile />} />
           <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
           <Route path="/buyer-dashboard/favorites" element={<BuyerFavorites />} />
           <Route path="/buyer-dashboard/messages" element={<BuyerMessages />} />

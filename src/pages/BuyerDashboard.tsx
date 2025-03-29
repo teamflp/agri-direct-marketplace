@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,8 @@ import {
   MessageSquare, 
   FileText, 
   Check,
-  Users
+  Users,
+  Settings
 } from 'lucide-react';
 
 // Mock data for orders
@@ -107,26 +109,43 @@ const BuyerDashboard = () => {
                     </Avatar>
                     <h2 className="text-xl font-bold">Martin Pasquier</h2>
                     <p className="text-gray-500">martin.p@email.com</p>
-                    <Button variant="outline" className="mt-4 w-full">
-                      <User className="w-4 h-4 mr-2" /> Éditer mon profil
+                    <Button variant="outline" className="mt-4 w-full" asChild>
+                      <Link to="/buyer-dashboard/profile">
+                        <User className="w-4 h-4 mr-2" /> Éditer mon profil
+                      </Link>
                     </Button>
                   </div>
                   
                   <div className="space-y-2">
-                    <Button variant="ghost" className="w-full justify-start">
-                      <ShoppingCart className="w-4 h-4 mr-2" /> Mes commandes
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link to="/buyer-dashboard/orders">
+                        <ShoppingCart className="w-4 h-4 mr-2" /> Mes commandes
+                      </Link>
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Heart className="w-4 h-4 mr-2" /> Mes favoris
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link to="/buyer-dashboard/favorites">
+                        <Heart className="w-4 h-4 mr-2" /> Mes favoris
+                      </Link>
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <MessageSquare className="w-4 h-4 mr-2" /> Messagerie
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link to="/buyer-dashboard/messages">
+                        <MessageSquare className="w-4 h-4 mr-2" /> Messagerie
+                      </Link>
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <Users className="w-4 h-4 mr-2" /> Mes agriculteurs
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link to="/buyer-dashboard/farmers">
+                        <Users className="w-4 h-4 mr-2" /> Mes agriculteurs
+                      </Link>
                     </Button>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <FileText className="w-4 h-4 mr-2" /> Factures
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link to="/buyer-dashboard/invoices">
+                        <FileText className="w-4 h-4 mr-2" /> Factures
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link to="/buyer-dashboard/profile">
+                        <Settings className="w-4 h-4 mr-2" /> Paramètres
+                      </Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -182,8 +201,11 @@ const BuyerDashboard = () => {
                                   <Button 
                                     variant="outline" 
                                     className="text-agrimarket-orange border-agrimarket-orange hover:bg-agrimarket-orange hover:text-white"
+                                    asChild
                                   >
-                                    Détails
+                                    <Link to={`/buyer-dashboard/orders`}>
+                                      Détails
+                                    </Link>
                                   </Button>
                                 </div>
                               </div>
@@ -193,7 +215,11 @@ const BuyerDashboard = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="justify-center">
-                      <Button variant="outline">Voir toutes les commandes</Button>
+                      <Button variant="outline" asChild>
+                        <Link to="/buyer-dashboard/orders">
+                          Voir toutes les commandes
+                        </Link>
+                      </Button>
                     </CardFooter>
                   </Card>
                 </TabsContent>
@@ -240,7 +266,11 @@ const BuyerDashboard = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="justify-center">
-                      <Button variant="outline">Voir tous les favoris</Button>
+                      <Button variant="outline" asChild>
+                        <Link to="/buyer-dashboard/favorites">
+                          Voir tous les favoris
+                        </Link>
+                      </Button>
                     </CardFooter>
                   </Card>
                 </TabsContent>
@@ -270,8 +300,10 @@ const BuyerDashboard = () => {
                                   <p className="text-sm text-gray-500">{message.date}</p>
                                   <p className="mt-2">{message.lastMessage}</p>
                                 </div>
-                                <Button className="bg-agrimarket-orange hover:bg-orange-600">
-                                  Répondre
+                                <Button className="bg-agrimarket-orange hover:bg-orange-600" asChild>
+                                  <Link to="/buyer-dashboard/messages">
+                                    Répondre
+                                  </Link>
                                 </Button>
                               </div>
                             </CardContent>
@@ -280,7 +312,11 @@ const BuyerDashboard = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="justify-center">
-                      <Button variant="outline">Voir tous les messages</Button>
+                      <Button variant="outline" asChild>
+                        <Link to="/buyer-dashboard/messages">
+                          Voir tous les messages
+                        </Link>
+                      </Button>
                     </CardFooter>
                   </Card>
                 </TabsContent>
@@ -310,8 +346,10 @@ const BuyerDashboard = () => {
                         <p className="text-sm text-gray-600">Plantation Bio du Sud</p>
                         <div className="flex justify-between items-center mt-2">
                           <p className="font-bold">8 450 FCFA</p>
-                          <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
-                            Voir
+                          <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600" asChild>
+                            <Link to="/products">
+                              Voir
+                            </Link>
                           </Button>
                         </div>
                       </CardContent>
@@ -331,8 +369,10 @@ const BuyerDashboard = () => {
                         <p className="text-sm text-gray-600">Oliveraie Sunlight</p>
                         <div className="flex justify-between items-center mt-2">
                           <p className="font-bold">10 820 FCFA</p>
-                          <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
-                            Voir
+                          <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600" asChild>
+                            <Link to="/products">
+                              Voir
+                            </Link>
                           </Button>
                         </div>
                       </CardContent>
@@ -352,8 +392,10 @@ const BuyerDashboard = () => {
                         <p className="text-sm text-gray-600">Ferme des Collines</p>
                         <div className="flex justify-between items-center mt-2">
                           <p className="font-bold">5 180 FCFA</p>
-                          <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
-                            Voir
+                          <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600" asChild>
+                            <Link to="/products">
+                              Voir
+                            </Link>
                           </Button>
                         </div>
                       </CardContent>
