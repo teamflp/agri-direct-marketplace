@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,7 +50,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from '@/hooks/use-toast';
 
-// Mock data for users
 const users = [
   {
     id: 1,
@@ -163,7 +161,6 @@ const AdminUsers = () => {
         variant: "default",
       });
       setShowSuspendDialog(false);
-      // Dans une vraie app, mise à jour de l'état
     }
   };
   
@@ -172,7 +169,6 @@ const AdminUsers = () => {
       title: "Édition d'utilisateur",
       description: `Redirection vers la page d'édition de l'utilisateur ID: ${userId}`,
     });
-    // Dans une vraie app, redirection vers la page d'édition
   };
   
   const handleViewUser = (userId: number) => {
@@ -180,7 +176,6 @@ const AdminUsers = () => {
       title: "Profil utilisateur",
       description: `Affichage du profil de l'utilisateur ID: ${userId}`,
     });
-    // Dans une vraie app, redirection vers la page de profil
   };
 
   return (
@@ -216,7 +211,7 @@ const AdminUsers = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les types</SelectItem>
+                <SelectItem value="all">Tous les types</SelectItem>
                 <SelectItem value="Consommateur">Consommateur</SelectItem>
                 <SelectItem value="Agriculteur">Agriculteur</SelectItem>
               </SelectContent>
@@ -229,7 +224,7 @@ const AdminUsers = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Actif">Actif</SelectItem>
                 <SelectItem value="Inactif">Inactif</SelectItem>
                 <SelectItem value="Suspendu">Suspendu</SelectItem>
@@ -385,7 +380,6 @@ const AdminUsers = () => {
         </div>
       </div>
 
-      {/* Suspend/reactive user dialog */}
       <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
         <DialogContent>
           <DialogHeader>

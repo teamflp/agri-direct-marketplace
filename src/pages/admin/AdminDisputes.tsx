@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,7 +54,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from '@/hooks/use-toast';
 
-// Mock data for disputes
 const disputes = [
   {
     id: 1,
@@ -147,7 +145,6 @@ const disputes = [
   }
 ];
 
-// Mock data for conversations
 const disputeConversations = [
   {
     disputeId: 1,
@@ -294,7 +291,6 @@ const AdminDisputes = () => {
         variant: "default",
       });
       setShowResolveDialog(false);
-      // Dans une vraie app, mise à jour de l'état
     }
   };
   
@@ -306,7 +302,6 @@ const AdminDisputes = () => {
       description: `Votre réponse a été envoyée aux deux parties`,
     });
     
-    // Dans une vraie app, mise à jour de l'état
     setNewReply("");
   };
   
@@ -315,7 +310,6 @@ const AdminDisputes = () => {
       title: "Statut mis à jour",
       description: `Le litige a été mis à jour au statut: ${newStatus}`,
     });
-    // Dans une vraie app, mise à jour de l'état
   };
   
   const handleSetDisputePriority = (disputeId: number, newPriority: string) => {
@@ -323,7 +317,6 @@ const AdminDisputes = () => {
       title: "Priorité mise à jour",
       description: `La priorité du litige a été mise à jour à: ${newPriority}`,
     });
-    // Dans une vraie app, mise à jour de l'état
   };
 
   return (
@@ -359,7 +352,7 @@ const AdminDisputes = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="En attente">En attente</SelectItem>
                 <SelectItem value="En traitement">En traitement</SelectItem>
                 <SelectItem value="Résolu">Résolu</SelectItem>
@@ -373,7 +366,7 @@ const AdminDisputes = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les priorités</SelectItem>
+                <SelectItem value="all">Toutes les priorités</SelectItem>
                 <SelectItem value="Élevé">Élevée</SelectItem>
                 <SelectItem value="Moyen">Moyenne</SelectItem>
                 <SelectItem value="Faible">Faible</SelectItem>
@@ -524,7 +517,6 @@ const AdminDisputes = () => {
         </div>
       </div>
 
-      {/* Resolve dispute dialog */}
       <Dialog open={showResolveDialog} onOpenChange={setShowResolveDialog}>
         <DialogContent>
           <DialogHeader>
@@ -573,7 +565,6 @@ const AdminDisputes = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Dispute detail dialog */}
       <Dialog open={showDisputeDetail} onOpenChange={setShowDisputeDetail}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -176,7 +175,7 @@ const FarmerOrders = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Nouvelle">Nouvelle</SelectItem>
                 <SelectItem value="En préparation">En préparation</SelectItem>
                 <SelectItem value="En livraison">En livraison</SelectItem>
