@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Avatar } from '@/components/ui/avatar';
+import { Link } from 'react-router-dom';
 import {
   User,
   FileText,
@@ -14,7 +15,8 @@ import {
   Check,
   ArrowUp,
   ArrowDown,
-  Info
+  Info,
+  BarChart
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
@@ -188,6 +190,14 @@ const FarmerDashboard = () => {
                       onClick={() => setSelectedTab("messages")}
                     >
                       <MessageSquare className="w-4 h-4 mr-2" /> Messagerie
+                    </Button>
+                    <Button 
+                      variant={selectedTab === "analytics" ? "default" : "ghost"} 
+                      className={`w-full justify-start ${selectedTab === "analytics" ? "bg-agrimarket-green hover:bg-agrimarket-green/90" : ""}`}
+                      as={Link}
+                      to="/farmer-dashboard/analytics"
+                    >
+                      <BarChart className="w-4 h-4 mr-2" /> Analyses
                     </Button>
                     <Button 
                       variant={selectedTab === "subscription" ? "default" : "ghost"} 
