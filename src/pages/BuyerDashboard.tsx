@@ -21,7 +21,7 @@ const orders = [
   {
     id: "ORD-2023-001",
     date: "27/07/2023",
-    total: 75.90,
+    total: 49800,
     items: 4,
     status: "Livré",
     farmer: "Ferme des Quatre Saisons"
@@ -29,7 +29,7 @@ const orders = [
   {
     id: "ORD-2023-002",
     date: "15/08/2023",
-    total: 32.50,
+    total: 21300,
     items: 2,
     status: "En préparation",
     farmer: "Les Ruches de Marie"
@@ -37,7 +37,7 @@ const orders = [
   {
     id: "ORD-2023-003",
     date: "05/09/2023",
-    total: 128.75,
+    total: 84500,
     items: 7,
     status: "En livraison",
     farmer: "Chèvrerie du Vallon"
@@ -50,21 +50,21 @@ const favorites = [
     id: 1,
     name: "Panier de légumes bio",
     farmer: "Ferme des Quatre Saisons",
-    price: 24.90,
+    price: 16350,
     image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843"
   },
   {
     id: 2,
     name: "Miel de fleurs sauvages",
     farmer: "Les Ruches de Marie",
-    price: 8.50,
+    price: 5600,
     image: "https://images.unsplash.com/photo-1472396961693-142e6e269027"
   },
   {
     id: 3,
     name: "Fromage de chèvre frais",
     farmer: "Chèvrerie du Vallon",
-    price: 4.20,
+    price: 2750,
     image: "https://images.unsplash.com/photo-1493962853295-0fd70327578a"
   },
 ];
@@ -165,7 +165,7 @@ const BuyerDashboard = () => {
                                   <p className="text-sm">Agriculteur: {order.farmer}</p>
                                 </div>
                                 <div className="text-right">
-                                  <p className="font-bold">{order.total.toFixed(2)} €</p>
+                                  <p className="font-bold">{order.total.toLocaleString()} FCFA</p>
                                   <p className="text-sm">{order.items} articles</p>
                                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
                                     order.status === "Livré" 
@@ -229,7 +229,7 @@ const BuyerDashboard = () => {
                               <h3 className="font-semibold">{product.name}</h3>
                               <p className="text-sm text-gray-600">{product.farmer}</p>
                               <div className="flex justify-between items-center mt-2">
-                                <p className="font-bold">{product.price.toFixed(2)} €</p>
+                                <p className="font-bold">{product.price.toLocaleString()} FCFA</p>
                                 <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
                                   Acheter
                                 </Button>
@@ -309,7 +309,7 @@ const BuyerDashboard = () => {
                         <h3 className="font-semibold">Fruits secs assortis</h3>
                         <p className="text-sm text-gray-600">Plantation Bio du Sud</p>
                         <div className="flex justify-between items-center mt-2">
-                          <p className="font-bold">12.90 €</p>
+                          <p className="font-bold">8 450 FCFA</p>
                           <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
                             Voir
                           </Button>
@@ -330,7 +330,7 @@ const BuyerDashboard = () => {
                         <h3 className="font-semibold">Huile d'olive extra vierge</h3>
                         <p className="text-sm text-gray-600">Oliveraie Sunlight</p>
                         <div className="flex justify-between items-center mt-2">
-                          <p className="font-bold">16.50 €</p>
+                          <p className="font-bold">10 820 FCFA</p>
                           <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
                             Voir
                           </Button>
@@ -351,7 +351,7 @@ const BuyerDashboard = () => {
                         <h3 className="font-semibold">Confiture artisanale</h3>
                         <p className="text-sm text-gray-600">Ferme des Collines</p>
                         <div className="flex justify-between items-center mt-2">
-                          <p className="font-bold">7.90 €</p>
+                          <p className="font-bold">5 180 FCFA</p>
                           <Button size="sm" className="bg-agrimarket-orange hover:bg-orange-600">
                             Voir
                           </Button>

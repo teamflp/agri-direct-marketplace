@@ -19,7 +19,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "19,90",
+    price: "13 050",
     description: "Pour les agriculteurs qui veulent se développer",
     features: [
       "Produits illimités",
@@ -33,7 +33,7 @@ const plans = [
   },
   {
     name: "Premium",
-    price: "49,90",
+    price: "32 700",
     description: "Solution complète pour maximiser vos ventes",
     features: [
       "Produits illimités",
@@ -79,7 +79,7 @@ const SubscriptionSection = () => {
                 <p className="text-gray-600 mb-4">{plan.description}</p>
                 
                 <div className="mb-6">
-                  <span className="text-4xl font-bold">{plan.price}€</span>
+                  <span className="text-4xl font-bold">{plan.price} FCFA</span>
                   <span className="text-gray-600">/mois</span>
                 </div>
                 

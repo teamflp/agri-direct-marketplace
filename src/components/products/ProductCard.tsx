@@ -62,7 +62,7 @@ const ProductCard = ({
         
         <div className="flex justify-between items-center">
           <div className="font-bold text-lg">
-            {price.toFixed(2)}€<span className="text-gray-500 text-sm font-normal">/{unit}</span>
+            {(price * 655.957).toFixed(0)} FCFA<span className="text-gray-500 text-sm font-normal">/{unit}</span>
           </div>
           <Button variant="default" size="sm" className="bg-agrimarket-orange hover:bg-orange-600 text-white">
             Ajouter
