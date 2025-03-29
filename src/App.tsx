@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Products from '@/pages/Products';
+import ProductDetail from '@/pages/ProductDetail';
 import Farmers from '@/pages/Farmers';
 import FarmersMap from '@/pages/FarmersMap';
 import Cart from '@/pages/Cart';
@@ -65,6 +66,7 @@ function App() {
                 {/* Pages Publiques */}
                 <Route path="/" element={<Index />} />
                 <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/farmers" element={<Farmers />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/contact" element={<Contact />} />
