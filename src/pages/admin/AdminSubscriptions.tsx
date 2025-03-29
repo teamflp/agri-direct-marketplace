@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { 
   User, 
   Users,
@@ -309,7 +309,7 @@ const AdminSubscriptions = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les forfaits</SelectItem>
+                <SelectItem value="all">Tous les forfaits</SelectItem>
                 <SelectItem value="Basic">Basic</SelectItem>
                 <SelectItem value="Pro">Pro</SelectItem>
                 <SelectItem value="Premium">Premium</SelectItem>
@@ -323,7 +323,7 @@ const AdminSubscriptions = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Actif">Actif</SelectItem>
                 <SelectItem value="Paiement en échec">Paiement en échec</SelectItem>
                 <SelectItem value="Annulé">Annulé</SelectItem>
