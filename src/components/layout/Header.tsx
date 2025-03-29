@@ -1,14 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, User } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, User, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { MiniCart } from '@/components/cart/MiniCart';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
+import { Input } from "@/components/ui/input";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   // Détection du défilement pour appliquer les effets visuels
   useEffect(() => {
@@ -35,8 +39,18 @@ const Header = () => {
       'header.subscriptions': 'Abonnements',
       'header.seasonal': 'Calendrier saisonnier',
       'header.contact': 'Contact',
+      'header.search.placeholder': 'Rechercher...',
     };
     return translations[key] || key;
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSearchOpen(false);
+      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
   };
 
   return (
@@ -83,9 +97,45 @@ const Header = () => {
           {/* Actions à droite */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Recherche */}
-            <Button variant="ghost" size="icon" className="text-white hover:bg-green-500">
-              <Search className="h-5 w-5" />
-            </Button>
+            <div className="relative">
+              {searchOpen ? (
+                <form onSubmit={handleSearch} className="absolute right-0 top-0 flex w-screen max-w-xs -mr-2">
+                  <Input
+                    type="text"
+                    placeholder={t('header.search.placeholder')}
+                    className="pl-3 pr-10 py-2 w-full text-black rounded-l-md focus:outline-none"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    autoFocus
+                  />
+                  <Button 
+                    type="submit" 
+                    className="rounded-l-none bg-green-500 hover:bg-green-400"
+                  >
+                    <Search className="h-5 w-5" />
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute right-[-45px] text-white hover:bg-green-500"
+                    onClick={() => setSearchOpen(false)}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </form>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-green-500"
+                  onClick={() => setSearchOpen(true)}
+                  aria-label="Rechercher"
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
             
             {/* Notification */}
             <NotificationCenter />
