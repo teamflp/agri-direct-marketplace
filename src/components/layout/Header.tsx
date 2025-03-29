@@ -26,36 +26,36 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm fixed w-full z-50">
+    <header className="bg-green-600 text-white shadow-md fixed w-full z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold text-agrimarket-orange">AgriMarket</span>
+            <span className="text-xl font-bold text-white">AgriMarket</span>
           </Link>
           
           {/* Navigation centrale - alignée au centre sur desktop */}
           <nav className="hidden md:flex items-center justify-center flex-1 mx-8">
             <div className="flex space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.home')}
               </Link>
-              <Link to="/products" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/products" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.products')}
               </Link>
-              <Link to="/farmers" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/farmers" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.farmers')}
               </Link>
-              <Link to="/farmers-map" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/farmers-map" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.map')}
               </Link>
-              <Link to="/subscriptions" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/subscriptions" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.subscriptions')}
               </Link>
-              <Link to="/contact" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/contact" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.contact')}
               </Link>
-              <Link to="/notifications-demo" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors">
+              <Link to="/notifications-demo" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.notificationsDemo')}
               </Link>
             </div>
@@ -64,7 +64,7 @@ const Header = () => {
           {/* Actions à droite */}
           <div className="flex items-center space-x-4">
             {/* Recherche */}
-            <Button variant="ghost" size="icon" className="text-gray-600">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-green-500">
               <Search className="h-5 w-5" />
             </Button>
             
@@ -77,7 +77,7 @@ const Header = () => {
             </div>
             
             {/* Profil */}
-            <Button asChild variant="ghost" size="icon" className="text-gray-600">
+            <Button asChild variant="ghost" size="icon" className="text-white hover:bg-green-500">
               <Link to="/login">
                 <User className="h-5 w-5" />
               </Link>
@@ -87,7 +87,7 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              className="md:hidden"
+              className="md:hidden text-white hover:bg-green-500"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               <span className="sr-only">Menu</span>
@@ -110,53 +110,53 @@ const Header = () => {
         
         {/* Menu mobile - visible uniquement sur mobile quand menuOpen est true */}
         {menuOpen && (
-          <div className="md:hidden py-4 border-t">
+          <div className="md:hidden py-4 border-t border-green-500">
             <nav className="flex flex-col space-y-4">
               <Link 
                 to="/" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.home')}
               </Link>
               <Link 
                 to="/products" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.products')}
               </Link>
               <Link 
                 to="/farmers" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.farmers')}
               </Link>
               <Link 
                 to="/farmers-map" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.map')}
               </Link>
               <Link 
                 to="/subscriptions" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.subscriptions')}
               </Link>
               <Link 
                 to="/contact" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.contact')}
               </Link>
               <Link 
                 to="/notifications-demo" 
-                className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors"
+                className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.notificationsDemo')}
