@@ -3,13 +3,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Menu, X, User, Search } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import MiniCart from '@/components/cart/MiniCart';
+import { MiniCart } from '@/components/cart/MiniCart';
 import { useCart } from '@/contexts/CartContext';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const { cartItems } = useCart();
+  const { cart } = useCart();
   
   return (
     <header className="bg-white shadow-sm fixed w-full z-50">
