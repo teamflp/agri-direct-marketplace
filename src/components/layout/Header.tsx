@@ -1,15 +1,13 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, User, Calendar } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { MiniCart } from '@/components/cart/MiniCart';
-import { useCart } from '@/contexts/CartContext';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const { cart } = useCart();
 
   // Temporary solution until i18next is fully implemented
   const t = (key: string) => {
@@ -26,35 +24,33 @@ const Header = () => {
 
   return (
     <header className="bg-green-600 text-white shadow-md fixed w-full z-50">
-      <div className="w-full px-0">
-        <div className="flex justify-between items-center h-16 px-4 md:px-8 lg:px-12">
+      <div className="container mx-auto">
+        <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <span className="text-xl font-bold text-white">AgriMarket</span>
           </Link>
           
-          {/* Navigation centrale - alignée au centre sur desktop */}
-          <nav className="hidden md:flex items-center justify-center flex-1 mx-8">
-            <div className="flex space-x-8">
-              <Link to="/" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.home')}
-              </Link>
-              <Link to="/products" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.products')}
-              </Link>
-              <Link to="/farmers" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.farmers')}
-              </Link>
-              <Link to="/seasonal-calendar" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.seasonal')}
-              </Link>
-              <Link to="/subscriptions" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.subscriptions')}
-              </Link>
-              <Link to="/contact" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.contact')}
-              </Link>
-            </div>
+          {/* Navigation centrale - alignée au centre sur tous les écrans */}
+          <nav className="hidden md:flex items-center justify-center space-x-8">
+            <Link to="/" className="text-white hover:text-green-100 font-medium transition-colors">
+              {t('header.home')}
+            </Link>
+            <Link to="/products" className="text-white hover:text-green-100 font-medium transition-colors">
+              {t('header.products')}
+            </Link>
+            <Link to="/farmers" className="text-white hover:text-green-100 font-medium transition-colors">
+              {t('header.farmers')}
+            </Link>
+            <Link to="/seasonal-calendar" className="text-white hover:text-green-100 font-medium transition-colors">
+              {t('header.seasonal')}
+            </Link>
+            <Link to="/subscriptions" className="text-white hover:text-green-100 font-medium transition-colors">
+              {t('header.subscriptions')}
+            </Link>
+            <Link to="/contact" className="text-white hover:text-green-100 font-medium transition-colors">
+              {t('header.contact')}
+            </Link>
           </nav>
           
           {/* Actions à droite */}
@@ -68,9 +64,7 @@ const Header = () => {
             <NotificationCenter />
             
             {/* Panier */}
-            <div className="relative">
-              <MiniCart />
-            </div>
+            <MiniCart />
             
             {/* Profil */}
             <Button asChild variant="ghost" size="icon" className="text-white hover:bg-green-500">

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -98,7 +99,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-grow pt-16"> {/* Pour compenser le header fixe */}
+      <main className="flex-grow pt-16"> {/* Padding top pour compenser le header fixe */}
         <HeroBanner />
         
         <FeaturesSection />
