@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, User } from 'lucide-react';
+import { Search, User, Calendar } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { MiniCart } from '@/components/cart/MiniCart';
 import { useCart } from '@/contexts/CartContext';
@@ -18,6 +18,7 @@ const Header = () => {
       'header.products': 'Produits',
       'header.farmers': 'Agriculteurs',
       'header.subscriptions': 'Abonnements',
+      'header.seasonal': 'Calendrier saisonnier',
       'header.contact': 'Contact',
     };
     return translations[key] || key;
@@ -43,6 +44,9 @@ const Header = () => {
               </Link>
               <Link to="/farmers" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.farmers')}
+              </Link>
+              <Link to="/seasonal-calendar" className="text-white hover:text-green-100 font-medium transition-colors">
+                {t('header.seasonal')}
               </Link>
               <Link to="/subscriptions" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.subscriptions')}
@@ -124,6 +128,13 @@ const Header = () => {
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.farmers')}
+              </Link>
+              <Link 
+                to="/seasonal-calendar" 
+                className="text-white hover:text-green-100 font-medium transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                {t('header.seasonal')}
               </Link>
               <Link 
                 to="/subscriptions" 

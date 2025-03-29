@@ -18,6 +18,7 @@ import BuyerDashboard from '@/pages/BuyerDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import FarmerDashboard from '@/pages/FarmerDashboard';
 import NotificationsDemoPage from '@/pages/NotificationsDemo';
+import SeasonalCalendar from '@/pages/SeasonalCalendar';
 
 // Buyer Dashboard
 import BuyerProfile from '@/pages/buyer/BuyerProfile';
@@ -73,6 +74,7 @@ function App() {
                 <Route path="/verify-email" element={<EmailVerification />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/checkout" element={<CheckoutProcess />} />
+                <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
                 
                 {/* Dashboard Acheteur */}
                 <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
