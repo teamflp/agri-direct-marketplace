@@ -242,7 +242,7 @@ const AdminFarmers = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les abonnements</SelectItem>
+                <SelectItem value="all">Tous les abonnements</SelectItem>
                 <SelectItem value="Basic">Basic</SelectItem>
                 <SelectItem value="Pro">Pro</SelectItem>
                 <SelectItem value="Premium">Premium</SelectItem>
@@ -256,7 +256,7 @@ const AdminFarmers = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Vérifié">Vérifié</SelectItem>
                 <SelectItem value="En attente">En attente</SelectItem>
                 <SelectItem value="Suspendu">Suspendu</SelectItem>

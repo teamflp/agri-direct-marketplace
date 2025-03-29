@@ -44,7 +44,6 @@ import {
 } from "@/components/ui/select";
 import { useToast } from '@/hooks/use-toast';
 
-// Mock data for orders
 const orders = [
   {
     id: "CMD-2023-001",
