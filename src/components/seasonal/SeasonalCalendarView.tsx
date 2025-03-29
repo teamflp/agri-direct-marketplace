@@ -29,7 +29,7 @@ const SeasonalCalendarView = () => {
             <CardContent className="p-6">
               <h3 className="text-lg font-medium mb-4">Sélectionner un mois</h3>
               <Calendar
-                mode="default"
+                mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
                 className="rounded-md border pointer-events-auto"
