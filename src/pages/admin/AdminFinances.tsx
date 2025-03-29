@@ -243,7 +243,7 @@ const AdminFinances = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les périodes</SelectItem>
+                <SelectItem value="all">Toutes les périodes</SelectItem>
                 <SelectItem value="today">Aujourd'hui</SelectItem>
                 <SelectItem value="week">Cette semaine</SelectItem>
                 <SelectItem value="month">Ce mois-ci</SelectItem>
@@ -414,7 +414,7 @@ const AdminFinances = () => {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les types</SelectItem>
+                    <SelectItem value="all">Tous les types</SelectItem>
                     <SelectItem value="Abonnement">Abonnement</SelectItem>
                     <SelectItem value="Vente">Vente</SelectItem>
                   </SelectContent>
@@ -427,7 +427,7 @@ const AdminFinances = () => {
                     </div>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les statuts</SelectItem>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
                     <SelectItem value="Réussi">Réussi</SelectItem>
                     <SelectItem value="Échoué">Échoué</SelectItem>
                     <SelectItem value="Remboursé">Remboursé</SelectItem>
