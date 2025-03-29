@@ -1,0 +1,214 @@
+
+import React from 'react';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import { useCart } from '@/contexts/CartContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, ArrowLeft, Trash2, Plus, Minus } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+
+const Cart = () => {
+  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const navigate = useNavigate();
+  
+  // Group items by farmer
+  const groupedByFarmer = cart.items.reduce((acc, item) => {
+    const farmerId = item.farmerId;
+    if (!acc[farmerId]) {
+      acc[farmerId] = {
+        farmerName: item.farmerName,
+        farmerId: item.farmerId,
+        items: []
+      };
+    }
+    acc[farmerId].items.push(item);
+    return acc;
+  }, {} as Record<number, { farmerName: string; farmerId: number; items: typeof cart.items }>);
+  
+  // Convert to array for rendering
+  const farmerGroups = Object.values(groupedByFarmer);
+  
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-grow pt-16 bg-gray-50 pb-10">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center mb-6">
+            <Button 
+              variant="ghost" 
+              className="mr-2" 
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+            <h1 className="text-3xl font-bold">Mon Panier</h1>
+          </div>
+          
+          {cart.items.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+              <div className="mb-4 flex justify-center">
+                <ShoppingCart className="h-16 w-16 text-gray-300" />
+              </div>
+              <h2 className="text-xl font-medium mb-2">Votre panier est vide</h2>
+              <p className="text-gray-500 mb-6">Découvrez nos produits frais et locaux pour remplir votre panier</p>
+              <Button 
+                className="bg-agrimarket-orange hover:bg-orange-600"
+                onClick={() => navigate('/products')}
+              >
+                Découvrir les produits
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-white rounded-lg shadow-sm p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-medium">Articles ({cart.totalItems})</h2>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-500 hover:bg-red-50 hover:text-red-600 border-red-200"
+                      onClick={clearCart}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Vider le panier
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {farmerGroups.map((group) => (
+                      <div key={group.farmerId} className="border rounded-lg overflow-hidden">
+                        <div className="bg-gray-50 p-4">
+                          <h3 className="font-medium">{group.farmerName}</h3>
+                        </div>
+                        
+                        <div className="divide-y">
+                          {group.items.map((item) => (
+                            <div key={item.id} className="p-4 flex flex-col sm:flex-row sm:items-center">
+                              <div className="flex items-center flex-grow">
+                                <div className="h-20 w-20 rounded overflow-hidden">
+                                  <img 
+                                    src={item.image} 
+                                    alt={item.name} 
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+                                <div className="ml-4">
+                                  <h4 className="font-medium">{item.name}</h4>
+                                  <p className="text-sm text-gray-500">{item.price.toFixed(2)} € / {item.unit}</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center justify-between sm:justify-end mt-4 sm:mt-0">
+                                <div className="flex items-center">
+                                  <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="h-8 w-8 rounded-full"
+                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    disabled={item.quantity <= 1}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="mx-3 w-8 text-center">{item.quantity}</span>
+                                  <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="h-8 w-8 rounded-full"
+                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                
+                                <div className="ml-6 text-right">
+                                  <p className="font-bold">{(item.price * item.quantity).toFixed(2)} €</p>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="text-red-500 hover:text-red-700 p-0 h-auto"
+                                    onClick={() => removeFromCart(item.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="sr-only">Supprimer</span>
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+                  <h2 className="text-xl font-medium mb-4">Récapitulatif</h2>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span>Sous-total</span>
+                      <span>{cart.totalPrice.toFixed(2)} €</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-gray-600">
+                      <span>Frais de livraison</span>
+                      <span>Calculés à la commande</span>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <div className="relative">
+                        <Input 
+                          placeholder="Code promotionnel" 
+                          className="pr-24"
+                        />
+                        <Button 
+                          className="absolute right-1 top-1 h-8 px-4"
+                          variant="secondary"
+                        >
+                          Appliquer
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="flex justify-between font-bold">
+                      <span>Total (TTC)</span>
+                      <span>{cart.totalPrice.toFixed(2)} €</span>
+                    </div>
+                    
+                    <Button 
+                      className="w-full bg-agrimarket-orange hover:bg-orange-600 mt-4" 
+                      onClick={() => navigate('/checkout')}
+                    >
+                      Procéder au paiement
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => navigate('/products')}
+                    >
+                      Continuer les achats
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+};
+
+export default Cart;
