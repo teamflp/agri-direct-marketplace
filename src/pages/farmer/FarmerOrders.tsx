@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useRef } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,8 @@ import {
   ArrowUpDown,
   Filter,
   CheckCircle2,
-  Clock
+  Clock,
+  Bell
 } from 'lucide-react';
 import { 
   Table,
@@ -43,6 +45,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/components/ui/notifications';
+import { DeliveryTracker } from '@/components/delivery/DeliveryTracker';
+import { DeliveryMethodSelector } from '@/components/delivery/DeliveryMethodSelector';
+import { DeliverySlotSelector } from '@/components/delivery/DeliverySlotSelector';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 const orders = [
   {
@@ -104,7 +119,14 @@ const orders = [
 const FarmerOrders = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
+  const [showDeliveryMethodDialog, setShowDeliveryMethodDialog] = useState(false);
+  const [showDeliverySlotDialog, setShowDeliverySlotDialog] = useState(false);
+  const notificationsContainerRef = useRef<HTMLDivElement>(null);
+  
   const { toast } = useToast();
+  const { showNotification, showInlineNotification } = useNotifications();
   
   const menuItems = [
     { title: "Tableau de bord", path: "/farmer-dashboard", icon: <User size={20} /> },
@@ -131,16 +153,50 @@ const FarmerOrders = () => {
     toast({
       title: "Statut mis à jour",
       description: `La commande ${orderId} est maintenant "${newStatus}"`,
+      variant: "success"
     });
+    
+    // Notification en temps réel
+    showNotification({
+      type: 'order',
+      title: 'Commande mise à jour',
+      description: `La commande ${orderId} est maintenant "${newStatus}"`,
+      action: () => setSelectedOrder(orderId)
+    });
+    
     // Dans une vraie app, mise à jour de l'état
   };
   
   const handleViewOrder = (orderId: string) => {
-    toast({
-      title: "Détails de la commande",
-      description: `Affichage des détails pour la commande ${orderId}`,
+    setSelectedOrder(orderId);
+    setShowDeliveryDialog(true);
+  };
+  
+  const handleNewOrder = () => {
+    const orderId = `CMD-2023-${Math.floor(Math.random() * 1000)}`;
+    
+    showNotification({
+      type: 'order',
+      title: 'Nouvelle commande reçue',
+      description: `Vous avez reçu une nouvelle commande : ${orderId}`,
+      action: () => console.log(`Viewing order ${orderId}`)
     });
-    // Dans une vraie app, navigation vers la page de détails
+    
+    // Notification dans la page
+    showInlineNotification({
+      type: 'order',
+      title: 'Nouvelle commande reçue',
+      description: `Vous avez reçu une nouvelle commande : ${orderId}`
+    }, notificationsContainerRef);
+  };
+  
+  const handleNewMessage = () => {
+    showNotification({
+      type: 'message',
+      title: 'Nouveau message',
+      description: `Vous avez reçu un nouveau message de Martin Pasquier`,
+      action: () => console.log('Viewing message')
+    });
   };
 
   return (
@@ -174,7 +230,7 @@ const FarmerOrders = () => {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="">Tous les statuts</SelectItem>
                 <SelectItem value="Nouvelle">Nouvelle</SelectItem>
                 <SelectItem value="En préparation">En préparation</SelectItem>
                 <SelectItem value="En livraison">En livraison</SelectItem>
@@ -183,6 +239,21 @@ const FarmerOrders = () => {
               </SelectContent>
             </Select>
           </div>
+        </div>
+        
+        {/* Zone de notifications en temps réel */}
+        <div ref={notificationsContainerRef}></div>
+        
+        {/* Boutons de démonstration */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          <Button onClick={handleNewOrder} className="bg-green-600 hover:bg-green-700">
+            <Bell className="mr-2 h-4 w-4" />
+            Simuler nouvelle commande
+          </Button>
+          <Button onClick={handleNewMessage} variant="outline">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Simuler nouveau message
+          </Button>
         </div>
 
         <Card>
@@ -341,6 +412,90 @@ const FarmerOrders = () => {
           </Card>
         </div>
       </div>
+
+      {/* Dialogue de suivi de livraison */}
+      <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
+        <DialogContent className="sm:max-w-[650px]">
+          <DialogHeader>
+            <DialogTitle>Détails de livraison</DialogTitle>
+            <DialogDescription>
+              Suivi de la commande {selectedOrder}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedOrder && (
+            <div className="space-y-4 mt-4">
+              <DeliveryTracker orderId={selectedOrder} />
+              
+              <div className="flex flex-wrap gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowDeliveryDialog(false);
+                    setShowDeliveryMethodDialog(true);
+                  }}
+                >
+                  <TruckIcon className="mr-2 h-4 w-4" />
+                  Changer la méthode de livraison
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowDeliveryDialog(false);
+                    setShowDeliverySlotDialog(true);
+                  }}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  Planifier un créneau
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialogue de sélection de méthode de livraison */}
+      <Dialog open={showDeliveryMethodDialog} onOpenChange={setShowDeliveryMethodDialog}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Choisir une méthode de livraison</DialogTitle>
+            <DialogDescription>
+              Sélectionnez comment vous souhaitez être livré
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedOrder && (
+            <DeliveryMethodSelector 
+              orderId={selectedOrder} 
+              onSelect={() => {
+                setShowDeliveryMethodDialog(false);
+                setShowDeliveryDialog(true);
+              }} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Dialogue de sélection de créneau */}
+      <Dialog open={showDeliverySlotDialog} onOpenChange={setShowDeliverySlotDialog}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle>Planifier la livraison</DialogTitle>
+            <DialogDescription>
+              Choisissez un créneau horaire pour votre livraison
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedOrder && (
+            <DeliverySlotSelector 
+              orderId={selectedOrder} 
+              onSelect={() => {
+                setShowDeliverySlotDialog(false);
+                setShowDeliveryDialog(true);
+              }} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };

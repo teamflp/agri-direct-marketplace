@@ -1,11 +1,25 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, ShoppingCart, FileText, Heart, MessageSquare, Users, User } from 'lucide-react';
+import { Check, ShoppingCart, FileText, Heart, MessageSquare, Users, User, TruckIcon, Clock, CalendarClock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useNotifications } from '@/components/ui/notifications';
+import { DeliveryTracker } from '@/components/delivery/DeliveryTracker';
+import { DeliveryMethodSelector } from '@/components/delivery/DeliveryMethodSelector';
+import { DeliverySlotSelector } from '@/components/delivery/DeliverySlotSelector';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter 
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Mock data for orders
 const orders = [
@@ -54,6 +68,11 @@ const orders = [
 const BuyerOrders = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { showNotification } = useNotifications();
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
+  const [showDeliveryMethodDialog, setShowDeliveryMethodDialog] = useState(false);
+  const [showDeliverySlotDialog, setShowDeliverySlotDialog] = useState(false);
   
   const menuItems = [
     { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
@@ -65,18 +84,35 @@ const BuyerOrders = () => {
   ];
   
   const handleOrderDetails = (orderId: string) => {
-    toast({
-      title: "Détails de la commande",
-      description: `Affichage des détails pour la commande ${orderId}`,
-    });
+    setSelectedOrder(orderId);
+    setShowDeliveryDialog(true);
   };
   
   const handleReorderItems = (orderId: string) => {
     toast({
       title: "Commander à nouveau",
       description: `Les articles de la commande ${orderId} ont été ajoutés au panier`,
+      variant: "success"
     });
+    
+    showNotification({
+      type: 'product',
+      title: 'Produits ajoutés au panier',
+      description: `Les articles de la commande ${orderId} ont été ajoutés au panier`,
+    });
+    
     // Dans une application réelle, redirigez vers le panier avec les produits ajoutés
+  };
+  
+  const simulateDeliveryUpdate = () => {
+    if (!selectedOrder) return;
+    
+    showNotification({
+      type: 'delivery',
+      title: 'Mise à jour de livraison',
+      description: `Votre commande ${selectedOrder} est en cours de livraison et sera livrée aujourd'hui`,
+      action: () => setShowDeliveryDialog(true)
+    });
   };
 
   return (
@@ -97,6 +133,14 @@ const BuyerOrders = () => {
             Découvrir plus de produits
           </Button>
         </div>
+        
+        {/* Bouton de démonstration pour les notifications */}
+        {selectedOrder && (
+          <Button onClick={simulateDeliveryUpdate} variant="outline" className="mb-4">
+            <TruckIcon className="mr-2 h-4 w-4" />
+            Simuler une mise à jour de livraison
+          </Button>
+        )}
 
         <Card>
           <CardHeader>
@@ -136,7 +180,8 @@ const BuyerOrders = () => {
                           className="text-agrimarket-orange border-agrimarket-orange hover:bg-agrimarket-orange hover:text-white"
                           onClick={() => handleOrderDetails(order.id)}
                         >
-                          Détails
+                          <TruckIcon className="mr-2 h-4 w-4" />
+                          Suivi
                         </Button>
                         {order.status === "Livré" && (
                           <Button 
@@ -160,6 +205,55 @@ const BuyerOrders = () => {
           </CardFooter>
         </Card>
       </div>
+      
+      {/* Dialogue de suivi de livraison */}
+      <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
+        <DialogContent className="sm:max-w-[650px]">
+          <DialogHeader>
+            <DialogTitle>Suivi de commande</DialogTitle>
+            <DialogDescription>
+              Détails et statut de votre commande {selectedOrder}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedOrder && (
+            <Tabs defaultValue="tracking" className="mt-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="tracking">
+                  <TruckIcon className="mr-2 h-4 w-4" />
+                  Suivi
+                </TabsTrigger>
+                <TabsTrigger value="method">
+                  <Clock className="mr-2 h-4 w-4" />
+                  Méthode
+                </TabsTrigger>
+                <TabsTrigger value="schedule">
+                  <CalendarClock className="mr-2 h-4 w-4" />
+                  Planifier
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="tracking" className="pt-4">
+                <DeliveryTracker orderId={selectedOrder} />
+              </TabsContent>
+              
+              <TabsContent value="method" className="pt-4">
+                <DeliveryMethodSelector 
+                  orderId={selectedOrder} 
+                  onSelect={() => {}} 
+                />
+              </TabsContent>
+              
+              <TabsContent value="schedule" className="pt-4">
+                <DeliverySlotSelector 
+                  orderId={selectedOrder} 
+                  onSelect={() => {}} 
+                />
+              </TabsContent>
+            </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
