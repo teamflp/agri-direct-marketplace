@@ -1,7 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check, Plus, Minus } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { StarRating } from '@/components/reviews/StarRating';
+import { useReviews } from '@/contexts/ReviewContext';
 
 type AddToCartButtonProps = {
   product: {
@@ -14,10 +17,12 @@ type AddToCartButtonProps = {
     farmerId: number;
   };
   className?: string;
+  showRating?: boolean;
 };
 
-export function AddToCartButton({ product, className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({ product, className = '', showRating = false }: AddToCartButtonProps) {
   const { cart, addToCart, updateQuantity } = useCart();
+  const { getAverageProductRating, getProductReviews } = useReviews();
   const cartItem = cart.items.find(item => item.id === product.id);
   const isInCart = !!cartItem;
   const [quantity, setQuantity] = useState(1);
@@ -53,9 +58,21 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
       setQuantity(prev => prev - 1);
     }
   };
+
+  const rating = getAverageProductRating(product.id);
+  const reviewsCount = getProductReviews(product.id).length;
   
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
+      {showRating && (
+        <div className="flex items-center space-x-1 mb-1">
+          <StarRating rating={rating} size={14} />
+          <span className="text-xs text-gray-500">
+            ({reviewsCount})
+          </span>
+        </div>
+      )}
+      
       {isInCart ? (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

@@ -16,110 +16,20 @@ import { Avatar } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock data for messages
-const conversations = [
-  {
-    id: 1,
-    customer: {
-      id: 1,
-      name: "Martin Pasquier",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop"
-    },
-    lastMessage: "Bonjour, je voulais savoir si ma commande serait prête demain?",
-    date: "Aujourd'hui, 14:30",
-    unread: true,
-    messages: [
-      {
-        id: 1,
-        sender: "farmer",
-        text: "Bonjour M. Pasquier, j'espère que vous allez bien!",
-        date: "Hier, 10:15"
-      },
-      {
-        id: 2,
-        sender: "customer",
-        text: "Bonjour Mme Dubois, tout va bien merci! Je voulais savoir si ma commande serait prête demain?",
-        date: "Aujourd'hui, 14:30"
-      }
-    ]
-  },
-  {
-    id: 2,
-    customer: {
-      id: 2,
-      name: "Lucie Martin",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop"
-    },
-    lastMessage: "Merci pour votre commande, n'hésitez pas si vous avez des questions.",
-    date: "Hier, 10:15",
-    unread: false,
-    messages: [
-      {
-        id: 1,
-        sender: "farmer",
-        text: "Bonjour Mme Martin, je vous confirme que votre commande a bien été préparée.",
-        date: "Hier, 09:45"
-      },
-      {
-        id: 2,
-        sender: "farmer",
-        text: "Merci pour votre commande, n'hésitez pas si vous avez des questions.",
-        date: "Hier, 10:15"
-      }
-    ]
-  },
-  {
-    id: 3,
-    customer: {
-      id: 3,
-      name: "Thomas Leroy",
-      avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop"
-    },
-    lastMessage: "Est-ce que vous avez des légumes de saison cette semaine?",
-    date: "Lundi, 15:45",
-    unread: false,
-    messages: [
-      {
-        id: 1,
-        sender: "customer",
-        text: "Bonjour, je suis intéressé par vos produits de saison.",
-        date: "Lundi, 15:40"
-      },
-      {
-        id: 2,
-        sender: "customer",
-        text: "Est-ce que vous avez des légumes de saison cette semaine?",
-        date: "Lundi, 15:45"
-      }
-    ]
-  },
-  {
-    id: 4,
-    customer: {
-      id: 4,
-      name: "Marie Dufour",
-      avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop"
-    },
-    lastMessage: "Bonjour, je souhaiterais commander quelques produits pour une occasion spéciale.",
-    date: "Dimanche, 12:20",
-    unread: false,
-    messages: [
-      {
-        id: 1,
-        sender: "customer",
-        text: "Bonjour, je souhaiterais commander quelques produits pour une occasion spéciale.",
-        date: "Dimanche, 12:20"
-      }
-    ]
-  }
-];
+import { useMessages } from '@/contexts/MessageContext';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const FarmerMessages = () => {
-  const [selectedConversation, setSelectedConversation] = useState<typeof conversations[0] | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const { messageState, setActiveConversation, sendMessage } = useMessages();
+  const { conversations, activeConversationId } = messageState;
+  
+  const selectedConversation = activeConversationId 
+    ? conversations.find(c => c.id === activeConversationId) 
+    : null;
   
   const menuItems = [
     { title: "Tableau de bord", path: "/farmer-dashboard", icon: <User size={20} /> },
@@ -134,20 +44,50 @@ const FarmerMessages = () => {
   };
   
   const filteredConversations = conversations.filter(conversation => 
-    conversation.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+    conversation.customerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
     
-    toast({
-      title: "Message envoyé",
-      description: `Votre message a été envoyé à ${selectedConversation.customer.name}`,
-    });
+    sendMessage(
+      selectedConversation.id,
+      newMessage,
+      selectedConversation.farmerId,
+      'farmer'
+    );
     
-    // Dans une vraie app, mise à jour de l'état
     setNewMessage("");
   };
+
+  const formatMessageDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return `Aujourd'hui, ${format(date, 'HH:mm')}`;
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return `Hier, ${format(date, 'HH:mm')}`;
+    } else {
+      return format(date, 'dd MMMM, HH:mm', { locale: fr });
+    }
+  };
+
+  // Handle keyboard shortcut for sending message
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      handleSendMessage();
+    }
+  };
+
+  // Handle reply template selection
+  const handleReplyTemplate = (templateText: string) => {
+    setNewMessage(templateText);
+  };
+
+  const unreadCount = conversations.filter(c => c.unread).length;
 
   return (
     <DashboardLayout
@@ -161,9 +101,9 @@ const FarmerMessages = () => {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h1 className="text-3xl font-bold">Messagerie</h1>
-          {conversations.filter(c => c.unread).length > 0 && (
+          {unreadCount > 0 && (
             <Badge className="bg-agrimarket-green px-3 py-1 text-sm">
-              {conversations.filter(c => c.unread).length} message{conversations.filter(c => c.unread).length > 1 ? 's' : ''} non lu{conversations.filter(c => c.unread).length > 1 ? 's' : ''}
+              {unreadCount} message{unreadCount > 1 ? 's' : ''} non lu{unreadCount > 1 ? 's' : ''}
             </Badge>
           )}
         </div>
@@ -192,20 +132,20 @@ const FarmerMessages = () => {
                     <div 
                       key={conversation.id}
                       className={`p-3 rounded-md cursor-pointer transition-colors ${
-                        selectedConversation?.id === conversation.id 
+                        activeConversationId === conversation.id 
                           ? 'bg-agrimarket-orange/10 border border-agrimarket-orange/20' 
                           : 'hover:bg-gray-100 border border-transparent'
                       } ${conversation.unread ? 'border-l-4 border-l-agrimarket-green' : ''}`}
-                      onClick={() => setSelectedConversation(conversation)}
+                      onClick={() => setActiveConversation(conversation.id)}
                     >
                       <div className="flex items-start gap-3">
                         <Avatar className="h-10 w-10">
-                          <img src={conversation.customer.avatar} alt={conversation.customer.name} />
+                          <img src={conversation.customerAvatar} alt={conversation.customerName} />
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between">
-                            <p className="font-medium truncate">{conversation.customer.name}</p>
-                            <p className="text-xs text-gray-500">{conversation.date}</p>
+                            <p className="font-medium truncate">{conversation.customerName}</p>
+                            <p className="text-xs text-gray-500">{formatMessageDate(conversation.lastMessageDate)}</p>
                           </div>
                           <p className="text-sm text-gray-600 truncate">{conversation.lastMessage}</p>
                         </div>
@@ -222,10 +162,10 @@ const FarmerMessages = () => {
               {selectedConversation ? (
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <img src={selectedConversation.customer.avatar} alt={selectedConversation.customer.name} />
+                    <img src={selectedConversation.customerAvatar} alt={selectedConversation.customerName} />
                   </Avatar>
                   <div>
-                    <CardTitle>{selectedConversation.customer.name}</CardTitle>
+                    <CardTitle>{selectedConversation.customerName}</CardTitle>
                     <CardDescription>Client</CardDescription>
                   </div>
                 </div>
@@ -240,18 +180,18 @@ const FarmerMessages = () => {
                     {selectedConversation.messages.map((message) => (
                       <div 
                         key={message.id}
-                        className={`flex ${message.sender === 'farmer' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${message.senderType === 'farmer' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div 
                           className={`max-w-[70%] p-3 rounded-lg ${
-                            message.sender === 'farmer' 
+                            message.senderType === 'farmer' 
                               ? 'bg-agrimarket-orange text-white' 
                               : 'bg-gray-100'
                           }`}
                         >
                           <p>{message.text}</p>
-                          <p className={`text-xs mt-1 ${message.sender === 'farmer' ? 'text-white/70' : 'text-gray-500'}`}>
-                            {message.date}
+                          <p className={`text-xs mt-1 ${message.senderType === 'farmer' ? 'text-white/70' : 'text-gray-500'}`}>
+                            {formatMessageDate(message.date)}
                           </p>
                         </div>
                       </div>
@@ -263,10 +203,14 @@ const FarmerMessages = () => {
                         placeholder="Écrivez votre message..." 
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyDown={handleKeyDown}
                         className="flex-1 min-h-[100px]"
                       />
                     </div>
-                    <div className="flex justify-end mt-2">
+                    <div className="flex justify-between mt-2">
+                      <p className="text-xs text-gray-500 italic self-end">
+                        Appuyez sur Ctrl+Entrée pour envoyer
+                      </p>
                       <Button 
                         className="bg-agrimarket-orange hover:bg-orange-600 flex gap-2"
                         onClick={handleSendMessage}
@@ -298,7 +242,7 @@ const FarmerMessages = () => {
               <Button 
                 variant="outline" 
                 className="justify-start h-auto py-3 px-4 text-left"
-                onClick={() => setNewMessage("Bonjour, merci pour votre message. Je suis heureux de pouvoir vous aider.")}
+                onClick={() => handleReplyTemplate("Bonjour, merci pour votre message. Je suis heureux de pouvoir vous aider.")}
               >
                 <div>
                   <p className="font-medium">Salutation</p>
@@ -308,7 +252,7 @@ const FarmerMessages = () => {
               <Button 
                 variant="outline" 
                 className="justify-start h-auto py-3 px-4 text-left"
-                onClick={() => setNewMessage("Votre commande a bien été préparée et sera disponible pour livraison ou retrait demain comme prévu.")}
+                onClick={() => handleReplyTemplate("Votre commande a bien été préparée et sera disponible pour livraison ou retrait demain comme prévu.")}
               >
                 <div>
                   <p className="font-medium">Commande prête</p>
@@ -318,7 +262,7 @@ const FarmerMessages = () => {
               <Button 
                 variant="outline" 
                 className="justify-start h-auto py-3 px-4 text-left"
-                onClick={() => setNewMessage("Merci de votre intérêt pour nos produits. N'hésitez pas si vous avez d'autres questions.")}
+                onClick={() => handleReplyTemplate("Merci de votre intérêt pour nos produits. N'hésitez pas si vous avez d'autres questions.")}
               >
                 <div>
                   <p className="font-medium">Remerciement</p>
