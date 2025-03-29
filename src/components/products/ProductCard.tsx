@@ -2,8 +2,9 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin } from 'lucide-react';
+import { Star, MapPin, Truck, Store, Leaf } from 'lucide-react';
 import { AddToCartButton } from './AddToCartButton';
+import { useNavigate } from 'react-router-dom';
 
 type ProductCardProps = {
   id: number;
@@ -12,8 +13,13 @@ type ProductCardProps = {
   price: number;
   unit: string;
   rating: number;
+  reviews?: number;
   farmerName: string;
+  farmerId: number;
+  distance?: number;
   organic?: boolean;
+  freeDelivery?: boolean;
+  farmPickup?: boolean;
   className?: string;
 };
 
@@ -24,36 +30,80 @@ const ProductCard = ({
   price, 
   unit, 
   rating, 
+  reviews = 0,
   farmerName, 
-  organic = false, 
+  farmerId,
+  distance,
+  organic = false,
+  freeDelivery = false,
+  farmPickup = false,
   className = "" 
 }: ProductCardProps) => {
-  // Mock data for farmer
-  const farmerId = parseInt(id.toString() + '00');
+  const navigate = useNavigate();
+  
+  const handleCardClick = () => {
+    // Naviguer vers la page détaillée du produit
+    navigate(`/products/${id}`);
+  };
   
   return (
-    <Card className={`overflow-hidden transition-shadow duration-300 hover:shadow-md ${className}`}>
+    <Card 
+      className={`overflow-hidden transition-shadow duration-300 hover:shadow-md cursor-pointer ${className}`}
+      onClick={handleCardClick}
+    >
       <div className={`relative ${className.includes("flex") ? "w-1/3" : "aspect-square"}`}>
         <img 
           src={image} 
           alt={name}
           className="w-full h-full object-cover"
         />
-        {organic && (
-          <Badge 
-            className="absolute top-2 right-2 bg-agrimarket-green"
-          >
-            Bio
-          </Badge>
-        )}
+        <div className="absolute top-2 right-2 flex flex-col gap-1">
+          {organic && (
+            <Badge 
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Leaf className="h-3 w-3 mr-1" />
+              Bio
+            </Badge>
+          )}
+          
+          {freeDelivery && (
+            <Badge 
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              <Truck className="h-3 w-3 mr-1" />
+              Livraison
+            </Badge>
+          )}
+          
+          {farmPickup && (
+            <Badge 
+              className="bg-purple-500 hover:bg-purple-600"
+            >
+              <Store className="h-3 w-3 mr-1" />
+              À la ferme
+            </Badge>
+          )}
+        </div>
       </div>
       
       <CardContent className={`p-4 ${className.includes("flex") ? "w-2/3" : ""}`}>
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm text-gray-500">{farmerName}</span>
+          <div className="flex items-center text-sm text-gray-500">
+            <span>{farmerName}</span>
+            {distance && (
+              <div className="flex items-center ml-2 text-xs text-agrimarket-green">
+                <MapPin className="w-3 h-3 mr-0.5" />
+                {distance} km
+              </div>
+            )}
+          </div>
           <div className="flex items-center">
             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
             <span className="ml-1 text-xs">{rating}</span>
+            {reviews > 0 && (
+              <span className="text-xs text-gray-500 ml-1">({reviews})</span>
+            )}
           </div>
         </div>
         
