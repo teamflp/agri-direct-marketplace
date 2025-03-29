@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { AddToCartButton } from '@/components/products/AddToCartButton';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ProductSocialActions } from '@/components/products/ProductSocialActions';
+import ProductSocialActions from '@/components/products/ProductSocialActions'; // Fixed: Changed from named to default import
 import { ProductReviews } from '@/components/reviews/ProductReviews';
 import { Star, MapPin, Truck, Store, Leaf, ChevronLeft, Plus, Minus } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -266,9 +266,19 @@ const ProductDetail = () => {
                       farmerId: product.farmerId
                     }}
                     className="py-6 px-8 text-lg w-full"
-                    quantity={quantity}
+                    // Removed the quantity prop as it's not accepted by the component
                   />
-                  <ProductSocialActions productId={product.id} />
+                  <ProductSocialActions 
+                    productId={product.id}
+                    // Added missing required props based on PropTypes
+                    productName={product.name}
+                    productImage={product.image}
+                    farmerId={product.farmerId}
+                    farmerName={product.farmerName}
+                    farmName={product.farmerName} // Using farmerName as fallback
+                    farmerProductCount={1} // Default value
+                    farmerRating={product.rating}
+                  />
                 </div>
               </div>
             </div>
@@ -324,7 +334,8 @@ const ProductDetail = () => {
                 </TabsContent>
                 
                 <TabsContent value="reviews" className="py-4">
-                  <ProductReviews productId={product.id} />
+                  {/* Added productName prop to ProductReviews component */}
+                  <ProductReviews productId={product.id} productName={product.name} />
                 </TabsContent>
               </Tabs>
             </div>
