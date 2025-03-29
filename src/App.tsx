@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from '@/pages/Index';
@@ -17,6 +18,34 @@ import BuyerDashboard from '@/pages/BuyerDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import FarmerDashboard from '@/pages/FarmerDashboard';
 import NotificationsDemoPage from '@/pages/NotificationsDemo';
+
+// Buyer Dashboard
+import BuyerProfile from '@/pages/buyer/BuyerProfile';
+import BuyerOrders from '@/pages/buyer/BuyerOrders';
+import BuyerFavorites from '@/pages/buyer/BuyerFavorites';
+import BuyerMessages from '@/pages/buyer/BuyerMessages';
+import BuyerInvoices from '@/pages/buyer/BuyerInvoices';
+import BuyerFarmers from '@/pages/buyer/BuyerFarmers';
+import BuyerSubscriptions from '@/pages/buyer/BuyerSubscriptions';
+
+// Farmer Dashboard
+import FarmerProfile from '@/pages/farmer/FarmerProfile';
+import FarmerProducts from '@/pages/farmer/FarmerProducts';
+import FarmerInventory from '@/pages/farmer/FarmerInventory';
+import FarmerOrders from '@/pages/farmer/FarmerOrders';
+import FarmerAnalytics from '@/pages/farmer/FarmerAnalytics';
+import FarmerMessages from '@/pages/farmer/FarmerMessages';
+import FarmerSubscription from '@/pages/farmer/FarmerSubscription';
+import FarmerBlog from '@/pages/farmer/FarmerBlog';
+
+// Admin Dashboard
+import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminFarmers from '@/pages/admin/AdminFarmers';
+import AdminMessages from '@/pages/admin/AdminMessages';
+import AdminDisputes from '@/pages/admin/AdminDisputes';
+import AdminSubscriptions from '@/pages/admin/AdminSubscriptions';
+import AdminFinances from '@/pages/admin/AdminFinances';
+import AdminReports from '@/pages/admin/AdminReports';
 
 import { CartProvider } from '@/contexts/CartContext';
 import { ReviewProvider } from '@/contexts/ReviewContext';
