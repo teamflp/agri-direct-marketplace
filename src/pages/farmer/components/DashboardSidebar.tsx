@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User, ShoppingBag, Package, MessageSquare, CreditCard, BarChart4 } from 'lucide-react';
+import { User, ShoppingBag, Package, MessageSquare, CreditCard, BarChart4, Newspaper } from 'lucide-react';
 
 interface DashboardSidebarProps {
   selectedTab: string;
@@ -14,6 +14,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ selectedTab, setSel
     { id: 'inventory', label: 'Inventaire', icon: <Package className="mr-2 h-4 w-4" /> },
     { id: 'orders', label: 'Commandes', icon: <ShoppingBag className="mr-2 h-4 w-4" /> },
     { id: 'messages', label: 'Messagerie', icon: <MessageSquare className="mr-2 h-4 w-4" /> },
+    { id: 'blog', label: 'Blog/Actualités', icon: <Newspaper className="mr-2 h-4 w-4" /> },
     { id: 'subscription', label: 'Mon abonnement', icon: <CreditCard className="mr-2 h-4 w-4" /> },
   ];
 
