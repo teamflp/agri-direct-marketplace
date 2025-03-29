@@ -17,18 +17,16 @@ const Header = () => {
       'header.home': 'Accueil',
       'header.products': 'Produits',
       'header.farmers': 'Agriculteurs',
-      'header.map': 'Carte',
       'header.subscriptions': 'Abonnements',
       'header.contact': 'Contact',
-      'header.notificationsDemo': 'Démo Notifications'
     };
     return translations[key] || key;
   };
 
   return (
     <header className="bg-green-600 text-white shadow-md fixed w-full z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full px-0">
+        <div className="flex justify-between items-center h-16 px-4 md:px-8 lg:px-12">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <span className="text-xl font-bold text-white">AgriMarket</span>
@@ -46,17 +44,11 @@ const Header = () => {
               <Link to="/farmers" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.farmers')}
               </Link>
-              <Link to="/farmers-map" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.map')}
-              </Link>
               <Link to="/subscriptions" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.subscriptions')}
               </Link>
               <Link to="/contact" className="text-white hover:text-green-100 font-medium transition-colors">
                 {t('header.contact')}
-              </Link>
-              <Link to="/notifications-demo" className="text-white hover:text-green-100 font-medium transition-colors">
-                {t('header.notificationsDemo')}
               </Link>
             </div>
           </nav>
@@ -111,7 +103,7 @@ const Header = () => {
         {/* Menu mobile - visible uniquement sur mobile quand menuOpen est true */}
         {menuOpen && (
           <div className="md:hidden py-4 border-t border-green-500">
-            <nav className="flex flex-col space-y-4">
+            <nav className="flex flex-col space-y-4 px-4">
               <Link 
                 to="/" 
                 className="text-white hover:text-green-100 font-medium transition-colors"
@@ -134,13 +126,6 @@ const Header = () => {
                 {t('header.farmers')}
               </Link>
               <Link 
-                to="/farmers-map" 
-                className="text-white hover:text-green-100 font-medium transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                {t('header.map')}
-              </Link>
-              <Link 
                 to="/subscriptions" 
                 className="text-white hover:text-green-100 font-medium transition-colors"
                 onClick={() => setMenuOpen(false)}
@@ -153,13 +138,6 @@ const Header = () => {
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.contact')}
-              </Link>
-              <Link 
-                to="/notifications-demo" 
-                className="text-white hover:text-green-100 font-medium transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                {t('header.notificationsDemo')}
               </Link>
             </nav>
           </div>

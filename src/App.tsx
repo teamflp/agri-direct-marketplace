@@ -17,7 +17,6 @@ import NotFound from '@/pages/NotFound';
 import BuyerDashboard from '@/pages/BuyerDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
 import FarmerDashboard from '@/pages/FarmerDashboard';
-import NotificationsDemoPage from '@/pages/NotificationsDemo';
 
 // Buyer Dashboard
 import BuyerProfile from '@/pages/buyer/BuyerProfile';
@@ -65,7 +64,6 @@ function App() {
                 <Route path="/" element={<Index />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/farmers" element={<Farmers />} />
-                <Route path="/farmers-map" element={<FarmersMap />} /> {/* Nouvelle page de carte */}
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
@@ -74,7 +72,6 @@ function App() {
                 <Route path="/verify-email" element={<EmailVerification />} />
                 <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/checkout" element={<CheckoutProcess />} />
-                <Route path="/notifications-demo" element={<NotificationsDemoPage />} />
                 
                 {/* Dashboard Acheteur */}
                 <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
@@ -106,6 +103,10 @@ function App() {
                 <Route path="/admin-dashboard/subscriptions" element={<AdminSubscriptions />} />
                 <Route path="/admin-dashboard/finances" element={<AdminFinances />} />
                 <Route path="/admin-dashboard/reports" element={<AdminReports />} />
+                
+                {/* Hidden routes that still need to work */}
+                <Route path="/farmers-map" element={<FarmersMap />} />
+                <Route path="/notifications-demo" element={<NotificationsDemoPage />} />
                 
                 {/* Page 404 */}
                 <Route path="*" element={<NotFound />} />
