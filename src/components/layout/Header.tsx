@@ -24,14 +24,16 @@ const Header = () => {
 
   return (
     <header className="bg-green-600 text-white shadow-md fixed w-full z-50">
-      <div className="container mx-auto">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold text-white">AgriMarket</span>
-          </Link>
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo - aligné à gauche */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center">
+              <span className="text-xl font-bold text-white">AgriMarket</span>
+            </Link>
+          </div>
           
-          {/* Navigation centrale - alignée au centre sur tous les écrans */}
+          {/* Navigation - centrée */}
           <nav className="hidden md:flex items-center justify-center space-x-8">
             <Link to="/" className="text-white hover:text-green-100 font-medium transition-colors">
               {t('header.home')}
@@ -54,7 +56,7 @@ const Header = () => {
           </nav>
           
           {/* Actions à droite */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {/* Recherche */}
             <Button variant="ghost" size="icon" className="text-white hover:bg-green-500">
               <Search className="h-5 w-5" />
@@ -66,8 +68,8 @@ const Header = () => {
             {/* Panier */}
             <MiniCart />
             
-            {/* Profil */}
-            <Button asChild variant="ghost" size="icon" className="text-white hover:bg-green-500">
+            {/* Profil - masqué pour correspondre à l'image */}
+            <Button asChild variant="ghost" size="icon" className="hidden text-white hover:bg-green-500">
               <Link to="/login">
                 <User className="h-5 w-5" />
               </Link>
