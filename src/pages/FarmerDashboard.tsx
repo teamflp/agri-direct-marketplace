@@ -16,6 +16,10 @@ import OrdersList from './farmer/components/OrdersList';
 import MessagesList from './farmer/components/MessagesList';
 import SubscriptionDetails from './farmer/components/SubscriptionDetails';
 
+// Système d'inventaire
+import FarmerInventory from './farmer/FarmerInventory';
+import { InventoryProductType } from './farmer/FarmerInventory';
+
 const FarmerDashboard = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
   const { products, orders, messages, subscription } = useDashboardData();
@@ -26,6 +30,10 @@ const FarmerDashboard = () => {
 
   const handleManageProducts = () => {
     setSelectedTab("products");
+  };
+
+  const handleManageInventory = () => {
+    setSelectedTab("inventory");
   };
 
   return (
@@ -59,11 +67,21 @@ const FarmerDashboard = () => {
                 <TabsContent value="products">
                   <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold">Mes produits</h1>
-                    <Button className="bg-agrimarket-green hover:bg-agrimarket-green/90">
-                      Ajouter un produit
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button onClick={handleManageInventory} variant="outline" className="bg-white hover:bg-gray-50">
+                        Gérer l'inventaire
+                      </Button>
+                      <Button className="bg-agrimarket-green hover:bg-agrimarket-green/90">
+                        Ajouter un produit
+                      </Button>
+                    </div>
                   </div>
                   <ProductsList products={products} />
+                </TabsContent>
+                
+                {/* Inventory Tab */}
+                <TabsContent value="inventory">
+                  <FarmerInventory />
                 </TabsContent>
                 
                 {/* Orders Tab */}
