@@ -28,7 +28,7 @@ export function StarRating({
         : starNumber <= rating
       : starNumber <= rating;
     
-    // Determine the fill of the star (full, half, or none)
+    // Determine if we need to show a half-filled star
     const isHalfFilled = !interactive && !isFilled && starNumber === Math.ceil(rating) && rating % 1 !== 0;
     
     return (

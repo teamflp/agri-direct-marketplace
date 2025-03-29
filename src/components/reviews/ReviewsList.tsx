@@ -7,7 +7,6 @@ import { StarRating } from './StarRating';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { Review } from '@/contexts/ReviewContext';
 
 interface ReviewsListProps {
