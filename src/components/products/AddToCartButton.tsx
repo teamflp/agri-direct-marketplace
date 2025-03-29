@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check, Plus, Minus } from 'lucide-react';
@@ -28,7 +27,7 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
     e.stopPropagation();
     
     if (!isInCart) {
-      addToCart({...product, quantity});
+      addToCart({...product});
       setQuantity(1);
     }
   };

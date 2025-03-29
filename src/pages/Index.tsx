@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -22,6 +21,7 @@ const featuredProducts = [
     unit: "panier",
     rating: 4.8,
     farmerName: "Ferme des Quatre Saisons",
+    farmerId: 1, // Added farmerId
     organic: true,
   },
   {
@@ -32,6 +32,7 @@ const featuredProducts = [
     unit: "pot 500g",
     rating: 4.9,
     farmerName: "Les Ruches de Marie",
+    farmerId: 2, // Added farmerId
     organic: true,
   },
   {
@@ -42,6 +43,7 @@ const featuredProducts = [
     unit: "pièce",
     rating: 4.7,
     farmerName: "Chèvrerie du Vallon",
+    farmerId: 3, // Added farmerId
     organic: false,
   },
   {
@@ -52,6 +54,7 @@ const featuredProducts = [
     unit: "boîte de 6",
     rating: 4.6,
     farmerName: "Ferme des Collines",
+    farmerId: 4, // Added farmerId
     organic: true,
   },
 ];
