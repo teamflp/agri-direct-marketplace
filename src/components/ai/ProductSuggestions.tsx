@@ -60,9 +60,9 @@ const ProductSuggestions = () => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="bg-agrimarket-lightGreen pb-2">
+      <CardHeader className="bg-emerald-50 pb-2">
         <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-agrimarket-green" />
+          <Sparkles className="h-5 w-5 text-emerald-600" />
           Suggestions IA
         </CardTitle>
         <CardDescription>
@@ -76,7 +76,7 @@ const ProductSuggestions = () => {
               <div key={index} className="bg-white border rounded-lg p-4 shadow-sm">
                 <h3 className="font-semibold text-lg flex items-center gap-1">
                   {suggestion.name}
-                  {suggestion.category === "Bio" && <Leaf className="h-4 w-4 text-agrimarket-green" />}
+                  {suggestion.category === "Bio" && <Leaf className="h-4 w-4 text-emerald-600" />}
                 </h3>
                 <p className="text-gray-600 mt-1">{suggestion.description}</p>
                 <div className="mt-2">
@@ -99,7 +99,7 @@ const ProductSuggestions = () => {
               <Button 
                 onClick={getSuggestions}
                 disabled={loading}
-                className="bg-agrimarket-green hover:bg-green-600"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
               >
                 {loading ? (
                   <>
@@ -116,7 +116,7 @@ const ProductSuggestions = () => {
             ) : (
               <ApiKeyDialog 
                 trigger={
-                  <Button className="bg-agrimarket-orange hover:bg-orange-600">
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
                     Configurer l'API OpenAI
                   </Button>
                 }

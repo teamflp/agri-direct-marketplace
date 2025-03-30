@@ -27,6 +27,9 @@ serve(async (req) => {
     // Choisir le modèle approprié, avec gpt-4o-mini par défaut
     const selectedModel = model || 'gpt-4o-mini';
     
+    // Modifier le prompt pour inclure le mot "json" pour être compatible avec response_format de type json_object
+    const modifiedPrompt = `${prompt} Veuillez répondre au format JSON.`;
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -38,11 +41,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'Vous êtes un expert en agriculture biologique et en alimentation durable.'
+            content: 'Vous êtes un expert en agriculture biologique et en alimentation durable. Répondez au format JSON.'
           },
           {
             role: 'user',
-            content: prompt
+            content: modifiedPrompt
           }
         ],
         temperature: 0.7,
