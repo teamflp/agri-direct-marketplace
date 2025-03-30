@@ -146,10 +146,18 @@ const Header = () => {
             {/* Panier */}
             <MiniCart />
             
-            {/* Profil - masqué pour correspondre à l'image */}
-            <Button asChild variant="ghost" size="icon" className="hidden text-white hover:bg-green-500">
-              <Link to="/login">
+            {/* Profil - restauré et amélioré */}
+            <Button 
+              asChild 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-green-500/50 transition-colors relative group"
+            >
+              <Link to="/login" className="relative flex items-center justify-center">
                 <User className="h-5 w-5" />
+                <span className="absolute -bottom-7 whitespace-nowrap bg-green-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Connexion
+                </span>
               </Link>
             </Button>
             
@@ -224,6 +232,14 @@ const Header = () => {
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.contact')}
+              </Link>
+              <Link 
+                to="/login" 
+                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30 flex items-center"
+                onClick={() => setMenuOpen(false)}
+              >
+                <User className="h-5 w-5 mr-2" />
+                Connexion
               </Link>
             </nav>
           </div>
