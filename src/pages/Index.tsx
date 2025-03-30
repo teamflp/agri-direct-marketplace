@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -11,6 +10,7 @@ import ProductCard from '@/components/products/ProductCard';
 import FarmerCard from '@/components/farmers/FarmerCard';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Exemples de données de produits
 const featuredProducts = [
@@ -109,9 +109,11 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Produits à la une</h2>
-              <Button variant="link" className="text-agrimarket-orange flex items-center">
-                Voir tous les produits <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+              <Link to="/products">
+                <Button variant="link" className="text-agrimarket-orange flex items-center">
+                  Voir tous les produits <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -129,9 +131,11 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Agriculteurs à découvrir</h2>
-              <Button variant="link" className="text-agrimarket-orange flex items-center">
-                Voir tous les agriculteurs <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
+              <Link to="/farmers">
+                <Button variant="link" className="text-agrimarket-orange flex items-center">
+                  Voir tous les agriculteurs <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
