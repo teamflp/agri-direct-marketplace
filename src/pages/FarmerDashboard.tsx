@@ -1,114 +1,51 @@
 
-import React, { useState } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-
-// Hooks and data
-import { useDashboardData } from './farmer/hooks/useDashboardData';
-
-// Components
-import DashboardSidebar from './farmer/components/DashboardSidebar';
+import React from 'react';
+import DashboardLayout from '@/components/layout/DashboardLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShoppingCart, FileText, ChevronRight, BarChart3, Newspaper, Package, MessageSquare, User, Settings } from 'lucide-react';
 import DashboardOverview from './farmer/components/DashboardOverview';
-import ProductsList from './farmer/components/ProductsList';
-import OrdersList from './farmer/components/OrdersList';
-import MessagesList from './farmer/components/MessagesList';
-import SubscriptionDetails from './farmer/components/SubscriptionDetails';
-
-// Système d'inventaire
-import FarmerInventory from './farmer/FarmerInventory';
-import { InventoryProductType } from './farmer/FarmerInventory';
+import SummaryCards from './farmer/components/SummaryCards';
+import RecentOrders from './farmer/components/RecentOrders';
+import LowStockProducts from './farmer/components/LowStockProducts';
+import PopularProducts from './farmer/components/PopularProducts';
+import OptimizationTips from './farmer/components/OptimizationTips';
+import FarmingTipsCard from '@/components/ai/FarmingTipsCard';
 
 const FarmerDashboard = () => {
-  const [selectedTab, setSelectedTab] = useState("overview");
-  const { products, orders, messages, subscription } = useDashboardData();
-  
-  const handleViewAllOrders = () => {
-    setSelectedTab("orders");
-  };
-
-  const handleManageProducts = () => {
-    setSelectedTab("products");
-  };
-
-  const handleManageInventory = () => {
-    setSelectedTab("inventory");
-  };
+  // Menu items pour la sidebar
+  const menuItems = [
+    { title: "Tableau de bord", path: "/farmer-dashboard", icon: <BarChart3 size={20} /> },
+    { title: "Commandes", path: "/farmer/orders", icon: <ShoppingCart size={20} /> },
+    { title: "Produits", path: "/farmer/products", icon: <Package size={20} /> },
+    { title: "Inventaire", path: "/farmer/inventory", icon: <FileText size={20} /> },
+    { title: "Blog & Actualités", path: "/farmer/blog", icon: <Newspaper size={20} /> },
+    { title: "Messagerie", path: "/farmer/messages", icon: <MessageSquare size={20} /> },
+    { title: "Analytiques", path: "/farmer/analytics", icon: <BarChart3 size={20} /> },
+    { title: "Mon Profil", path: "/farmer/profile", icon: <User size={20} /> },
+    { title: "Abonnement", path: "/farmer/subscription", icon: <Settings size={20} /> }
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-grow pt-16 bg-gray-50 pb-10">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Sidebar */}
-            <DashboardSidebar 
-              selectedTab={selectedTab} 
-              setSelectedTab={setSelectedTab} 
-            />
-            
-            {/* Main content */}
-            <div className="w-full md:w-3/4">
-              <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-                {/* Overview Tab */}
-                <TabsContent value="overview">
-                  <DashboardOverview 
-                    products={products}
-                    orders={orders}
-                    subscription={subscription}
-                    onViewAllOrders={handleViewAllOrders}
-                    onManageProducts={handleManageProducts}
-                  />
-                </TabsContent>
-                
-                {/* Products Tab */}
-                <TabsContent value="products">
-                  <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-bold">Mes produits</h1>
-                    <div className="flex space-x-2">
-                      <Button onClick={handleManageInventory} variant="outline" className="bg-white hover:bg-gray-50">
-                        Gérer l'inventaire
-                      </Button>
-                      <Button className="bg-agrimarket-green hover:bg-agrimarket-green/90">
-                        Ajouter un produit
-                      </Button>
-                    </div>
-                  </div>
-                  <ProductsList products={products} />
-                </TabsContent>
-                
-                {/* Inventory Tab */}
-                <TabsContent value="inventory">
-                  <FarmerInventory />
-                </TabsContent>
-                
-                {/* Orders Tab */}
-                <TabsContent value="orders">
-                  <h1 className="text-3xl font-bold mb-6">Commandes</h1>
-                  <OrdersList orders={orders} />
-                </TabsContent>
-                
-                {/* Messages Tab */}
-                <TabsContent value="messages">
-                  <h1 className="text-3xl font-bold mb-6">Messagerie</h1>
-                  <MessagesList messages={messages} />
-                </TabsContent>
-                
-                {/* Subscription Tab */}
-                <TabsContent value="subscription">
-                  <h1 className="text-3xl font-bold mb-6">Mon abonnement</h1>
-                  <SubscriptionDetails subscription={subscription} />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-      </main>
-      
-      <Footer />
-    </div>
+    <DashboardLayout
+      name="Sophie Dubois"
+      email="sophie.d@quatre-saisons.com"
+      avatar={<img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop" alt="Sophie Dubois" />}
+      menuItems={menuItems}
+    >
+      <DashboardOverview />
+      <SummaryCards />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <RecentOrders />
+        <FarmingTipsCard />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <LowStockProducts />
+        <PopularProducts />
+        <OptimizationTips />
+      </div>
+    </DashboardLayout>
   );
 };
 
