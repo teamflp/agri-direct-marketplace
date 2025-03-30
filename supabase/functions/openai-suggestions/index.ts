@@ -27,16 +27,27 @@ serve(async (req) => {
     // Choisir le modèle approprié, avec gpt-4o-mini par défaut
     const selectedModel = model || 'gpt-4o-mini';
     
-    // Modifier le prompt pour inclure le mot "json" pour être compatible avec response_format de type json_object
-    const modifiedPrompt = `${prompt} Veuillez répondre au format JSON.`;
+    let requestBody;
     
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    // Pour les requêtes de test, ne pas utiliser le format JSON
+    if (type === 'test') {
+      requestBody = {
+        model: selectedModel,
+        messages: [
+          {
+            role: 'system',
+            content: 'Vous êtes un expert en agriculture biologique et en alimentation durable.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7
+      };
+    } else {
+      // Pour les autres types de requêtes, utiliser le format JSON
+      requestBody = {
         model: selectedModel,
         messages: [
           {
@@ -45,12 +56,21 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: modifiedPrompt
+            content: `${prompt} Veuillez répondre au format JSON.`
           }
         ],
         temperature: 0.7,
         response_format: { type: "json_object" }
-      }),
+      };
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

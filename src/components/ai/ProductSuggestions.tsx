@@ -46,8 +46,10 @@ const ProductSuggestions = () => {
       const season = getCurrentSeason();
       
       const results = await openAIService.getProductSuggestions(userPreferences, season);
+      console.log("Suggestions reçues:", results);
       setSuggestions(results);
     } catch (error: any) {
+      console.error("Erreur lors de la récupération des suggestions:", error);
       toast({
         title: "Erreur",
         description: error.message,
@@ -76,7 +78,7 @@ const ProductSuggestions = () => {
               <div key={index} className="bg-white border rounded-lg p-4 shadow-sm">
                 <h3 className="font-semibold text-lg flex items-center gap-1">
                   {suggestion.name}
-                  {suggestion.category === "Bio" && <Leaf className="h-4 w-4 text-emerald-600" />}
+                  {suggestion.category.toLowerCase().includes("bio") && <Leaf className="h-4 w-4 text-emerald-600" />}
                 </h3>
                 <p className="text-gray-600 mt-1">{suggestion.description}</p>
                 <div className="mt-2">

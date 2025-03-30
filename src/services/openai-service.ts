@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 interface ProductSuggestion {
@@ -55,6 +54,7 @@ class OpenAIService {
     `;
 
     try {
+      console.log("Envoi de la requête pour des suggestions de produits");
       const { data, error } = await supabase.functions.invoke('openai-suggestions', {
         body: { 
           prompt,
@@ -67,15 +67,25 @@ class OpenAIService {
         throw new Error(error.message);
       }
       
+      console.log("Réponse reçue:", data);
+      
       if (data && data.content) {
-        const parsedContent = JSON.parse(data.content);
-        return parsedContent.suggestions || [];
+        console.log("Contenu reçu:", data.content);
+        try {
+          const parsedContent = JSON.parse(data.content);
+          console.log("Contenu parsé:", parsedContent);
+          return parsedContent.suggestions || [];
+        } catch (parseError) {
+          console.error("Erreur lors du parsing JSON:", parseError);
+          console.log("Données brutes:", data.content);
+          throw new Error("Format de réponse invalide");
+        }
       }
       
       return [];
     } catch (error) {
       console.error("Erreur lors de l'obtention des suggestions de produits:", error);
-      return [];
+      throw error;
     }
   }
 
