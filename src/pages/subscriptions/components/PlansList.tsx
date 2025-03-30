@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import SubscriptionPlans from '@/components/subscriptions/SubscriptionPlans';
 
 // Plans d'abonnement
@@ -93,17 +93,136 @@ const subscriptionPlans = [
   }
 ];
 
-const PlansList = () => {
+// On ajoute aussi les formules pour les agriculteurs
+const farmerPlans = [
+  {
+    id: "basic",
+    name: "Basic",
+    description: "Parfait pour débuter sur la plateforme",
+    price: {
+      monthly: 0
+    },
+    features: [
+      "5 produits maximum",
+      "Page de profil basique",
+      "Commissions de 10%",
+      "Support par email"
+    ],
+    popular: false,
+    type: "farmer"
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    description: "Pour les agriculteurs qui veulent se développer",
+    price: {
+      monthly: 13050
+    },
+    features: [
+      "Produits illimités",
+      "Page de profil personnalisée",
+      "Commissions de 5%",
+      "Mise en avant sur la plateforme",
+      "Support prioritaire"
+    ],
+    popular: true,
+    type: "farmer"
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    description: "Solution complète pour maximiser vos ventes",
+    price: {
+      monthly: 32700
+    },
+    features: [
+      "Produits illimités",
+      "Page de profil professionnelle",
+      "Commissions de 3%",
+      "Mise en avant prioritaire",
+      "Support dédié 7j/7",
+      "Outils d'analyse avancés",
+      "Formation marketing incluse"
+    ],
+    popular: false,
+    type: "farmer"
+  }
+];
+
+type PlansListProps = {
+  initialSelectedPlan?: string | null;
+};
+
+const PlansList: React.FC<PlansListProps> = ({ initialSelectedPlan }) => {
+  // État pour gérer l'onglet actif (paniers ou formules agriculteurs)
+  const [activeTab, setActiveTab] = useState<'baskets' | 'farmer-plans'>('baskets');
+
+  useEffect(() => {
+    // Si un plan agriculteur est sélectionné, afficher cet onglet
+    if (initialSelectedPlan === 'pro' || initialSelectedPlan === 'premium' || initialSelectedPlan === 'basic') {
+      setActiveTab('farmer-plans');
+    }
+  }, [initialSelectedPlan]);
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold mb-4">Nos formules d'abonnement</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Choisissez le panier qui correspond le mieux à vos besoins et recevez des produits frais et de saison régulièrement
+          Choisissez la formule qui correspond le mieux à vos besoins
         </p>
       </div>
       
-      <SubscriptionPlans plans={subscriptionPlans} />
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => setActiveTab('baskets')}
+            className={`px-4 py-2 rounded-md ${
+              activeTab === 'baskets'
+                ? 'bg-white shadow-sm text-agrimarket-green'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Paniers de produits
+          </button>
+          <button
+            onClick={() => setActiveTab('farmer-plans')}
+            className={`px-4 py-2 rounded-md ${
+              activeTab === 'farmer-plans'
+                ? 'bg-white shadow-sm text-agrimarket-green'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Formules agriculteurs
+          </button>
+        </div>
+      </div>
+      
+      {activeTab === 'baskets' ? (
+        <SubscriptionPlans plans={subscriptionPlans} />
+      ) : (
+        <SubscriptionPlans plans={farmerPlans.map(plan => ({
+          ...plan,
+          id: plan.id,
+          name: plan.name,
+          description: plan.description,
+          price: {
+            weekly: plan.price.monthly / 4,
+            biweekly: plan.price.monthly / 2,
+            monthly: plan.price.monthly
+          },
+          features: plan.features,
+          popular: plan.popular,
+          image: undefined,
+          products: [],
+          farmerId: 0,
+          farmerName: "AgriMarket",
+          farmerAvatar: undefined
+        }))} 
+        defaultFrequency="monthly"
+        isFarmerPlan={true}
+        />
+      )}
     </div>
   );
 };

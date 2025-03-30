@@ -45,6 +45,7 @@ type Plan = {
   farmerId: number;
   farmerName: string;
   farmerAvatar?: string;
+  type?: string;
 };
 
 type SubscriptionPlansProps = {
@@ -52,15 +53,19 @@ type SubscriptionPlansProps = {
   defaultFarmerId?: number;
   defaultFarmerName?: string;
   defaultFarmerAvatar?: string;
+  defaultFrequency?: 'weekly' | 'biweekly' | 'monthly';
+  isFarmerPlan?: boolean;
 };
 
 const SubscriptionPlans = ({ 
   plans,
   defaultFarmerId,
   defaultFarmerName,
-  defaultFarmerAvatar
+  defaultFarmerAvatar,
+  defaultFrequency = 'weekly',
+  isFarmerPlan = false
 }: SubscriptionPlansProps) => {
-  const [frequency, setFrequency] = useState<'weekly' | 'biweekly' | 'monthly'>('weekly');
+  const [frequency, setFrequency] = useState<'weekly' | 'biweekly' | 'monthly'>(defaultFrequency);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   
@@ -69,6 +74,16 @@ const SubscriptionPlans = ({
 
   const handleSubscribe = () => {
     if (!selectedPlan) return;
+    
+    // Pour les plans Agriculteur avec prix 0, afficher message et fermer le dialogue
+    if (isFarmerPlan && selectedPlan.price[frequency] === 0) {
+      setShowDialog(false);
+      toast({
+        title: "Plan gratuit",
+        description: "Vous pouvez vous inscrire gratuitement comme agriculteur sans paiement. Vous serez limité à 5 produits.",
+      });
+      return;
+    }
     
     // Get today's date and calculate next delivery date
     const today = new Date();
@@ -108,17 +123,23 @@ const SubscriptionPlans = ({
     
     toast({
       title: "Abonnement souscrit",
-      description: `Votre panier ${selectedPlan.name} sera livré le ${nextDeliveryStr.split('-').reverse().join('/')}`,
+      description: isFarmerPlan 
+        ? `Votre abonnement ${selectedPlan.name} est maintenant actif.` 
+        : `Votre panier ${selectedPlan.name} sera livré le ${nextDeliveryStr.split('-').reverse().join('/')}`,
     });
   };
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="weekly" onValueChange={(value) => setFrequency(value as any)}>
+      <Tabs defaultValue={defaultFrequency} onValueChange={(value) => setFrequency(value as any)}>
         <div className="flex justify-center mb-8">
           <TabsList>
-            <TabsTrigger value="weekly">Hebdomadaire</TabsTrigger>
-            <TabsTrigger value="biweekly">Bimensuel</TabsTrigger>
+            {!isFarmerPlan && (
+              <>
+                <TabsTrigger value="weekly">Hebdomadaire</TabsTrigger>
+                <TabsTrigger value="biweekly">Bimensuel</TabsTrigger>
+              </>
+            )}
             <TabsTrigger value="monthly">Mensuel</TabsTrigger>
           </TabsList>
         </div>
@@ -134,6 +155,7 @@ const SubscriptionPlans = ({
                   setSelectedPlan(plan);
                   setShowDialog(true);
                 }}
+                isFarmerPlan={isFarmerPlan}
               />
             ))}
           </div>
@@ -150,6 +172,7 @@ const SubscriptionPlans = ({
                   setSelectedPlan(plan);
                   setShowDialog(true);
                 }}
+                isFarmerPlan={isFarmerPlan}
               />
             ))}
           </div>
@@ -166,6 +189,7 @@ const SubscriptionPlans = ({
                   setSelectedPlan(plan);
                   setShowDialog(true);
                 }}
+                isFarmerPlan={isFarmerPlan}
               />
             ))}
           </div>
@@ -177,14 +201,17 @@ const SubscriptionPlans = ({
           <DialogHeader>
             <DialogTitle>Confirmer votre abonnement</DialogTitle>
             <DialogDescription>
-              Vous êtes sur le point de vous abonner au panier {selectedPlan?.name} avec une livraison {frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'bimensuelle' : 'mensuelle'}.
+              {isFarmerPlan 
+                ? `Vous êtes sur le point de souscrire à la formule ${selectedPlan?.name} pour agriculteurs.`
+                : `Vous êtes sur le point de vous abonner au panier ${selectedPlan?.name} avec une livraison ${frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'bimensuelle' : 'mensuelle'}.`
+              }
             </DialogDescription>
           </DialogHeader>
           
           {selectedPlan && (
             <div className="space-y-4">
               <div className="flex items-center justify-between py-2 border-b">
-                <span className="font-medium">Panier</span>
+                <span className="font-medium">Formule</span>
                 <span>{selectedPlan.name}</span>
               </div>
               
@@ -198,17 +225,19 @@ const SubscriptionPlans = ({
                 <span className="font-semibold">{selectedPlan.price[frequency].toLocaleString()} FCFA</span>
               </div>
               
-              <div className="py-2">
-                <Label htmlFor="products">Contenu du panier</Label>
-                <ul className="mt-2 space-y-1 text-sm">
-                  {selectedPlan.products.map((product) => (
-                    <li key={product.id} className="flex items-center">
-                      <Check className="w-4 h-4 text-agrimarket-green mr-2" />
-                      {product.quantity} × {product.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {!isFarmerPlan && selectedPlan.products.length > 0 && (
+                <div className="py-2">
+                  <Label htmlFor="products">Contenu du panier</Label>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    {selectedPlan.products.map((product) => (
+                      <li key={product.id} className="flex items-center">
+                        <Check className="w-4 h-4 text-agrimarket-green mr-2" />
+                        {product.quantity} × {product.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
           
@@ -230,9 +259,12 @@ type PlanCardProps = {
   plan: Plan;
   frequency: 'weekly' | 'biweekly' | 'monthly';
   onSubscribe: () => void;
+  isFarmerPlan?: boolean;
 };
 
-const PlanCard = ({ plan, frequency, onSubscribe }: PlanCardProps) => {
+const PlanCard = ({ plan, frequency, onSubscribe, isFarmerPlan = false }: PlanCardProps) => {
+  const frequencyText = isFarmerPlan ? 'mois' : (frequency === 'weekly' ? 'semaine' : frequency === 'biweekly' ? '2 semaines' : 'mois');
+
   return (
     <Card 
       className={`relative overflow-hidden ${
@@ -250,7 +282,7 @@ const PlanCard = ({ plan, frequency, onSubscribe }: PlanCardProps) => {
         <CardDescription>{plan.description}</CardDescription>
         <div className="mt-4 flex items-center">
           <span className="text-3xl font-bold">{plan.price[frequency].toLocaleString()}</span>
-          <span className="text-gray-500 ml-1">FCFA/{frequency === 'weekly' ? 'semaine' : frequency === 'biweekly' ? '2 semaines' : 'mois'}</span>
+          <span className="text-gray-500 ml-1">FCFA/{frequencyText}</span>
         </div>
       </CardHeader>
       
@@ -264,10 +296,12 @@ const PlanCard = ({ plan, frequency, onSubscribe }: PlanCardProps) => {
             />
           )}
         </div>
-        <div className="flex items-center mb-4">
-          <Calendar className="w-5 h-5 text-agrimarket-green mr-2" />
-          <span>Livraison {frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'bimensuelle' : 'mensuelle'}</span>
-        </div>
+        {!isFarmerPlan && (
+          <div className="flex items-center mb-4">
+            <Calendar className="w-5 h-5 text-agrimarket-green mr-2" />
+            <span>Livraison {frequency === 'weekly' ? 'hebdomadaire' : frequency === 'biweekly' ? 'bimensuelle' : 'mensuelle'}</span>
+          </div>
+        )}
         <ul className="space-y-3">
           {plan.features.map((feature, i) => (
             <li key={i} className="flex items-start">
@@ -289,7 +323,7 @@ const PlanCard = ({ plan, frequency, onSubscribe }: PlanCardProps) => {
           onClick={onSubscribe}
         >
           <BookmarkCheck className="w-5 h-5 mr-2" />
-          S'abonner
+          {plan.price[frequency] === 0 ? "Commencer gratuitement" : "S'abonner"}
         </Button>
       </CardFooter>
     </Card>

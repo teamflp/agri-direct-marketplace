@@ -2,6 +2,9 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 const plans = [
   {
@@ -15,7 +18,8 @@ const plans = [
       "Support par email"
     ],
     highlighted: false,
-    buttonText: "Commencer gratuitement"
+    buttonText: "Commencer gratuitement",
+    id: "basic"
   },
   {
     name: "Pro",
@@ -29,7 +33,8 @@ const plans = [
       "Support prioritaire"
     ],
     highlighted: true,
-    buttonText: "Souscrire maintenant"
+    buttonText: "Souscrire maintenant",
+    id: "pro"
   },
   {
     name: "Premium",
@@ -45,11 +50,32 @@ const plans = [
       "Formation marketing incluse"
     ],
     highlighted: false,
-    buttonText: "Passer à Premium"
+    buttonText: "Passer à Premium",
+    id: "premium"
   }
 ];
 
 const SubscriptionSection = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { subscribe } = useSubscription();
+
+  const handleSubscription = (plan: typeof plans[0]) => {
+    // Pour le plan Basic, on montre simplement un message et on redirige vers l'inscription
+    if (plan.id === "basic") {
+      toast({
+        title: "Félicitations !",
+        description: "Vous pouvez maintenant vous inscrire gratuitement en tant qu'agriculteur",
+        variant: "success",
+      });
+      navigate("/register");
+      return;
+    }
+
+    // Pour les autres plans, rediriger vers la page d'abonnement avec le plan sélectionné
+    navigate("/subscriptions", { state: { selectedPlan: plan.id } });
+  };
+
   return (
     <section className="py-16 bg-agrimarket-lightGreen">
       <div className="container mx-auto px-4">
@@ -99,6 +125,7 @@ const SubscriptionSection = () => {
                       : 'bg-white border-agrimarket-green text-agrimarket-green hover:bg-agrimarket-green hover:text-white'
                   }`}
                   variant={plan.highlighted ? 'default' : 'outline'}
+                  onClick={() => handleSubscription(plan)}
                 >
                   {plan.buttonText}
                 </Button>
