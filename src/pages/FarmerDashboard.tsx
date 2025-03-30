@@ -10,6 +10,7 @@ import LowStockProducts from './farmer/components/LowStockProducts';
 import PopularProducts from './farmer/components/PopularProducts';
 import OptimizationTips from './farmer/components/OptimizationTips';
 import FarmingTipsCard from '@/components/ai/FarmingTipsCard';
+import { InventoryProductType } from './farmer/FarmerInventory';
 
 const FarmerDashboard = () => {
   // Récupération des données du dashboard
@@ -44,8 +45,23 @@ const FarmerDashboard = () => {
     console.log("Mise à jour du stock pour le produit", product.id);
   };
 
-  // Filtrer les produits avec un stock bas (moins de 15 unités)
-  const lowStockProducts = products.filter(p => p.stock < 15);
+  // Convert ProductType to InventoryProductType for compatibility with LowStockProducts component
+  const convertedLowStockProducts = products
+    .filter(p => p.stock < 15)
+    .map(p => ({
+      id: p.id,
+      name: p.name,
+      price: p.price * 100, // Convert to cents as expected by InventoryProductType
+      inventory: p.stock,
+      unit: p.unit,
+      category: 'Légumes', // Default category
+      organic: true, // Default to organic
+      published: true, // Default to published
+      image: p.image,
+      stockHistory: [],
+      minimumStock: 10, // Default minimum stock
+      lastUpdated: new Date().toISOString().split('T')[0]
+    } as InventoryProductType));
 
   return (
     <DashboardLayout
@@ -73,7 +89,7 @@ const FarmerDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <LowStockProducts 
-          lowStockProducts={lowStockProducts}
+          lowStockProducts={convertedLowStockProducts}
           onUpdateClick={handleUpdateStock}
         />
         <PopularProducts />
