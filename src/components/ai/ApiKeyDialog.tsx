@@ -2,33 +2,18 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useOpenAIKey } from "@/hooks/use-openai-key";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, KeyRound, Settings } from 'lucide-react';
+import { AlertCircle, KeyRound, Settings, Loader2 } from 'lucide-react';
+import { useSupabaseApiKey } from "@/hooks/use-supabase-api-key";
 
 interface ApiKeyDialogProps {
   trigger?: React.ReactNode;
 }
 
 const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ trigger }) => {
-  const { apiKey, isKeySet, saveApiKey, clearApiKey } = useOpenAIKey();
-  const [inputKey, setInputKey] = useState('');
+  const { apiKeyState, testApiKey } = useSupabaseApiKey();
   const [open, setOpen] = useState(false);
-
-  const handleSave = () => {
-    if (inputKey.trim()) {
-      saveApiKey(inputKey.trim());
-      setInputKey('');
-      setOpen(false);
-    }
-  };
-
-  const handleClear = () => {
-    clearApiKey();
-    setInputKey('');
-  };
 
   const defaultTrigger = (
     <Button variant="outline" size="sm" className="gap-2">
@@ -46,50 +31,58 @@ const ApiKeyDialog: React.FC<ApiKeyDialogProps> = ({ trigger }) => {
         <DialogHeader>
           <DialogTitle>Configuration de l'API OpenAI</DialogTitle>
           <DialogDescription>
-            Entrez votre clé API OpenAI pour activer les fonctionnalités d'IA
+            Statut de la configuration de l'API OpenAI pour les fonctionnalités d'IA
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          {isKeySet && (
+          {apiKeyState.isKeySet && (
             <Alert className="bg-green-50 border-green-200">
               <KeyRound className="h-4 w-4 text-green-600" />
               <AlertTitle className="text-green-600">Clé API configurée</AlertTitle>
               <AlertDescription className="text-green-700">
-                Votre clé API est actuellement configurée et stockée localement.
+                La clé API OpenAI est configurée dans Supabase et fonctionne correctement.
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {!apiKeyState.isKeySet && (
+            <Alert variant="destructive" className="bg-red-50 border-red-200">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Clé API non configurée</AlertTitle>
+              <AlertDescription>
+                La clé API OpenAI n'est pas configurée ou n'est pas valide. Configurez-la dans les secrets des fonctions Edge de Supabase.
               </AlertDescription>
             </Alert>
           )}
           
           <div className="space-y-2">
-            <Label htmlFor="api-key">Clé API OpenAI</Label>
-            <Input 
-              id="api-key" 
-              type="password"
-              placeholder={isKeySet ? "••••••••••••••••••••••••••" : "sk-..."}
-              value={inputKey}
-              onChange={(e) => setInputKey(e.target.value)}
-            />
-            <p className="text-xs text-gray-500">
-              Votre clé API sera stockée uniquement dans votre navigateur local et ne sera jamais envoyée à nos serveurs.
+            <Label htmlFor="api-key">Pour configurer la clé API OpenAI:</Label>
+            <p className="text-sm text-gray-600">
+              1. Accédez au tableau de bord Supabase<br/>
+              2. Allez dans "Edge Functions" puis "Secrets"<br/>
+              3. Ajoutez une nouvelle clé secrète nommée "OPENAI_API_KEY"<br/>
+              4. Entrez votre clé API OpenAI comme valeur<br/>
+              5. Cliquez sur le bouton ci-dessous pour tester la configuration
             </p>
           </div>
-          
-          <Alert variant="destructive" className="bg-red-50 border-red-200">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Attention</AlertTitle>
-            <AlertDescription>
-              Ne partagez jamais votre clé API avec d'autres personnes. Pour une solution plus sécurisée, nous recommandons d'intégrer Supabase.
-            </AlertDescription>
-          </Alert>
         </div>
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          {isKeySet && (
-            <Button variant="destructive" onClick={handleClear}>
-              Effacer la clé
-            </Button>
-          )}
-          <Button type="submit" onClick={handleSave}>
-            {isKeySet ? "Mettre à jour" : "Enregistrer"}
+          <Button 
+            onClick={testApiKey} 
+            disabled={apiKeyState.isTesting}
+            variant={apiKeyState.isKeySet ? "outline" : "default"}
+          >
+            {apiKeyState.isTesting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Test en cours...
+              </>
+            ) : (
+              "Tester la configuration"
+            )}
+          </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Fermer
           </Button>
         </DialogFooter>
       </DialogContent>

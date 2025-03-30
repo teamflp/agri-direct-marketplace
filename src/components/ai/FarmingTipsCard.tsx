@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flower2, Loader2, Sparkles } from 'lucide-react';
-import { useOpenAIKey } from '@/hooks/use-openai-key';
+import { useSupabaseApiKey } from '@/hooks/use-supabase-api-key';
 import { openAIService } from '@/services/openai-service';
 import ApiKeyDialog from './ApiKeyDialog';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +16,7 @@ interface FarmingTip {
 }
 
 const FarmingTipsCard = () => {
-  const { isKeySet } = useOpenAIKey();
+  const { apiKeyState } = useSupabaseApiKey();
   const [tips, setTips] = useState<FarmingTip[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -30,10 +30,10 @@ const FarmingTipsCard = () => {
   };
 
   const getTips = async () => {
-    if (!isKeySet) {
+    if (!apiKeyState.isKeySet) {
       toast({
         title: "Clé API requise",
-        description: "Veuillez configurer votre clé API OpenAI pour utiliser cette fonctionnalité",
+        description: "Veuillez configurer votre clé API OpenAI dans Supabase pour utiliser cette fonctionnalité",
         variant: "destructive"
       });
       return;
@@ -113,7 +113,7 @@ const FarmingTipsCard = () => {
             <p className="text-gray-500 mb-4">
               Obtenez des conseils personnalisés pour optimiser votre production agricole
             </p>
-            {isKeySet ? (
+            {apiKeyState.isKeySet ? (
               <Button 
                 onClick={getTips}
                 disabled={loading}

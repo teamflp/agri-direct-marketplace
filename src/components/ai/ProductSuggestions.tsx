@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Leaf, Loader2, Sparkles } from 'lucide-react';
-import { useOpenAIKey } from '@/hooks/use-openai-key';
+import { useSupabaseApiKey } from '@/hooks/use-supabase-api-key';
 import { openAIService } from '@/services/openai-service';
 import ApiKeyDialog from './ApiKeyDialog';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +16,7 @@ interface ProductSuggestion {
 }
 
 const ProductSuggestions = () => {
-  const { isKeySet } = useOpenAIKey();
+  const { apiKeyState } = useSupabaseApiKey();
   const [suggestions, setSuggestions] = useState<ProductSuggestion[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -30,10 +30,10 @@ const ProductSuggestions = () => {
   };
 
   const getSuggestions = async () => {
-    if (!isKeySet) {
+    if (!apiKeyState.isKeySet) {
       toast({
         title: "Clé API requise",
-        description: "Veuillez configurer votre clé API OpenAI pour utiliser cette fonctionnalité",
+        description: "Veuillez configurer votre clé API OpenAI dans Supabase pour utiliser cette fonctionnalité",
         variant: "destructive"
       });
       return;
@@ -95,7 +95,7 @@ const ProductSuggestions = () => {
             <p className="text-gray-500 mb-4">
               Obtenez des suggestions personnalisées de produits bio et de saison
             </p>
-            {isKeySet ? (
+            {apiKeyState.isKeySet ? (
               <Button 
                 onClick={getSuggestions}
                 disabled={loading}
