@@ -8,6 +8,8 @@ import MapSection from "@/components/home/MapSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import SubscriptionSection from "@/components/home/SubscriptionSection";
 import ProductSuggestions from "@/components/ai/ProductSuggestions";
+import SeasonalRecipesCard from "@/components/ai/SeasonalRecipesCard";
+import GardeningTipsCard from "@/components/ai/GardeningTipsCard";
 import ApiKeyDialog from "@/components/ai/ApiKeyDialog";
 
 const Index = () => {
@@ -25,6 +27,15 @@ const Index = () => {
             <div className="lg:col-span-3">
               <ProductSuggestions />
             </div>
+          </div>
+          
+          <div className="mb-4">
+            <h2 className="text-3xl font-bold">Conseils personnalisés</h2>
+            <p className="text-gray-600">Des idées et astuces pour vous aider à consommer et produire mieux</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            <SeasonalRecipesCard />
+            <GardeningTipsCard />
           </div>
         </div>
         <FeaturesSection />

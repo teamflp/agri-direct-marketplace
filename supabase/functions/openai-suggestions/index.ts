@@ -24,6 +24,9 @@ serve(async (req) => {
     console.log(`Appel OpenAI de type: ${type}`);
     console.log(`Prompt: ${prompt}`);
     
+    // Choisir le modèle approprié, avec gpt-4o-mini par défaut
+    const selectedModel = model || 'gpt-4o-mini';
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -31,7 +34,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model || 'gpt-4o-mini',
+        model: selectedModel,
         messages: [
           {
             role: 'system',

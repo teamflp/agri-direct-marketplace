@@ -39,9 +39,9 @@ const FarmerDashboard = () => {
     console.log("Navigation vers la gestion des produits");
   };
 
-  const handleUpdateStock = (productId: number) => {
+  const handleUpdateStock = (product: any) => {
     // Mise à jour du stock (à implémenter)
-    console.log("Mise à jour du stock pour le produit", productId);
+    console.log("Mise à jour du stock pour le produit", product.id);
   };
 
   // Filtrer les produits avec un stock bas (moins de 15 unités)
