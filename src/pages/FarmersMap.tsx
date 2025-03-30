@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import InteractiveMap, { MapFarmer } from '@/components/map/InteractiveMap';
@@ -7,9 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Navigation } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-// Vous pouvez remplacer cette valeur par une clé Google Maps si vous en avez une
-const GOOGLE_MAPS_API_KEY = '';
+import FarmerCard from '@/components/farmers/FarmerCard';
 
 // Exemple de données des agriculteurs pour la carte
 const mockFarmers: MapFarmer[] = [
@@ -70,8 +68,12 @@ const mockFarmers: MapFarmer[] = [
   }
 ];
 
+// Clé API pour Google Maps - Remplacez cette valeur par votre propre clé
+const GOOGLE_MAPS_API_KEY = '';
+
 const FarmersMap = () => {
   const [selectedFarmer, setSelectedFarmer] = useState<MapFarmer | null>(null);
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
   const { toast } = useToast();
   
   const handleFarmerSelect = (farmer: MapFarmer) => {
@@ -110,113 +112,153 @@ const FarmersMap = () => {
             <p className="text-gray-600">Trouvez les agriculteurs près de chez vous et explorez leurs produits</p>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-8">
-              <InteractiveMap 
-                farmers={mockFarmers} 
-                onFarmerSelect={handleFarmerSelect}
-                googleMapsApiKey={GOOGLE_MAPS_API_KEY}
-              />
-            </div>
-            
-            <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white rounded-lg shadow-md p-4">
-                <h2 className="font-bold text-lg mb-3">Comment ça marche</h2>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <div className="bg-agrimarket-orange/10 rounded-full p-1 mr-2 mt-0.5">
-                      <MapPin className="w-4 h-4 text-agrimarket-orange" />
-                    </div>
-                    <span className="text-sm">Cliquez sur les marqueurs pour voir les détails des agriculteurs</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="bg-agrimarket-orange/10 rounded-full p-1 mr-2 mt-0.5">
-                      <MapPin className="w-4 h-4 text-agrimarket-orange" />
-                    </div>
-                    <span className="text-sm">Utilisez les filtres pour affiner votre recherche</span>
-                  </li>
-                  <li className="flex items-start">
-                    <div className="bg-agrimarket-orange/10 rounded-full p-1 mr-2 mt-0.5">
-                      <MapPin className="w-4 h-4 text-agrimarket-orange" />
-                    </div>
-                    <span className="text-sm">Les marqueurs verts indiquent les agriculteurs certifiés bio</span>
-                  </li>
-                </ul>
-              </div>
-              
-              {selectedFarmer && (
-                <Card id="farmer-detail" className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-32 relative">
-                    {/* Image de couverture simulée */}
-                    <div className="w-full h-full bg-gradient-to-r from-agrimarket-green/50 to-agrimarket-orange/50"></div>
-                    <div className="absolute -bottom-10 left-4">
-                      <div className="h-20 w-20 rounded-full overflow-hidden border-4 border-white">
-                        <img 
-                          src={selectedFarmer.image} 
-                          alt={selectedFarmer.name}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <CardContent className="pt-12 pb-4">
-                    <div>
-                      <h3 className="font-bold text-lg">{selectedFarmer.farmName}</h3>
-                      <p className="text-sm text-gray-600">{selectedFarmer.name}</p>
-                      
-                      <div className="flex items-center mt-2">
-                        <MapPin className="w-4 h-4 text-gray-400 mr-1" />
-                        <span className="text-sm">{selectedFarmer.distance} km</span>
-                      </div>
-                      
-                      {selectedFarmer.isCertified && (
-                        <div className="mt-2 inline-block bg-agrimarket-green/10 text-agrimarket-green text-xs px-2 py-1 rounded-full">
-                          Certifié Bio
-                        </div>
-                      )}
-                      
-                      <div className="mt-4">
-                        <h4 className="text-sm font-medium mb-2">Produits:</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {selectedFarmer.products.map((product, index) => (
-                            <span 
-                              key={index} 
-                              className="text-xs bg-agrimarket-lightGreen text-agrimarket-green rounded-full px-2 py-1"
-                            >
-                              {product}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-col gap-2 mt-4">
-                        <Button 
-                          onClick={() => handleGetDirections(selectedFarmer)}
-                          className="flex items-center gap-2"
-                          variant="outline"
-                        >
-                          <Navigation className="w-4 h-4" />
-                          Obtenir l'itinéraire
-                        </Button>
-                        
-                        <Button 
-                          onClick={() => handleContact(selectedFarmer)}
-                          className="bg-agrimarket-orange hover:bg-orange-600 text-white"
-                        >
-                          Contacter l'agriculteur
-                        </Button>
-                        
-                        <Button variant="link" asChild>
-                          <a href={`/farmers/${selectedFarmer.id}`}>Voir le profil complet</a>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+          <div className="mb-6 flex justify-end">
+            <div className="inline-flex rounded-md shadow-sm" role="group">
+              <Button
+                variant={viewMode === 'map' ? 'default' : 'outline'}
+                className={`rounded-l-md ${viewMode === 'map' ? 'bg-agrimarket-orange' : ''}`}
+                onClick={() => setViewMode('map')}
+              >
+                Carte
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                className={`rounded-r-md ${viewMode === 'list' ? 'bg-agrimarket-orange' : ''}`}
+                onClick={() => setViewMode('list')}
+              >
+                Liste
+              </Button>
             </div>
           </div>
+          
+          {viewMode === 'map' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-8">
+                <InteractiveMap 
+                  farmers={mockFarmers} 
+                  onFarmerSelect={handleFarmerSelect}
+                  googleMapsApiKey={GOOGLE_MAPS_API_KEY}
+                />
+              </div>
+              
+              <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white rounded-lg shadow-md p-4">
+                  <h2 className="font-bold text-lg mb-3">Comment ça marche</h2>
+                  <ul className="space-y-2">
+                    <li className="flex items-start">
+                      <div className="bg-agrimarket-orange/10 rounded-full p-1 mr-2 mt-0.5">
+                        <MapPin className="w-4 h-4 text-agrimarket-orange" />
+                      </div>
+                      <span className="text-sm">Cliquez sur les marqueurs pour voir les détails des agriculteurs</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-agrimarket-orange/10 rounded-full p-1 mr-2 mt-0.5">
+                        <MapPin className="w-4 h-4 text-agrimarket-orange" />
+                      </div>
+                      <span className="text-sm">Utilisez les filtres pour affiner votre recherche</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-agrimarket-orange/10 rounded-full p-1 mr-2 mt-0.5">
+                        <MapPin className="w-4 h-4 text-agrimarket-orange" />
+                      </div>
+                      <span className="text-sm">Les marqueurs verts indiquent les agriculteurs certifiés bio</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                {selectedFarmer && (
+                  <Card id="farmer-detail" className="overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="h-32 relative">
+                      {/* Image de couverture simulée */}
+                      <div className="w-full h-full bg-gradient-to-r from-agrimarket-green/50 to-agrimarket-orange/50"></div>
+                      <div className="absolute -bottom-10 left-4">
+                        <div className="h-20 w-20 rounded-full overflow-hidden border-4 border-white">
+                          <img 
+                            src={selectedFarmer.image} 
+                            alt={selectedFarmer.name}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <CardContent className="pt-12 pb-4">
+                      <div>
+                        <h3 className="font-bold text-lg">{selectedFarmer.farmName}</h3>
+                        <p className="text-sm text-gray-600">{selectedFarmer.name}</p>
+                        
+                        <div className="flex items-center mt-2">
+                          <MapPin className="w-4 h-4 text-gray-400 mr-1" />
+                          <span className="text-sm">{selectedFarmer.distance} km</span>
+                        </div>
+                        
+                        {selectedFarmer.isCertified && (
+                          <div className="mt-2 inline-block bg-agrimarket-green/10 text-agrimarket-green text-xs px-2 py-1 rounded-full">
+                            Certifié Bio
+                          </div>
+                        )}
+                        
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium mb-2">Produits:</h4>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedFarmer.products.map((product, index) => (
+                              <span 
+                                key={index} 
+                                className="text-xs bg-agrimarket-lightGreen text-agrimarket-green rounded-full px-2 py-1"
+                              >
+                                {product}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col gap-2 mt-4">
+                          <Button 
+                            onClick={() => handleGetDirections(selectedFarmer)}
+                            className="flex items-center gap-2"
+                            variant="outline"
+                          >
+                            <Navigation className="w-4 h-4" />
+                            Obtenir l'itinéraire
+                          </Button>
+                          
+                          <Button 
+                            onClick={() => handleContact(selectedFarmer)}
+                            className="bg-agrimarket-orange hover:bg-orange-600 text-white"
+                          >
+                            Contacter l'agriculteur
+                          </Button>
+                          
+                          <Button variant="link" asChild>
+                            <a href={`/farmers/${selectedFarmer.id}`}>Voir le profil complet</a>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {viewMode === 'list' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mockFarmers.map((farmer) => (
+                <FarmerCard
+                  key={farmer.id}
+                  id={farmer.id}
+                  name={farmer.name}
+                  image={farmer.image}
+                  location={farmer.location.lat.toFixed(4) + ', ' + farmer.location.lng.toFixed(4)}
+                  distance={farmer.distance}
+                  rating={4.5}
+                  productsCount={farmer.products.length}
+                  specialties={farmer.categories}
+                  onClick={() => handleFarmerSelect(farmer)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
       

@@ -16,6 +16,7 @@ interface FarmerCardProps {
   productsCount: number;
   specialties: string[];
   className?: string;
+  onClick?: () => void;
 }
 
 const FarmerCard = ({
@@ -28,9 +29,13 @@ const FarmerCard = ({
   productsCount,
   specialties,
   className,
+  onClick,
 }: FarmerCardProps) => {
   return (
-    <div className={cn("farmer-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100", className)}>
+    <div 
+      className={cn("farmer-card bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer", className)}
+      onClick={onClick}
+    >
       <Link to={`/farmers/${id}`}>
         <div className="relative h-48 overflow-hidden">
           <img 

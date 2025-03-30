@@ -5,6 +5,7 @@ import { MapPin, Search, Navigation } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import InteractiveMap, { MapFarmer } from '@/components/map/InteractiveMap';
 import { Input } from '@/components/ui/input';
+import { useToast } from "@/hooks/use-toast";
 
 // Exemple de données simplifiées pour la carte de la page d'accueil
 const homepageFarmers: MapFarmer[] = [
@@ -48,12 +49,16 @@ const GOOGLE_MAPS_API_KEY = '';
 
 const MapSection = () => {
   const [address, setAddress] = useState('');
+  const { toast } = useToast();
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Dans une application réelle, cette fonction enverrait l'adresse à un service de géocodage
     // pour obtenir les coordonnées et centrer la carte sur cet emplacement
-    console.log("Recherche d'agriculteurs près de :", address);
+    toast({
+      title: "Recherche en cours",
+      description: `Recherche d'agriculteurs près de : ${address}`,
+    });
   };
   
   return (

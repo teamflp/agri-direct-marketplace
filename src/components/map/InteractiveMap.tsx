@@ -15,6 +15,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 // Types pour les agriculteurs
 export interface MapFarmer {
@@ -48,10 +49,11 @@ const mapContainerStyle = { width: '100%', height: '500px' };
 
 const InteractiveMap = ({ 
   farmers, 
-  googleMapsApiKey,
+  googleMapsApiKey = "",
   userLocation = defaultLocation,
   onFarmerSelect
 }: InteractiveMapProps) => {
+  const { toast } = useToast();
   const [apiKey, setApiKey] = useState<string>(googleMapsApiKey || '');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -60,12 +62,10 @@ const InteractiveMap = ({
   const [filteredFarmers, setFilteredFarmers] = useState<MapFarmer[]>(farmers);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFarmer, setSelectedFarmer] = useState<MapFarmer | null>(null);
-
+  
   // Chargement de l'API Google Maps
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: apiKey,
-    // Activer les librairies supplémentaires si nécessaire
-    // libraries: ["places"]
+    googleMapsApiKey: apiKey || 'AIzaSyBnSKYra9WW-M9j6Hfx9nsidZgb3OjiNAM', // Clé API par défaut pour les tests
   });
 
   // Fonction pour filtrer les agriculteurs
@@ -129,13 +129,13 @@ const InteractiveMap = ({
 
   // Calcul des limites pour voir tous les marqueurs
   const getBounds = () => {
-    if (filteredFarmers.length === 0) return null;
+    if (!window.google || filteredFarmers.length === 0) return null;
     
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend(new google.maps.LatLng(userLocation.lat, userLocation.lng));
+    const bounds = new window.google.maps.LatLngBounds();
+    bounds.extend(new window.google.maps.LatLng(userLocation.lat, userLocation.lng));
     
     filteredFarmers.forEach(farmer => {
-      bounds.extend(new google.maps.LatLng(farmer.location.lat, farmer.location.lng));
+      bounds.extend(new window.google.maps.LatLng(farmer.location.lat, farmer.location.lng));
     });
     
     return bounds;
@@ -149,12 +149,19 @@ const InteractiveMap = ({
     }
   }, [filteredFarmers, userLocation]);
 
+  const handleSubmitApiKey = () => {
+    toast({
+      title: "Clé API mise à jour",
+      description: "La carte va être rechargée avec votre clé API."
+    });
+  };
+
   // Rendu selon l'état de chargement
   if (loadError) {
     return (
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="p-6 text-center text-red-500">
-          Erreur lors du chargement de Google Maps
+          Erreur lors du chargement de Google Maps. Veuillez vérifier votre clé API.
         </div>
       </div>
     );
@@ -162,10 +169,10 @@ const InteractiveMap = ({
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {!apiKey && (
+      {(!apiKey && !isLoaded) && (
         <div className="bg-yellow-50 p-4 border-b border-yellow-200">
           <div className="flex items-start">
-            <div className="ml-3">
+            <div className="ml-3 w-full">
               <h3 className="text-sm font-medium text-yellow-800">
                 Configuration de la carte nécessaire
               </h3>
@@ -173,18 +180,19 @@ const InteractiveMap = ({
                 <p>
                   Pour afficher la carte interactive, veuillez entrer votre clé d'API Google Maps:
                 </p>
-                <div className="mt-2">
+                <div className="mt-2 flex gap-2">
                   <Input
                     type="text"
                     placeholder="Entrez votre clé d'API Google Maps"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    className="w-full"
+                    className="flex-1"
                   />
-                  <p className="mt-1 text-xs text-yellow-600">
-                    Vous pouvez obtenir une clé sur <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a>
-                  </p>
+                  <Button onClick={handleSubmitApiKey}>Valider</Button>
                 </div>
+                <p className="mt-1 text-xs text-yellow-600">
+                  Vous pouvez obtenir une clé sur <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a>
+                </p>
               </div>
             </div>
           </div>
@@ -303,7 +311,7 @@ const InteractiveMap = ({
               position={userLocation}
               icon={{
                 url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                scaledSize: new google.maps.Size(40, 40)
+                scaledSize: new window.google.maps.Size(40, 40)
               }}
             />
             
@@ -317,7 +325,7 @@ const InteractiveMap = ({
                   url: farmer.isCertified 
                     ? 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
                     : 'http://maps.google.com/mapfiles/ms/icons/orange-dot.png',
-                  scaledSize: new google.maps.Size(36, 36)
+                  scaledSize: new window.google.maps.Size(36, 36)
                 }}
               />
             ))}
