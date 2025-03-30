@@ -65,7 +65,7 @@ const ProductSuggestions = () => {
       <CardHeader className="bg-emerald-50 pb-2">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-emerald-600" />
-          Suggestions IA
+          Recommandations produits
         </CardTitle>
         <CardDescription>
           Recommandations personnalisées de produits de saison
@@ -116,21 +116,13 @@ const ProductSuggestions = () => {
                 )}
               </Button>
             ) : (
-              <ApiKeyDialog 
-                trigger={
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                    Configurer l'API OpenAI
-                  </Button>
-                }
-              />
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={testApiKey}>
+                Configurer l'API
+              </Button>
             )}
           </div>
         )}
       </CardContent>
-      <CardFooter className="bg-gray-50 flex justify-between">
-        <div className="text-xs text-gray-500">Propulsé par OpenAI</div>
-        <ApiKeyDialog />
-      </CardFooter>
     </Card>
   );
 };

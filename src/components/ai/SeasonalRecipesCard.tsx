@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Loader2, UtensilsCrossed, Sparkles } from 'lucide-react';
 import { useSupabaseApiKey } from '@/hooks/use-supabase-api-key';
 import { openAIService } from '@/services/openai-service';
-import ApiKeyDialog from './ApiKeyDialog';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -20,7 +19,7 @@ interface RecipeWithIngredients {
 }
 
 const SeasonalRecipesCard = () => {
-  const { apiKeyState } = useSupabaseApiKey();
+  const { apiKeyState, testApiKey } = useSupabaseApiKey();
   const [recipes, setRecipes] = useState<RecipeWithIngredients[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -129,21 +128,13 @@ const SeasonalRecipesCard = () => {
                 )}
               </Button>
             ) : (
-              <ApiKeyDialog 
-                trigger={
-                  <Button className="bg-agrimarket-orange hover:bg-orange-600">
-                    Configurer l'API OpenAI
-                  </Button>
-                }
-              />
+              <Button className="bg-orange-500 hover:bg-orange-600" onClick={testApiKey}>
+                Configurer l'API
+              </Button>
             )}
           </div>
         )}
       </CardContent>
-      <CardFooter className="bg-gray-50 flex justify-between">
-        <div className="text-xs text-gray-500">Propulsé par OpenAI</div>
-        <ApiKeyDialog />
-      </CardFooter>
     </Card>
   );
 };
