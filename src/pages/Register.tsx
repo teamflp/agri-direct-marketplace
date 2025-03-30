@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -69,7 +70,8 @@ const Register = () => {
         variant: "success",
       });
       
-      navigate("/email-verification", { state: { email: values.email } });
+      // Correction ici : utiliser la route correcte "verify-email" au lieu de "email-verification"
+      navigate("/verify-email", { state: { email: values.email } });
       
       setIsLoading(false);
     }, 1500);

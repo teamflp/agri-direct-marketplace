@@ -53,7 +53,7 @@ import { CartProvider } from '@/contexts/CartContext';
 import { ReviewProvider } from '@/contexts/ReviewContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { SubscriptionProvider } from '@/contexts/SubscriptionContext';
-import { SocialProvider } from '@/contexts/SocialContext'; // Added import for SocialProvider
+import { SocialProvider } from '@/contexts/SocialContext';
 import '@/App.css';
 
 function App() {
@@ -62,7 +62,7 @@ function App() {
       <CartProvider>
         <NotificationProvider>
           <SubscriptionProvider>
-            <SocialProvider> {/* Added SocialProvider */}
+            <SocialProvider>
               <Router>
                 <Routes>
                   {/* Pages Publiques */}
@@ -75,7 +75,9 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+                  {/* Correction ici : ajouter l'alias pour que les deux routes fonctionnent */}
                   <Route path="/verify-email" element={<EmailVerification />} />
+                  <Route path="/email-verification" element={<EmailVerification />} />
                   <Route path="/subscriptions" element={<Subscriptions />} />
                   <Route path="/checkout" element={<CheckoutProcess />} />
                   <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
@@ -119,7 +121,7 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Router>
-            </SocialProvider> {/* Close SocialProvider */}
+            </SocialProvider>
           </SubscriptionProvider>
         </NotificationProvider>
       </CartProvider>
