@@ -8,6 +8,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Navigation } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Vous pouvez remplacer cette valeur par une clé Google Maps si vous en avez une
+const GOOGLE_MAPS_API_KEY = '';
+
 // Exemple de données des agriculteurs pour la carte
 const mockFarmers: MapFarmer[] = [
   {
@@ -111,7 +114,8 @@ const FarmersMap = () => {
             <div className="lg:col-span-8">
               <InteractiveMap 
                 farmers={mockFarmers} 
-                onFarmerSelect={handleFarmerSelect} 
+                onFarmerSelect={handleFarmerSelect}
+                googleMapsApiKey={GOOGLE_MAPS_API_KEY}
               />
             </div>
             

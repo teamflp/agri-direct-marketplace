@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import SeasonalCalendarView from '@/components/seasonal/SeasonalCalendarView';
 import { Leaf } from 'lucide-react';
+import SeasonalLegend from '@/components/seasonal/SeasonalLegend';
 
 const SeasonalCalendar = () => {
   return (
@@ -19,7 +20,15 @@ const SeasonalCalendar = () => {
             </p>
           </div>
           
-          <SeasonalCalendarView />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-9">
+              <SeasonalCalendarView />
+            </div>
+            
+            <div className="lg:col-span-3">
+              <SeasonalLegend />
+            </div>
+          </div>
           
           <div className="mt-12 bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-4">Pourquoi manger de saison ?</h2>

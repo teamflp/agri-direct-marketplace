@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MapPin, Search, Navigation } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import InteractiveMap, { MapFarmer } from '@/components/map/InteractiveMap';
+import { Input } from '@/components/ui/input';
 
 // Exemple de données simplifiées pour la carte de la page d'accueil
 const homepageFarmers: MapFarmer[] = [
@@ -42,7 +43,19 @@ const homepageFarmers: MapFarmer[] = [
   }
 ];
 
+// Vous pouvez remplacer cette valeur par une clé Google Maps si vous en avez une
+const GOOGLE_MAPS_API_KEY = '';
+
 const MapSection = () => {
+  const [address, setAddress] = useState('');
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Dans une application réelle, cette fonction enverrait l'adresse à un service de géocodage
+    // pour obtenir les coordonnées et centrer la carte sur cet emplacement
+    console.log("Recherche d'agriculteurs près de :", address);
+  };
+  
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -54,25 +67,33 @@ const MapSection = () => {
         </div>
         
         <div className="bg-white p-4 rounded-lg shadow-md mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input 
+              <Input 
                 type="text" 
                 placeholder="Votre adresse ou code postal" 
-                className="w-full pl-10 pr-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-agrimarket-orange focus:border-transparent"
+                className="pl-10 pr-4 py-3"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
               />
             </div>
             <div>
-              <Button className="w-full md:w-auto bg-agrimarket-orange hover:bg-orange-600 text-white">
+              <Button 
+                type="submit"
+                className="w-full md:w-auto bg-agrimarket-orange hover:bg-orange-600 text-white"
+              >
                 Rechercher
               </Button>
             </div>
-          </div>
+          </form>
         </div>
         
         <div className="bg-white rounded-lg overflow-hidden shadow-md mb-8" style={{ height: '500px' }}>
-          <InteractiveMap farmers={homepageFarmers} />
+          <InteractiveMap 
+            farmers={homepageFarmers} 
+            googleMapsApiKey={GOOGLE_MAPS_API_KEY}
+          />
         </div>
         
         <div className="text-center">
