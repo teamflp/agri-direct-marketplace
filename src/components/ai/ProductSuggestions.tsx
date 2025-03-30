@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Leaf, Loader2, Sparkles } from 'lucide-react';
 import { useSupabaseApiKey } from '@/hooks/use-supabase-api-key';
 import { openAIService } from '@/services/openai-service';
-import ApiKeyDialog from './ApiKeyDialog';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProductSuggestion {
@@ -116,9 +115,9 @@ const ProductSuggestions = () => {
                 )}
               </Button>
             ) : (
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={testApiKey}>
-                Configurer l'API
-              </Button>
+              <div className="text-center text-gray-600">
+                API non configurée
+              </div>
             )}
           </div>
         )}
