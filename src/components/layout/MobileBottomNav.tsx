@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, Bell, ShoppingCart, Search } from 'lucide-react';
+import { User, Bell, ShoppingCart, Search, MessageSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from '@/contexts/CartContext';
@@ -26,6 +26,13 @@ const MobileBottomNav = ({
           <Link to="/" className="flex flex-col items-center orange-500">
             <Search className="h-5 w-5" />
             <span className="text-xs mt-1">Rechercher</span>
+          </Link>
+        </Button>
+        
+        <Button asChild variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100 transition-colors">
+          <Link to="/chat" className="flex flex-col items-center">
+            <MessageSquare className="h-5 w-5" />
+            <span className="text-xs mt-1">Chat</span>
           </Link>
         </Button>
         
