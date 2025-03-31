@@ -9,6 +9,7 @@ import TestimonialsSection from "@/components/home/TestimonialsSection";
 import SubscriptionSection from "@/components/home/SubscriptionSection";
 import SeasonalProductsRecommendations from "@/components/seasonal/SeasonalProductsRecommendations";
 import MemberOnlyAdvice from "@/components/home/MemberOnlyAdvice";
+import SecuritySection from "@/components/home/SecuritySection";
 
 const Index = () => {
   return (
@@ -46,6 +47,7 @@ const Index = () => {
         </div>
         
         <FeaturesSection />
+        <SecuritySection />
         <MapSection />
         <TestimonialsSection />
         <SubscriptionSection />
