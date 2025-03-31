@@ -6,9 +6,9 @@ import { BookmarkCheck } from 'lucide-react';
 
 const SubscriptionBanner = () => {
   return (
-    <div className="relative overflow-hidden shadow-lg mt-0 w-full">
+    <div className="relative overflow-hidden shadow-lg mt-0 w-screen">
       {/* Image de fond */}
-      <div className="absolute inset-0 z-0 w-screen">
+      <div className="absolute inset-0 w-screen">
         <img 
           src="https://images.unsplash.com/photo-1535350356005-fd52b3b524fb?q=80&w=1920&auto=format&fit=crop"
           alt="Légumes frais" 

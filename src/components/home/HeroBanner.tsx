@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+
 const HeroBanner: React.FC = () => {
   const navigate = useNavigate();
-  return <div className="relative">
+  return (
+    <div className="relative w-screen">
       {/* Image de fond */}
       <div className="absolute inset-0 z-0">
         <img src="https://images.unsplash.com/photo-1536657464919-892534f60d6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Agriculteurs dans un champ" className="w-full h-full object-cover" />
@@ -30,6 +33,8 @@ const HeroBanner: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default HeroBanner;
