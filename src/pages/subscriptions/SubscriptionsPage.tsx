@@ -49,7 +49,7 @@ const SubscriptionsPage = () => {
           <SubscriptionBanner />
           
           <div className="my-12">
-            <SubscriptionPlans selected={selectedPlan} />
+            <SubscriptionPlans initialSelectedPlan={selectedPlan} />
           </div>
           
           <SubscriptionAdvantages />
