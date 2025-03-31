@@ -11,6 +11,7 @@ import DashboardStatsCards from '@/pages/farmer/components/DashboardStatsCards';
 import RecentOrders from '@/pages/farmer/components/RecentOrders';
 import TopProducts from '@/pages/farmer/components/TopProducts';
 import LowStockProducts from '@/pages/farmer/components/LowStockProducts';
+import { InventoryProductType } from '@/pages/farmer/FarmerInventory';
 
 const FarmerDashboard = () => {
   const menuItems = [
@@ -22,6 +23,106 @@ const FarmerDashboard = () => {
     { title: "Paramètres", path: "/farmer-dashboard/profile", icon: <Settings size={20} /> },
   ];
 
+  // Mock data for DashboardStatsCards
+  const dashboardStats = {
+    salesThisMonth: 37,
+    customersCount: 24,
+    productsCount: 18
+  };
+
+  // Mock data for RecentOrders
+  const recentOrders = [
+    {
+      id: "CMD-001",
+      customer: "Marie Dubois",
+      date: "12 Mai 2023",
+      total: 45.50,
+      items: 4,
+      status: "Confirmée"
+    },
+    {
+      id: "CMD-002",
+      customer: "Pierre Martin",
+      date: "10 Mai 2023",
+      total: 32.20,
+      items: 3,
+      status: "Livrée"
+    }
+  ];
+
+  // Mock data for TopProducts
+  const topProducts = [
+    {
+      id: 1,
+      name: "Tomates Bio",
+      price: 3.50,
+      stock: 25,
+      unit: "kg",
+      image: "https://images.unsplash.com/photo-1546520057-a59c8fb22400?w=500&h=500&fit=crop",
+      sales: 42
+    },
+    {
+      id: 2,
+      name: "Carottes",
+      price: 2.20,
+      stock: 18,
+      unit: "kg",
+      image: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=500&h=500&fit=crop",
+      sales: 36
+    },
+    {
+      id: 3,
+      name: "Pommes de terre",
+      price: 1.80,
+      stock: 40,
+      unit: "kg",
+      image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=500&h=500&fit=crop",
+      sales: 28
+    }
+  ];
+
+  // Mock data for LowStockProducts
+  const lowStockProducts: InventoryProductType[] = [
+    {
+      id: 4,
+      name: "Laitue",
+      price: 1.50,
+      inventory: 3,
+      minimumStock: 5,
+      unit: "pièce",
+      image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=500&h=500&fit=crop",
+      category: "Légumes",
+      organic: true,
+      published: true
+    },
+    {
+      id: 5,
+      name: "Aubergines",
+      price: 2.80,
+      inventory: 4,
+      minimumStock: 10,
+      unit: "kg",
+      image: "https://images.unsplash.com/photo-1613878501069-18e97ac2dacf?w=500&h=500&fit=crop",
+      category: "Légumes",
+      organic: false,
+      published: true
+    }
+  ];
+
+  // Event handlers
+  const handleViewAllOrders = () => {
+    window.location.href = "/farmer-dashboard/orders";
+  };
+
+  const handleManageProducts = () => {
+    window.location.href = "/farmer-dashboard/products";
+  };
+
+  const handleUpdateInventory = (product: InventoryProductType) => {
+    console.log("Update inventory for product:", product);
+    // Actual implementation would open a dialog to update the inventory
+  };
+
   return (
     <DashboardLayout
       name="Jean Dupont"
@@ -32,11 +133,21 @@ const FarmerDashboard = () => {
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Tableau de bord Agriculteur</h1>
         
-        <DashboardStatsCards />
+        <DashboardStatsCards 
+          salesThisMonth={dashboardStats.salesThisMonth}
+          customersCount={dashboardStats.customersCount}
+          productsCount={dashboardStats.productsCount}
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RecentOrders />
-          <TopProducts />
+          <RecentOrders 
+            orders={recentOrders} 
+            onViewAllOrders={handleViewAllOrders} 
+          />
+          <TopProducts 
+            products={topProducts} 
+            onManageProducts={handleManageProducts} 
+          />
         </div>
         
         {/* Ajout de la section de conseils saisonniers */}
@@ -46,7 +157,10 @@ const FarmerDashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <LowStockProducts />
+          <LowStockProducts 
+            lowStockProducts={lowStockProducts} 
+            onUpdateClick={handleUpdateInventory} 
+          />
           
           <Card>
             <CardHeader>
