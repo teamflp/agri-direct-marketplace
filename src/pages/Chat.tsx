@@ -2,7 +2,6 @@
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import ChatInterface from '@/components/chat/ChatInterface';
 import { MessageSquare } from 'lucide-react';
 
 const Chat = () => {
@@ -17,10 +16,6 @@ const Chat = () => {
               Posez vos questions sur l'agriculture biologique, les produits de saison, ou contacter notre équipe 
               <MessageSquare className="inline h-5 w-5 text-green-600 ml-2" />
             </p>
-          </div>
-          
-          <div className="mb-12">
-            <ChatInterface />
           </div>
           
           <div className="bg-white rounded-lg p-6 shadow-sm">

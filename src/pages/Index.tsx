@@ -12,6 +12,7 @@ import MemberOnlyAdvice from "@/components/home/MemberOnlyAdvice";
 import SecuritySection from "@/components/home/SecuritySection";
 import MarketStats from "@/components/home/MarketStats";
 import HowItWorks from "@/components/home/HowItWorks";
+import FloatingChatButton from "@/components/chat/FloatingChatButton";
 
 const Index = () => {
   return (
@@ -61,6 +62,7 @@ const Index = () => {
         <SubscriptionSection />
       </main>
       <Footer />
+      <FloatingChatButton />
     </div>
   );
 };
