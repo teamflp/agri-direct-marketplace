@@ -23,36 +23,41 @@ import Chat from './pages/Chat';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { CartProvider } from './contexts/CartContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import FloatingChatButton from './components/chat/FloatingChatButton';
+import { MessageProvider } from './contexts/MessageContext';
 
 const App = () => {
   return (
     <NotificationProvider>
       <CartProvider>
         <SubscriptionProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/farmers" element={<Farmers />} />
-              <Route path="/farmers-map" element={<FarmersMap />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
-              <Route path="/email-verification" element={<EmailVerification />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<CheckoutProcess />} />
-              <Route path="/admin/*" element={<AdminDashboard />} />
-              <Route path="/farmer/*" element={<FarmerDashboard />} />
-              <Route path="/buyer/*" element={<BuyerDashboard />} />
-              <Route path="/notifications-demo" element={<NotificationsDemo />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Router>
+          <MessageProvider>
+            <Router>
+              <FloatingChatButton />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/farmers" element={<Farmers />} />
+                <Route path="/farmers-map" element={<FarmersMap />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
+                <Route path="/email-verification" element={<EmailVerification />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<CheckoutProcess />} />
+                <Route path="/admin/*" element={<AdminDashboard />} />
+                <Route path="/farmer/*" element={<FarmerDashboard />} />
+                <Route path="/buyer/*" element={<BuyerDashboard />} />
+                <Route path="/notifications-demo" element={<NotificationsDemo />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Router>
+          </MessageProvider>
         </SubscriptionProvider>
       </CartProvider>
     </NotificationProvider>

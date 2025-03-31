@@ -10,7 +10,12 @@ import { useToast } from '@/hooks/use-toast';
 import { chatService, ChatMessage } from '@/services/chat-service';
 import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 
-const ChatInterface = () => {
+interface ChatInterfaceProps {
+  className?: string;
+  compact?: boolean;
+}
+
+const ChatInterface = ({ className = "", compact = false }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +101,7 @@ const ChatInterface = () => {
   };
 
   return (
-    <Card className="w-full h-[600px] max-h-[80vh] flex flex-col">
+    <Card className={`${compact ? 'h-[500px]' : 'h-[600px] max-h-[80vh]'} flex flex-col ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center">
           <div className="mr-2">
