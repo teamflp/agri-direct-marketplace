@@ -1,8 +1,9 @@
 
 import React, { useRef, useEffect } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowDown, Loader2 } from 'lucide-react';
+import { ArrowDown, Loader2, Bot } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
 import { ChatMessage as ChatMessageType } from '@/services/chat-service';
 import ChatMessage from './ChatMessage';
 
