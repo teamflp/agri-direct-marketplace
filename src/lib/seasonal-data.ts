@@ -35,7 +35,7 @@ const seasonalProducts: SeasonalProduct[] = [
     organic: true,
     highlight: true,
     months: [5, 6, 7],
-    image: "https://images.unsplash.com/photo-1518635017498-87f514b751ba?w=150&h=150&fit=crop"
+    image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=150&h=150&fit=crop"
   },
   {
     id: 4,
@@ -271,6 +271,60 @@ const seasonalProducts: SeasonalProduct[] = [
     months: [7, 8, 9],
     image: "https://images.unsplash.com/photo-1563288525-8f1ee0f874a8?w=150&h=150&fit=crop"
   },
+  {
+    id: 30,
+    name: "Brocolis",
+    category: "Légumes",
+    organic: true,
+    highlight: false,
+    months: [6, 7, 8, 9, 10],
+    image: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=150&h=150&fit=crop"
+  },
+  {
+    id: 31,
+    name: "Raisins",
+    category: "Fruits",
+    organic: false,
+    highlight: true,
+    months: [8, 9, 10],
+    image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=150&h=150&fit=crop"
+  },
+  {
+    id: 32,
+    name: "Prunes",
+    category: "Fruits",
+    organic: true,
+    highlight: false,
+    months: [7, 8, 9],
+    image: "https://images.unsplash.com/photo-1603408209093-cd3c9af498f5?w=150&h=150&fit=crop"
+  },
+  {
+    id: 33,
+    name: "Endives",
+    category: "Légumes",
+    organic: false,
+    highlight: false,
+    months: [10, 11, 12, 1, 2, 3],
+    image: "https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=150&h=150&fit=crop"
+  },
+  {
+    id: 34,
+    name: "Artichauts",
+    category: "Légumes",
+    organic: true,
+    highlight: false,
+    months: [5, 6, 7, 8, 9],
+    image: "https://images.unsplash.com/photo-1613743943493-5e3b3b358a5b?w=150&h=150&fit=crop"
+  },
+  {
+    id: 35,
+    name: "Poireaux",
+    category: "Légumes",
+    organic: true,
+    highlight: false,
+    months: [9, 10, 11, 12, 1, 2, 3],
+    image: "https://images.unsplash.com/photo-1613744447892-ad13955a30f3?w=150&h=150&fit=crop"
+  }
 ];
 
 export const getProductsByMonth = (month: number) => {
@@ -290,3 +344,4 @@ export const getAllCategories = () => {
 };
 
 export default seasonalProducts;
+
