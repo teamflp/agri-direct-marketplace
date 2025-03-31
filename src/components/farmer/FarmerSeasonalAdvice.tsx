@@ -1,92 +1,168 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Leaf, Calendar, Sprout } from 'lucide-react';
+import { Lightbulb, Sprout, UtensilsCrossed } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
-interface SeasonalCropSuggestion {
-  id: string;
+interface CropSuggestion {
   name: string;
-  season: string;
-  advice: string;
+  description: string;
+  difficulty: string;
+  growthTime: string;
+  image: string;
+  tips: string[];
 }
 
-interface FarmerSeasonalAdviceProps {
-  cropSuggestions?: SeasonalCropSuggestion[];
+interface RecipeSuggestion {
+  title: string;
+  description: string;
+  ingredients: string[];
+  image: string;
+  preparationTime: string;
 }
 
-const FarmerSeasonalAdvice = ({ cropSuggestions }: FarmerSeasonalAdviceProps) => {
-  // Si aucune suggestion n'est fournie, créer des suggestions par défaut basées sur la saison actuelle
+const FarmerSeasonalAdvice = () => {
+  // Obtenir le mois actuel
   const currentMonth = new Date().getMonth();
-  const currentSeason = 
-    currentMonth >= 2 && currentMonth <= 4 ? "Printemps" :
-    currentMonth >= 5 && currentMonth <= 7 ? "Été" :
-    currentMonth >= 8 && currentMonth <= 10 ? "Automne" : "Hiver";
+  const seasons = ["Hiver", "Hiver", "Printemps", "Printemps", "Printemps", "Été", "Été", "Été", "Automne", "Automne", "Automne", "Hiver"];
+  const currentSeason = seasons[currentMonth];
   
-  const defaultSuggestions: Record<string, SeasonalCropSuggestion[]> = {
-    "Printemps": [
-      { id: "spring-1", name: "Tomates", season: "Printemps", advice: "Semez en intérieur 6-8 semaines avant le dernier gel. Transplantez quand la température nocturne dépasse 10°C." },
-      { id: "spring-2", name: "Salades", season: "Printemps", advice: "Semez directement en pleine terre dès que le sol peut être travaillé. Récoltez avant les fortes chaleurs." },
-      { id: "spring-3", name: "Carottes", season: "Printemps", advice: "Semez en pleine terre dans un sol meuble et profond. Échelonnez les semis pour des récoltes successives." }
-    ],
-    "Été": [
-      { id: "summer-1", name: "Courgettes", season: "Été", advice: "Plantez en pleine terre après les dernières gelées. Récoltez régulièrement pour stimuler la production." },
-      { id: "summer-2", name: "Concombres", season: "Été", advice: "Cultivez dans un sol riche en compost. Arrosez régulièrement pour éviter l'amertume des fruits." },
-      { id: "summer-3", name: "Aubergines", season: "Été", advice: "Plantez dans un endroit ensoleillé et chaud. Tuteurez pour soutenir les plants chargés de fruits." }
-    ],
-    "Automne": [
-      { id: "autumn-1", name: "Choux", season: "Automne", advice: "Semez en été pour une récolte d'automne. Protégez des chenilles avec un voile anti-insectes." },
-      { id: "autumn-2", name: "Épinards", season: "Automne", advice: "Semez en fin d'été pour une récolte d'automne. Résiste bien aux températures fraîches." },
-      { id: "autumn-3", name: "Poireaux", season: "Automne", advice: "Repiquez les plants en été. Buttez pour obtenir un fût blanc plus long." }
-    ],
-    "Hiver": [
-      { id: "winter-1", name: "Ail", season: "Hiver", advice: "Plantez les gousses à l'automne pour une récolte l'été suivant. Privilégiez un sol bien drainé." },
-      { id: "winter-2", name: "Mâche", season: "Hiver", advice: "Semez en fin d'été pour des récoltes tout l'hiver. Supporte bien le froid mais pas l'excès d'humidité." },
-      { id: "winter-3", name: "Oignons", season: "Hiver", advice: "Plantez à l'automne pour des oignons plus précoces. Espacez suffisamment pour favoriser le grossissement." }
-    ]
-  };
-  
-  const suggestions = cropSuggestions || defaultSuggestions[currentSeason] || [];
+  // Suggestions de cultures selon la saison
+  const cropSuggestions: CropSuggestion[] = [
+    {
+      name: "Tomates cerises",
+      description: "Variété robuste et productive, parfaite pour les marchés locaux",
+      difficulty: "Modérée",
+      growthTime: "70-80 jours",
+      image: "https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=500&h=500&fit=crop",
+      tips: [
+        "Planter en pleine terre après les dernières gelées",
+        "Tuteurer régulièrement pour soutenir la croissance",
+        "Arroser à la base pour éviter les maladies fongiques"
+      ]
+    },
+    {
+      name: "Courgettes",
+      description: "Culture facile et rendement important, idéale pour diversifier votre offre",
+      difficulty: "Facile",
+      growthTime: "45-55 jours",
+      image: "https://images.unsplash.com/photo-1586789923396-437ef4883682?w=500&h=500&fit=crop",
+      tips: [
+        "Semer en poquet de 2-3 graines",
+        "Récolter régulièrement pour stimuler la production",
+        "Prévoir un espacement d'au moins 80cm entre les plants"
+      ]
+    }
+  ];
+
+  // Recettes à suggérer avec les produits de saison
+  const recipeSuggestions: RecipeSuggestion[] = [
+    {
+      title: "Salade printanière",
+      description: "Idéale à proposer en suggestion à vos clients pour valoriser vos produits",
+      ingredients: ["Jeunes pousses d'épinards", "Radis", "Fraises", "Fromage de chèvre frais", "Vinaigrette au miel"],
+      image: "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=500&h=500&fit=crop",
+      preparationTime: "15 min"
+    }
+  ];
 
   return (
     <Card className="w-full">
       <CardHeader className="bg-green-50 pb-2">
         <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-green-600" />
-          Conseils de culture saisonniers
+          <Lightbulb className="h-5 w-5 text-green-600" />
+          Conseils saisonniers - {currentSeason}
         </CardTitle>
         <CardDescription>
-          Recommandations pour la saison actuelle: {currentSeason}
+          Recommandations pour optimiser votre production cette saison
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
-        {suggestions.length > 0 ? (
-          <div className="space-y-4">
-            {suggestions.map((crop) => (
-              <Card key={crop.id} className="border border-green-100">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1">
-                      <Sprout className="h-5 w-5 text-green-600" />
-                    </div>
+        <div className="space-y-6">
+          {/* Suggestions de cultures */}
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+              <Sprout className="h-5 w-5 text-green-600" />
+              Cultures recommandées
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {cropSuggestions.map((crop, index) => (
+                <Card key={index} className="overflow-hidden border border-green-100">
+                  <div className="h-48 relative">
+                    <img
+                      src={crop.image}
+                      alt={crop.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <Badge className="absolute top-2 right-2 bg-green-100 text-green-800">
+                      {crop.difficulty}
+                    </Badge>
+                  </div>
+                  <CardContent className="p-4">
+                    <h4 className="font-medium text-lg mb-1">{crop.name}</h4>
+                    <p className="text-gray-600 text-sm mb-1">{crop.description}</p>
+                    <p className="text-green-700 text-sm mb-3">Temps de croissance: {crop.growthTime}</p>
+                    
+                    <Separator className="my-2" />
+                    
                     <div>
-                      <h4 className="font-medium text-lg mb-1">{crop.name}</h4>
-                      <p className="text-gray-600">{crop.advice}</p>
+                      <h5 className="text-sm font-medium mb-1">Conseils de culture:</h5>
+                      <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
+                        {crop.tips.map((tip, i) => (
+                          <li key={i}>{tip}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Suggestions de recettes */}
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+              <UtensilsCrossed className="h-5 w-5 text-green-600" />
+              Recettes à suggérer à vos clients
+            </h3>
+            <div className="grid grid-cols-1 gap-4">
+              {recipeSuggestions.map((recipe, index) => (
+                <Card key={index} className="overflow-hidden border border-green-100">
+                  <div className="grid grid-cols-1 md:grid-cols-3">
+                    <div className="relative h-full">
+                      <img
+                        src={recipe.image}
+                        alt={recipe.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <Badge className="absolute top-2 right-2 bg-green-100 text-green-800">
+                        {recipe.preparationTime}
+                      </Badge>
+                    </div>
+                    <div className="md:col-span-2">
+                      <CardContent className="p-4">
+                        <h4 className="font-medium text-lg mb-1">{recipe.title}</h4>
+                        <p className="text-gray-600 text-sm mb-3">{recipe.description}</p>
+                        
+                        <Separator className="my-2" />
+                        
+                        <div>
+                          <h5 className="text-sm font-medium mb-1">Ingrédients de saison:</h5>
+                          <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
+                            {recipe.ingredients.map((ingredient, i) => (
+                              <li key={i}>{ingredient}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </CardContent>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
-        ) : (
-          <Alert className="bg-green-50 border-green-200">
-            <Leaf className="h-4 w-4 text-green-600" />
-            <AlertTitle>Aucune suggestion disponible</AlertTitle>
-            <AlertDescription>
-              Revenez bientôt pour des conseils de culture adaptés à votre région et à la saison.
-            </AlertDescription>
-          </Alert>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

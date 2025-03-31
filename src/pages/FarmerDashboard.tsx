@@ -93,7 +93,22 @@ const FarmerDashboard = () => {
       image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=500&h=500&fit=crop",
       category: "Légumes",
       organic: true,
-      published: true
+      published: true,
+      stockHistory: [
+        {
+          date: "2023-05-01",
+          quantity: 10,
+          type: "add",
+          reason: "Livraison initiale"
+        },
+        {
+          date: "2023-05-10",
+          quantity: 7,
+          type: "remove",
+          reason: "Ventes"
+        }
+      ],
+      lastUpdated: "2023-05-10"
     },
     {
       id: 5,
@@ -105,7 +120,22 @@ const FarmerDashboard = () => {
       image: "https://images.unsplash.com/photo-1613878501069-18e97ac2dacf?w=500&h=500&fit=crop",
       category: "Légumes",
       organic: false,
-      published: true
+      published: true,
+      stockHistory: [
+        {
+          date: "2023-05-05",
+          quantity: 15,
+          type: "add",
+          reason: "Livraison initiale"
+        },
+        {
+          date: "2023-05-15",
+          quantity: 11,
+          type: "remove",
+          reason: "Ventes"
+        }
+      ],
+      lastUpdated: "2023-05-15"
     }
   ];
 
