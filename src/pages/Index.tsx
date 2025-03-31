@@ -7,9 +7,8 @@ import FeaturesSection from "@/components/home/FeaturesSection";
 import MapSection from "@/components/home/MapSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import SubscriptionSection from "@/components/home/SubscriptionSection";
-import ProductSuggestions from "@/components/ai/ProductSuggestions";
-import SeasonalRecipesCard from "@/components/ai/SeasonalRecipesCard";
-import GardeningTipsCard from "@/components/ai/GardeningTipsCard";
+import SeasonalProductsRecommendations from "@/components/seasonal/SeasonalProductsRecommendations";
+import MemberOnlyAdvice from "@/components/home/MemberOnlyAdvice";
 
 const Index = () => {
   return (
@@ -23,7 +22,7 @@ const Index = () => {
             <div className="mb-4">
               <h2 className="text-3xl font-bold">Produits recommandés</h2>
             </div>
-            <ProductSuggestions />
+            <SeasonalProductsRecommendations />
           </div>
           
           {/* Section Conseils personnalisés */}
@@ -32,10 +31,7 @@ const Index = () => {
               <h2 className="text-3xl font-bold">Conseils personnalisés</h2>
               <p className="text-gray-600">Des idées et astuces pour vous aider à consommer et produire mieux</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-              <SeasonalRecipesCard />
-              <GardeningTipsCard />
-            </div>
+            <MemberOnlyAdvice />
           </div>
         </div>
         <FeaturesSection />
