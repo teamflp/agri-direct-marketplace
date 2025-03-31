@@ -26,6 +26,9 @@ import {
 } from "@/components/ui/table";
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import PaymentMethodDialog from './components/PaymentMethodDialog';
+import InvoiceDownloader from './components/InvoiceDownloader';
+import PlanUpgradeDialog from './components/PlanUpgradeDialog';
 
 // Mock data for subscription
 const subscription = {
@@ -128,28 +131,19 @@ const FarmerSubscription = () => {
     { title: "Mon abonnement", path: "/farmer-dashboard/subscription", icon: <CreditCard size={20} /> },
   ];
   
-  const handleDownloadInvoice = (invoiceId: string) => {
+  const handleDownloadAllInvoices = () => {
     toast({
-      title: "Téléchargement de facture",
-      description: `La facture ${invoiceId} a été téléchargée`,
+      title: "Téléchargement groupé",
+      description: "Toutes les factures ont été téléchargées en format ZIP",
     });
-    // Dans une vraie app, téléchargement du PDF
-  };
-  
-  const handleChangePlan = (planId: string) => {
-    toast({
-      title: "Changement de forfait",
-      description: `Vous allez être redirigé vers la page de paiement pour le forfait ${planId}`,
-    });
-    // Dans une vraie app, redirection vers la page de paiement
-  };
-  
-  const handleUpdatePayment = () => {
-    toast({
-      title: "Mise à jour du moyen de paiement",
-      description: "Vous allez être redirigé vers la page de paiement",
-    });
-    // Dans une vraie app, redirection vers la page de paiement
+    
+    // Dans une vraie app, téléchargement du ZIP
+    const dummyLink = document.createElement('a');
+    dummyLink.href = `data:application/zip;base64,UEsDBBQAAAAAAMVtlFYAAAAAAAAAAAAAAAALAAAAZmFjdHVyZXMvLzUvUEsDBAoAAAAAAMVtlFYAAAAAAAAAAAAAAAAVAAAAZmFjdHVyZXMvRkFDLTIwMjMtMDA`;
+    dummyLink.download = "Toutes_les_factures.zip";
+    document.body.appendChild(dummyLink);
+    dummyLink.click();
+    document.body.removeChild(dummyLink);
   };
 
   return (
@@ -215,9 +209,7 @@ const FarmerSubscription = () => {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <Button variant="outline" onClick={handleUpdatePayment}>
-                    Mettre à jour le moyen de paiement
-                  </Button>
+                  <PaymentMethodDialog />
                 </div>
               </div>
               
@@ -290,15 +282,7 @@ const FarmerSubscription = () => {
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="inline-flex items-center gap-1"
-                        onClick={() => handleDownloadInvoice(invoice.id)}
-                      >
-                        <Download size={16} />
-                        PDF
-                      </Button>
+                      <InvoiceDownloader invoiceId={invoice.id} invoiceNumber={invoice.id} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -341,17 +325,13 @@ const FarmerSubscription = () => {
                     </ul>
                   </CardContent>
                   <CardFooter className="flex justify-center pb-6">
-                    {plan.current ? (
-                      <Button disabled>Forfait actuel</Button>
-                    ) : (
-                      <Button 
-                        variant={plan.popular ? "default" : "outline"}
-                        className={plan.popular ? "bg-agrimarket-orange hover:bg-orange-600" : ""}
-                        onClick={() => handleChangePlan(plan.name)}
-                      >
-                        Choisir ce forfait
-                      </Button>
-                    )}
+                    <PlanUpgradeDialog 
+                      planName={plan.name}
+                      planPrice={plan.price} 
+                      planFeatures={plan.features}
+                      currentPlan={plan.current || false}
+                      popular={plan.popular || false}
+                    />
                   </CardFooter>
                 </Card>
               ))}
