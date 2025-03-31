@@ -41,7 +41,27 @@ const FloatingChatButton = () => {
                 <ChatInterface compact={true} />
               </div>
             </div>
-          ) : null}
+          ) : (
+            // Petite fenêtre toujours visible
+            <div className="absolute bottom-0 right-0 mb-20 w-[300px]">
+              <div className="rounded-lg shadow-md bg-white p-3 border border-agrimarket-lightGreen">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Chat AgriMarket</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setIsOpen(true)}
+                    className="text-agrimarket-green hover:bg-agrimarket-lightGreen p-1 h-6"
+                  >
+                    Agrandir
+                  </Button>
+                </div>
+                <div className="text-xs text-gray-500">
+                  Besoin d'aide? Cliquez pour discuter avec notre assistant!
+                </div>
+              </div>
+            </div>
+          )}
           
           <Button
             onClick={() => setIsOpen(!isOpen)}

@@ -16,14 +16,13 @@ const Header = () => {
   const [showCart, setShowCart] = useState(false);
   const isMobile = useIsMobile();
 
-  // Navigation links
+  // Navigation links - sans le lien Chat
   const navLinks = [
     { path: '/', label: t('header.home') },
     { path: '/products', label: t('header.products') },
     { path: '/farmers', label: t('header.farmers') },
     { path: '/seasonal-calendar', label: t('header.seasonal') },
     { path: '/subscriptions', label: t('header.subscriptions') },
-    { path: '/chat', label: 'Chat' },
     { path: '/contact', label: t('header.contact') },
   ];
 
