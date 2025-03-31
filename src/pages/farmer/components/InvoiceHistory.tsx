@@ -73,7 +73,12 @@ const InvoiceHistory = ({ invoices }: InvoiceHistoryProps) => {
                 </span>
               </TableCell>
               <TableCell className="text-right">
-                <InvoiceDownloader invoiceId={invoice.id} invoiceNumber={invoice.id} />
+                <InvoiceDownloader 
+                  invoiceId={invoice.id} 
+                  invoiceNumber={invoice.id} 
+                  amount={invoice.amount}
+                  period={invoice.period}
+                />
               </TableCell>
             </TableRow>
           ))}

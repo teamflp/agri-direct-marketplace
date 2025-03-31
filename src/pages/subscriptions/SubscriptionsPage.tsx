@@ -1,59 +1,66 @@
 
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import UserSubscriptions from '@/components/subscriptions/UserSubscriptions';
-import { useSubscription } from '@/contexts/SubscriptionContext';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useLocation, useNavigate } from 'react-router-dom';
+import SubscriptionPlans from './components/PlansList';
 import SubscriptionBanner from './components/SubscriptionBanner';
-import PlansList from './components/PlansList';
 import SubscriptionAdvantages from './components/SubscriptionAdvantages';
 import SubscriptionFaq from './components/SubscriptionFaq';
+import UserSubscriptions from '@/components/subscriptions/UserSubscriptions';
 import SubscriptionCta from './components/SubscriptionCta';
 
 const SubscriptionsPage = () => {
-  const { getUserSubscriptions } = useSubscription();
-  const userSubscriptions = getUserSubscriptions();
   const location = useLocation();
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Récupérer le plan sélectionné depuis l'état de navigation
-    if (location.state && location.state.selectedPlan) {
-      setSelectedPlan(location.state.selectedPlan);
-      // Faire défiler jusqu'à la section des plans
-      setTimeout(() => {
-        const plansSection = document.getElementById('plans-section');
-        if (plansSection) {
-          plansSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
+  const navigate = useNavigate();
+  const selectedPlan = location.state?.selectedPlan || null;
+  
+  const [showUserSubscriptions, setShowUserSubscriptions] = React.useState(false);
+  
+  React.useEffect(() => {
+    // Si on reçoit un plan sélectionné, afficher la section de mes abonnements
+    if (selectedPlan) {
+      setShowUserSubscriptions(true);
     }
-  }, [location.state]);
+  }, [selectedPlan]);
+  
+  const toggleUserSubscriptions = () => {
+    setShowUserSubscriptions(!showUserSubscriptions);
+  };
   
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="container mx-auto px-4 py-10">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Abonnements</h1>
+        <Button 
+          variant="outline" 
+          onClick={toggleUserSubscriptions}
+        >
+          {showUserSubscriptions ? "Voir les forfaits" : "Mes abonnements"}
+        </Button>
+      </div>
       
-      <main className="flex-grow pt-16">
-        <SubscriptionBanner />
-        
-        {/* Mes abonnements (si l'utilisateur en a) */}
-        {userSubscriptions.length > 0 && (
-          <div className="container mx-auto px-4 py-12">
-            <UserSubscriptions />
-          </div>
-        )}
-        
-        <div id="plans-section">
-          <PlansList initialSelectedPlan={selectedPlan} />
+      {showUserSubscriptions ? (
+        <div className="space-y-8">
+          <UserSubscriptions showTitle={true} />
         </div>
-        <SubscriptionAdvantages />
-        <SubscriptionFaq />
-        <SubscriptionCta />
-      </main>
-      
-      <Footer />
+      ) : (
+        <>
+          <SubscriptionBanner />
+          
+          <div className="my-12">
+            <SubscriptionPlans selectedPlanId={selectedPlan} />
+          </div>
+          
+          <SubscriptionAdvantages />
+          
+          <div className="my-12">
+            <SubscriptionCta />
+          </div>
+          
+          <SubscriptionFaq />
+        </>
+      )}
     </div>
   );
 };
