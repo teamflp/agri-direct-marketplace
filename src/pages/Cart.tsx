@@ -108,7 +108,7 @@ const Cart = () => {
                                   <Button 
                                     variant="outline" 
                                     size="icon" 
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-8 w-8 rounded-full bg-white border-orange-200 text-orange-500 hover:bg-orange-50 hover:text-orange-700"
                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                     disabled={item.quantity <= 1}
                                   >
@@ -118,7 +118,7 @@ const Cart = () => {
                                   <Button 
                                     variant="outline" 
                                     size="icon" 
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-8 w-8 rounded-full bg-white border-orange-200 text-orange-500 hover:bg-orange-50 hover:text-orange-700"
                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                   >
                                     <Plus className="h-4 w-4" />

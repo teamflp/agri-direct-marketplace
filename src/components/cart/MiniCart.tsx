@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -70,13 +71,24 @@ export function MiniCart() {
                       
                       <div className="flex justify-between items-center mt-2">
                         <div className="flex items-center gap-1">
-                          <Button variant="outline" size="icon" className="h-6 w-6 rounded-full p-0 bg-orange-600 border-white/20 text-white hover:bg-orange-700" onClick={() => handleDecreaseQuantity(item.id, item.quantity)} disabled={item.quantity <= 1}>
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-6 w-6 rounded-full p-0 bg-white border-white text-orange-600 hover:bg-orange-50 hover:text-orange-700 shadow-sm" 
+                            onClick={() => handleDecreaseQuantity(item.id, item.quantity)} 
+                            disabled={item.quantity <= 1}
+                          >
                             <Minus className="h-3 w-3" />
                           </Button>
                           <span className="text-xs font-medium min-w-[1.5rem] text-center">
                             {item.quantity}
                           </span>
-                          <Button variant="outline" size="icon" className="h-6 w-6 rounded-full p-0 bg-orange-600 border-white/20 text-white hover:bg-orange-700" onClick={() => handleIncreaseQuantity(item.id, item.quantity)}>
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-6 w-6 rounded-full p-0 bg-white border-white text-orange-600 hover:bg-orange-50 hover:text-orange-700 shadow-sm" 
+                            onClick={() => handleIncreaseQuantity(item.id, item.quantity)}
+                          >
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
