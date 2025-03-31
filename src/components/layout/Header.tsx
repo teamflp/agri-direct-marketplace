@@ -7,6 +7,7 @@ import { MiniCart } from '@/components/cart/MiniCart';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { Input } from "@/components/ui/input";
 import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -14,6 +15,7 @@ const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // Détection du défilement pour appliquer les effets visuels
   useEffect(() => {
@@ -160,21 +162,23 @@ const Header = () => {
               </Link>
             </Button>
             
-            {/* Bouton menu mobile - caché sur desktop */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="md:hidden text-gray-600 hover:bg-gray-100"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Menu principal"
-            >
-              <span className="sr-only">Menu</span>
-              {menuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </Button>
+            {/* Bouton menu mobile - visible seulement sur mobile */}
+            {isMobile && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="text-gray-600 hover:bg-gray-100"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Menu principal"
+              >
+                <span className="sr-only">Menu</span>
+                {menuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
         
