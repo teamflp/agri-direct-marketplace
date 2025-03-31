@@ -6,7 +6,7 @@ import { BookmarkCheck } from 'lucide-react';
 
 const SubscriptionBanner = () => {
   return (
-    <div className="relative rounded-xl overflow-hidden shadow-lg mt-16">
+    <div className="relative overflow-hidden shadow-lg mt-16 w-full">
       {/* Image de fond */}
       <div className="absolute inset-0 z-0">
         <img 
