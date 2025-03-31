@@ -41,7 +41,7 @@ const BuyerSubscriptions = () => {
           </Button>
         </div>
         
-        <UserSubscriptions showTitle={false} />
+        <UserSubscriptions />
         
         {subscriptions.length > 0 && (
           <div className="bg-gray-50 p-6 rounded-lg mt-8">

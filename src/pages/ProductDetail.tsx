@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { AddToCartButton } from '@/components/products/AddToCartButton';
+import AddToCartButton from '@/components/products/AddToCartButton';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProductSocialActions from '@/components/products/ProductSocialActions';

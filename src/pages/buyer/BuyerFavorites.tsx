@@ -9,6 +9,24 @@ import { useSocial } from '@/contexts/SocialContext';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
 
+// Define an extended type for FavoriteFarmer to include required properties
+interface ExtendedFavoriteFarmer {
+  id: number;
+  name: string;
+  avatar: string;
+  location: string;
+  rating: number;
+  reviewCount: number;
+  description: string;
+  popularProducts: Array<{
+    id: number;
+    name: string;
+    image: string;
+    price: number;
+    unit: string;
+  }>;
+}
+
 const BuyerFavorites = () => {
   const { favoriteFarmers, removeFavoriteFarmer } = useSocial();
   const { addItem } = useCart();
@@ -22,6 +40,9 @@ const BuyerFavorites = () => {
     { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
     { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
   ];
+  
+  // Cast favoriteFarmers to the extended type with required properties
+  const extendedFavoriteFarmers = favoriteFarmers as unknown as ExtendedFavoriteFarmer[];
   
   const handleRemoveFavorite = (farmerId: number) => {
     removeFavoriteFarmer(farmerId);
@@ -65,7 +86,7 @@ const BuyerFavorites = () => {
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Mes Favoris</h1>
         
-        {favoriteFarmers.length === 0 ? (
+        {extendedFavoriteFarmers.length === 0 ? (
           <div className="text-center py-16 border rounded-lg bg-gray-50">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-medium text-gray-700">Vous n'avez pas encore d'agriculteurs favoris</h3>
@@ -76,7 +97,7 @@ const BuyerFavorites = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {favoriteFarmers.map((farmer) => (
+            {extendedFavoriteFarmers.map((farmer) => (
               <Card key={farmer.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="p-6">

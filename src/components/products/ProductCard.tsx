@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Truck, Store, Leaf } from 'lucide-react';
-import { AddToCartButton } from './AddToCartButton';
+import AddToCartButton from './AddToCartButton';
 import { useNavigate } from 'react-router-dom';
 
 type ProductCardProps = {

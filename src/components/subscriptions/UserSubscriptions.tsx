@@ -51,9 +51,25 @@ const UserSubscriptions = () => {
         // Appel à l'API pour récupérer les abonnements
         const subscriptions = await getUserSubscriptions();
         
+        // Convertir les abonnements au format attendu par notre interface locale
+        const convertedSubscriptions = subscriptions.map(sub => ({
+          id: sub.id,
+          status: sub.status,
+          startDate: sub.startDate instanceof Date ? sub.startDate.toISOString() : String(sub.startDate),
+          endDate: sub.endDate instanceof Date ? sub.endDate.toISOString() : (sub.endDate ? String(sub.endDate) : ''),
+          price: sub.price,
+          planName: sub.plan || '',
+          farmerName: sub.farmerName || '',
+          frequency: sub.frequency || 'monthly',
+          nextDelivery: sub.nextDelivery instanceof Date ? sub.nextDelivery.toISOString() : 
+                     (typeof sub.nextDelivery === 'string' ? sub.nextDelivery : ''),
+          isAutoRenew: sub.isAutoRenew || false,
+          items: sub.items || []
+        }));
+        
         // Filtrer les abonnements actifs et passés
-        const active = subscriptions.filter(sub => ['active', 'paused'].includes(sub.status));
-        const past = subscriptions.filter(sub => ['cancelled', 'expired'].includes(sub.status));
+        const active = convertedSubscriptions.filter(sub => ['active', 'paused'].includes(sub.status));
+        const past = convertedSubscriptions.filter(sub => ['cancelled', 'expired'].includes(sub.status));
         
         setActiveSubscriptions(active);
         setPastSubscriptions(past);
