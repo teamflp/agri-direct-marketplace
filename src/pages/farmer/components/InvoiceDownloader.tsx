@@ -35,16 +35,12 @@ const InvoiceDownloader = ({ invoiceId, invoiceNumber, order }: InvoiceDownloade
     const today = new Date().toLocaleDateString('fr-FR');
     
     // Génération des détails d'articles fictifs basés sur le nombre d'articles
-    let itemsDetails = '';
-    if (order?.items) {
-      for (let i = 1; i <= order.items; i++) {
-        itemsDetails += `Article ${i} x 1 : ${Math.round(totalHT / order.items)} EUR\n`;
-      }
-    }
+    const itemsCount = order?.items || 0;
+    const itemUnitPrice = itemsCount > 0 ? Math.round(totalHT / itemsCount) : 0;
     
-    // Génération d'un PDF plus complet avec des informations de facture réelles
+    // Création d'un document PDF bien formaté
     const pdfContent = `
-%PDF-1.4
+%PDF-1.7
 1 0 obj
 <</Type/Catalog/Pages 2 0 R>>
 endobj
@@ -52,58 +48,128 @@ endobj
 <</Type/Pages/Kids[3 0 R]/Count 1>>
 endobj
 3 0 obj
-<</Type/Page/MediaBox[0 0 612 792]/Resources<</Font<</F1 5 0 R>>>>/Contents 4 0 R/Parent 2 0 R>>
+<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Resources<</Font<</F1 4 0 R/F2 5 0 R>>>>/Contents 6 0 R>>
 endobj
 4 0 obj
-<</Length 1000>>
-stream
-BT
-/F1 24 Tf
-50 700 Td
-(FACTURE) Tj
-/F1 12 Tf
-0 -50 Td
-(Num\\351ro de facture: ${invoiceNumber}) Tj
-0 -20 Td
-(Date: ${today}) Tj
-0 -20 Td
-(ID Commande: ${invoiceId}) Tj
-0 -40 Td
-(Client: ${order?.customer || 'Client non spécifié'}) Tj
-0 -40 Td
-(D\\351tails de la commande:) Tj
-0 -20 Td
-(${itemsDetails.replace(/\n/g, '\\n0 -20 Td (')}) Tj
-0 -40 Td
-(Montant total HT: ${totalHT.toFixed(2)} EUR) Tj
-0 -20 Td
-(TVA (20%): ${tva.toFixed(2)} EUR) Tj
-0 -20 Td
-(Total TTC: ${totalTTC.toFixed(2)} EUR) Tj
-0 -40 Td
-(Agrimarket SAS - 123 Rue de l'Agriculture - 75000 Paris) Tj
-0 -20 Td
-(SIRET: 123 456 789 00010 - TVA: FR 12 345 678 90) Tj
-ET
-endstream
+<</Type/Font/Subtype/Type1/BaseFont/Helvetica-Bold>>
 endobj
 5 0 obj
 <</Type/Font/Subtype/Type1/BaseFont/Helvetica>>
 endobj
+6 0 obj
+<</Length 1500>>
+stream
+BT
+/F1 24 Tf
+50 780 Td
+(FACTURE) Tj
+
+/F2 12 Tf
+0 -50 Td
+(Num) Tj
+/F2 12 Tf
+(é) Tj
+/F2 12 Tf
+(ro de facture: ${invoiceNumber}) Tj
+
+0 -20 Td
+(Date: ${today}) Tj
+
+0 -20 Td
+(ID Commande: ${invoiceId}) Tj
+
+0 -40 Td
+(Client: ${order?.customer || 'Client non spécifié'}) Tj
+
+0 -40 Td
+(D) Tj
+/F2 12 Tf
+(é) Tj
+/F2 12 Tf
+(tails de la commande:) Tj
+ET
+
+${generateItemsTable(itemsCount, itemUnitPrice)}
+
+BT
+/F2 12 Tf
+50 350 Td
+(Montant total HT: ${totalHT.toFixed(2)} EUR) Tj
+
+0 -20 Td
+(TVA (20%): ${tva.toFixed(2)} EUR) Tj
+
+/F1 12 Tf
+0 -20 Td
+(Total TTC: ${totalTTC.toFixed(2)} EUR) Tj
+
+/F2 10 Tf
+0 -60 Td
+(Agrimarket SAS - 123 Rue de l'Agriculture - 75000 Paris) Tj
+
+0 -15 Td
+(SIRET: 123 456 789 00010 - TVA: FR 12 345 678 90) Tj
+ET
+endstream
+endobj
 xref
-0 6
+0 7
 0000000000 65535 f
 0000000009 00000 n
 0000000056 00000 n
 0000000111 00000 n
-0000000212 00000 n
-0000001265 00000 n
+0000000223 00000 n
+0000000289 00000 n
+0000000350 00000 n
 trailer
-<</Size 6/Root 1 0 R>>
+<</Size 7/Root 1 0 R>>
 startxref
-1330
+1903
 %%EOF
 `;
+    
+    // Fonction pour générer la table des articles
+    function generateItemsTable(count, unitPrice) {
+      if (count <= 0) return '';
+      
+      let tableContent = `
+BT
+/F2 12 Tf
+50 480 Td
+(Article) Tj
+150 0 Td
+(Quantité) Tj
+250 0 Td
+(Prix Unitaire) Tj
+350 0 Td
+(Total) Tj
+
+/F2 10 Tf
+`;
+
+      let yOffset = 20;
+      for (let i = 1; i <= count; i++) {
+        const name = `Article ${i}`;
+        const quantity = 1;
+        const price = unitPrice;
+        const total = quantity * price;
+        
+        tableContent += `
+-350 -${yOffset} Td
+(${name}) Tj
+150 0 Td
+(${quantity}) Tj
+100 0 Td
+(${price.toFixed(2)} EUR) Tj
+100 0 Td
+(${total.toFixed(2)} EUR) Tj
+`;
+        yOffset = 15; // Espacement réduit pour les lignes suivantes
+      }
+      
+      tableContent += 'ET';
+      return tableContent;
+    }
     
     const pdfBlob = new Blob([pdfContent], { type: 'application/pdf' });
     
