@@ -1,0 +1,50 @@
+
+import React from 'react';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import ChatInterface from '@/components/chat/ChatInterface';
+import { MessageSquare } from 'lucide-react';
+
+const Chat = () => {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow pt-20 sm:pt-24 bg-gray-50">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold mb-3">Assistant AgriMarket</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Posez vos questions sur l'agriculture biologique, les produits de saison, ou contacter notre équipe 
+              <MessageSquare className="inline h-5 w-5 text-green-600 ml-2" />
+            </p>
+          </div>
+          
+          <div className="mb-12">
+            <ChatInterface />
+          </div>
+          
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h2 className="text-2xl font-bold mb-4">Comment puis-je vous aider ?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-4 border rounded-lg bg-green-50">
+                <h3 className="font-bold text-lg mb-2">Produits de saison</h3>
+                <p className="text-gray-700">Découvrez quels produits sont disponibles en ce moment et comment les cuisiner.</p>
+              </div>
+              <div className="p-4 border rounded-lg bg-blue-50">
+                <h3 className="font-bold text-lg mb-2">Agriculture biologique</h3>
+                <p className="text-gray-700">Posez vos questions sur les pratiques agricoles durables et les certifications bio.</p>
+              </div>
+              <div className="p-4 border rounded-lg bg-yellow-50">
+                <h3 className="font-bold text-lg mb-2">Support AgriMarket</h3>
+                <p className="text-gray-700">Besoin d'aide avec votre commande, votre compte ou nos services ? Demandez-moi !</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default Chat;

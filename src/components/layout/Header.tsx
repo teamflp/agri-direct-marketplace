@@ -23,6 +23,7 @@ const Header = () => {
     { path: '/farmers', label: t('header.farmers') },
     { path: '/seasonal-calendar', label: t('header.seasonal') },
     { path: '/subscriptions', label: t('header.subscriptions') },
+    { path: '/chat', label: 'Chat' },
     { path: '/contact', label: t('header.contact') },
   ];
 
