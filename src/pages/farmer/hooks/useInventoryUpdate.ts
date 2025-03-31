@@ -106,6 +106,21 @@ export function useInventoryUpdate() {
       });
     });
     
+    // NOUVELLE FONCTIONNALITÉ: Retirer le produit de la liste si maintenant suffisamment approvisionné
+    setLowStockProducts(prevProducts => {
+      return prevProducts.filter(product => {
+        // Si c'est le produit mis à jour et que c'était un ajout
+        if (product.id === productId && type === 'add') {
+          // On vérifie si le nouveau stock est suffisant
+          const newInventory = product.inventory + quantity;
+          // On le garde uniquement s'il est encore sous le seuil minimum
+          return newInventory <= product.minimumStock;
+        }
+        // On garde tous les autres produits
+        return true;
+      });
+    });
+    
     setShowUpdateDialog(false);
     
     toast({

@@ -9,13 +9,17 @@ type ProductsOverviewProps = {
   filteredProducts: ProductType[];
   onTogglePublish: (productId: number, currentStatus: boolean) => void;
   onDeleteClick: (product: ProductType) => void;
+  onViewClick: (product: ProductType) => void;
+  onEditClick: (product: ProductType) => void;
 };
 
 const ProductsOverview = ({
   products,
   filteredProducts,
   onTogglePublish,
-  onDeleteClick
+  onDeleteClick,
+  onViewClick,
+  onEditClick
 }: ProductsOverviewProps) => {
   return (
     <Card>
@@ -30,6 +34,8 @@ const ProductsOverview = ({
           products={filteredProducts} 
           onTogglePublish={onTogglePublish}
           onDeleteClick={onDeleteClick}
+          onViewClick={onViewClick}
+          onEditClick={onEditClick}
         />
       </CardContent>
     </Card>

@@ -25,12 +25,16 @@ type ProductsTableProps = {
   products: ProductType[];
   onTogglePublish: (productId: number, currentStatus: boolean) => void;
   onDeleteClick: (product: ProductType) => void;
+  onViewClick: (product: ProductType) => void;
+  onEditClick: (product: ProductType) => void;
 };
 
 const ProductsTable = ({ 
   products, 
   onTogglePublish, 
-  onDeleteClick 
+  onDeleteClick,
+  onViewClick,
+  onEditClick
 }: ProductsTableProps) => {
   return (
     <Table>
@@ -85,11 +89,21 @@ const ProductsTable = ({
                 />
               </TableCell>
               <TableCell className="text-right space-x-2">
-                <Button variant="outline" size="sm" className="inline-flex items-center gap-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="inline-flex items-center gap-1"
+                  onClick={() => onViewClick(product)}
+                >
                   <Eye size={16} />
                   <span className="hidden sm:inline">Voir</span>
                 </Button>
-                <Button variant="outline" size="sm" className="inline-flex items-center gap-1 ml-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="inline-flex items-center gap-1 ml-2"
+                  onClick={() => onEditClick(product)}
+                >
                   <Edit size={16} />
                   <span className="hidden sm:inline">Éditer</span>
                 </Button>
