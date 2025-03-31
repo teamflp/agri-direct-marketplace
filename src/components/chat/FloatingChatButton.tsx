@@ -42,7 +42,7 @@ const FloatingChatButton = () => {
               </div>
             </div>
           ) : (
-            // Petite fenêtre toujours visible
+            // Petite fenêtre toujours visible comme dans l'image
             <div className="absolute bottom-0 right-0 mb-20 w-[300px]">
               <div className="rounded-lg shadow-md bg-white p-3 border border-agrimarket-lightGreen">
                 <div className="flex items-center justify-between mb-2">
