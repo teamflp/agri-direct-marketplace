@@ -12,14 +12,6 @@ const SeasonalProductsRecommendations = () => {
   // Obtenir le nom du mois actuel en français
   const currentMonthName = new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(new Date());
 
-  // Images par défaut pour les produits saisonniers
-  const productImages = [
-    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=300&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=300&h=300&fit=crop",
-    "https://images.unsplash.com/photo-1465379944081-7f47de8d74ac?w=300&h=300&fit=crop"
-  ];
-
   return (
     <Card className="w-full">
       <CardHeader className="bg-green-50 pb-2">
@@ -33,11 +25,11 @@ const SeasonalProductsRecommendations = () => {
       </CardHeader>
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {products.map((product, index) => (
+          {products.map((product) => (
             <div key={product.id} className="rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="relative h-40 overflow-hidden">
                 <img
-                  src={productImages[index % productImages.length]}
+                  src={product.image}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
