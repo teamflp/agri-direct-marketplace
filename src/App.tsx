@@ -23,7 +23,6 @@ import Chat from './pages/Chat';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { CartProvider } from './contexts/CartContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
-import FloatingChatButton from './components/chat/FloatingChatButton';
 import { MessageProvider } from './contexts/MessageContext';
 
 const App = () => {
@@ -33,7 +32,6 @@ const App = () => {
         <SubscriptionProvider>
           <MessageProvider>
             <Router>
-              <FloatingChatButton />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/farmers" element={<Farmers />} />
