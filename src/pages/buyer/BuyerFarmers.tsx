@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,9 @@ import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, MessageCircl
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useSocial } from '@/contexts/SocialContext';
+import { useMessages } from '@/contexts/MessageContext';
+import { FavoriteFarmerButton } from '@/components/social/FavoriteFarmerButton';
 
 // Mock data for favorite farmers
 const farmers = [
@@ -84,6 +87,9 @@ const recommendedFarmers = [
 
 const BuyerFarmers = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { isFarmerFavorite, addFavoriteFarmer, removeFavoriteFarmer, favoriteFarmers } = useSocial();
+  const { messageState, setActiveConversation } = useMessages();
   
   const menuItems = [
     { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
@@ -94,24 +100,118 @@ const BuyerFarmers = () => {
     { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
   ];
   
-  const handleFollowFarmer = (farmerId: number, farmerName: string, isFollowing: boolean) => {
-    toast({
-      title: isFollowing ? "Agriculteur retiré" : "Agriculteur suivi",
-      description: isFollowing 
-        ? `Vous ne suivez plus ${farmerName}` 
-        : `Vous suivez maintenant ${farmerName}`,
-      variant: isFollowing ? "destructive" : "default",
-    });
-    // Dans une application réelle, mise à jour de l'état
+  const handleFollowFarmer = (farmer) => {
+    const isFavorite = isFarmerFavorite(farmer.id);
+    
+    if (isFavorite) {
+      // Trouver l'ID du favori pour le supprimer
+      const favorite = favoriteFarmers.find(f => f.farmerId === farmer.id);
+      if (favorite) {
+        removeFavoriteFarmer(favorite.id);
+      }
+    } else {
+      // Ajouter l'agriculteur aux favoris
+      addFavoriteFarmer({
+        farmerId: farmer.id,
+        farmerName: farmer.name,
+        farmName: farmer.farm,
+        farmerAvatar: farmer.avatar,
+        products: farmer.products,
+        rating: farmer.rating
+      });
+    }
   };
   
-  const handleContactFarmer = (farmerId: number, farmerName: string) => {
-    toast({
-      title: "Message à l'agriculteur",
-      description: `Conversation avec ${farmerName} ouverte`,
-    });
-    // Dans une application réelle, redirigez vers la messagerie
+  const handleContactFarmer = (farmerId, farmerName) => {
+    // Chercher si une conversation existe déjà
+    const conversation = messageState.conversations.find(
+      conv => conv.farmerId === farmerId
+    );
+    
+    if (conversation) {
+      // Ouvrir la conversation existante
+      setActiveConversation(conversation.id);
+      navigate('/buyer-dashboard/messages');
+    } else {
+      // Informer l'utilisateur qu'une nouvelle conversation serait créée dans une vraie application
+      toast({
+        title: "Nouvelle conversation",
+        description: `Une nouvelle conversation avec ${farmerName} serait créée.`,
+        variant: "info"
+      });
+      
+      // Dans une vraie application, créer une nouvelle conversation puis naviguer
+      // Pour cette démo, on navigue simplement vers la messagerie
+      navigate('/buyer-dashboard/messages');
+    }
   };
+  
+  const navigateToFarmerProfile = (farmerId) => {
+    navigate(`/farmers/${farmerId}`);
+  };
+
+  // Fonction pour afficher un agriculteur dans une carte
+  const renderFarmerCard = (farmer) => (
+    <Card key={farmer.id} className="overflow-hidden hover:shadow-md transition-shadow">
+      <div className="h-32 relative">
+        <img 
+          src={farmer.cover} 
+          alt={farmer.farm} 
+          className="w-full h-full object-cover cursor-pointer"
+          onClick={() => navigateToFarmerProfile(farmer.id)}
+        />
+        <div className="absolute -bottom-10 left-4">
+          <Avatar className="h-20 w-20 border-4 border-white cursor-pointer">
+            <img 
+              src={farmer.avatar} 
+              alt={farmer.name}
+              onClick={() => navigateToFarmerProfile(farmer.id)}
+            />
+          </Avatar>
+        </div>
+      </div>
+      <CardContent className="pt-12 pb-4">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+          <div>
+            <Link to={`/farmers/${farmer.id}`} className="hover:underline">
+              <h3 className="font-bold text-lg">{farmer.farm}</h3>
+            </Link>
+            <p className="text-sm text-gray-600">{farmer.name}</p>
+            <div className="flex items-center mt-1">
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <span className="ml-1 text-sm">{farmer.rating} · {farmer.products} produits</span>
+            </div>
+            <p className="text-sm mt-2">{farmer.location}</p>
+            <div className="flex flex-wrap gap-1 mt-2">
+              {farmer.categories.map((category, idx) => (
+                <Badge key={idx} variant="outline" className="bg-gray-100">
+                  {category}
+                </Badge>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 mt-4 md:mt-0">
+            <Button 
+              variant="outline" 
+              className="flex gap-2"
+              onClick={() => handleContactFarmer(farmer.id, farmer.name)}
+            >
+              <MessageCircle size={16} />
+              Contacter
+            </Button>
+            <FavoriteFarmerButton
+              farmerId={farmer.id}
+              farmerName={farmer.name}
+              farmName={farmer.farm}
+              farmerAvatar={farmer.avatar}
+              products={farmer.products}
+              rating={farmer.rating}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <DashboardLayout
@@ -141,61 +241,7 @@ const BuyerFarmers = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {farmers.map((farmer) => (
-                <Card key={farmer.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-32 relative">
-                    <img 
-                      src={farmer.cover} 
-                      alt={farmer.farm} 
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute -bottom-10 left-4">
-                      <Avatar className="h-20 w-20 border-4 border-white">
-                        <img src={farmer.avatar} alt={farmer.name} />
-                      </Avatar>
-                    </div>
-                  </div>
-                  <CardContent className="pt-12 pb-4">
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                      <div>
-                        <Link to={`/farmers/${farmer.id}`} className="hover:underline">
-                          <h3 className="font-bold text-lg">{farmer.farm}</h3>
-                        </Link>
-                        <p className="text-sm text-gray-600">{farmer.name}</p>
-                        <div className="flex items-center mt-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="ml-1 text-sm">{farmer.rating} · {farmer.products} produits</span>
-                        </div>
-                        <p className="text-sm mt-2">{farmer.location}</p>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {farmer.categories.map((category, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-gray-100">
-                              {category}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2 mt-4 md:mt-0">
-                        <Button 
-                          variant="outline" 
-                          className="flex gap-2"
-                          onClick={() => handleContactFarmer(farmer.id, farmer.name)}
-                        >
-                          <MessageCircle size={16} />
-                          Contacter
-                        </Button>
-                        <Button 
-                          variant={farmer.followed ? "destructive" : "default"}
-                          className="flex gap-2"
-                          onClick={() => handleFollowFarmer(farmer.id, farmer.name, farmer.followed)}
-                        >
-                          {farmer.followed ? "Ne plus suivre" : "Suivre"}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {farmers.map(renderFarmerCard)}
             </div>
           </CardContent>
         </Card>
@@ -209,61 +255,7 @@ const BuyerFarmers = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {recommendedFarmers.map((farmer) => (
-                <Card key={farmer.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-32 relative">
-                    <img 
-                      src={farmer.cover} 
-                      alt={farmer.farm} 
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute -bottom-10 left-4">
-                      <Avatar className="h-20 w-20 border-4 border-white">
-                        <img src={farmer.avatar} alt={farmer.name} />
-                      </Avatar>
-                    </div>
-                  </div>
-                  <CardContent className="pt-12 pb-4">
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-                      <div>
-                        <Link to={`/farmers/${farmer.id}`} className="hover:underline">
-                          <h3 className="font-bold text-lg">{farmer.farm}</h3>
-                        </Link>
-                        <p className="text-sm text-gray-600">{farmer.name}</p>
-                        <div className="flex items-center mt-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="ml-1 text-sm">{farmer.rating} · {farmer.products} produits</span>
-                        </div>
-                        <p className="text-sm mt-2">{farmer.location}</p>
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {farmer.categories.map((category, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-gray-100">
-                              {category}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2 mt-4 md:mt-0">
-                        <Button 
-                          variant="outline" 
-                          className="flex gap-2"
-                          onClick={() => handleContactFarmer(farmer.id, farmer.name)}
-                        >
-                          <MessageCircle size={16} />
-                          Contacter
-                        </Button>
-                        <Button 
-                          variant={farmer.followed ? "destructive" : "default"}
-                          className="flex gap-2"
-                          onClick={() => handleFollowFarmer(farmer.id, farmer.name, farmer.followed)}
-                        >
-                          {farmer.followed ? "Ne plus suivre" : "Suivre"}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {recommendedFarmers.map(renderFarmerCard)}
             </div>
           </CardContent>
         </Card>
