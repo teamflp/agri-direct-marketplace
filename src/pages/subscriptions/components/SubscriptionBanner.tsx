@@ -6,7 +6,7 @@ import { BookmarkCheck } from 'lucide-react';
 
 const SubscriptionBanner = () => {
   return (
-    <div className="relative overflow-hidden shadow-lg mt-16 w-full">
+    <div className="relative overflow-hidden shadow-lg mt-0 w-full">
       {/* Image de fond */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -18,7 +18,7 @@ const SubscriptionBanner = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-agrimarket-green/90 to-agrimarket-orange/80"></div>
       </div>
       
-      <div className="container mx-auto px-4 py-24 relative z-10 flex flex-col items-center text-center md:max-w-3xl">
+      <div className="mx-auto px-4 py-24 relative z-10 flex flex-col items-center text-center max-w-3xl">
         <div className="mb-6">
           <AgrimarketLogo variant="white" size="lg" />
         </div>
