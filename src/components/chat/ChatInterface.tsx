@@ -43,14 +43,14 @@ const ChatInterface = ({ className = "", compact = false }: ChatInterfaceProps) 
 
   return (
     <Card className={`${compact ? 'h-[500px]' : 'h-[600px] max-h-[80vh]'} flex flex-col ${className}`}>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 bg-agrimarket-green">
         <div className="flex items-center">
           <div className="mr-2">
             <AgrimarketLogo size="sm" />
           </div>
-          <div>
-            <CardTitle>Assistant AgriMarket</CardTitle>
-            <CardDescription>Posez vos questions sur l'agriculture biologique et nos services</CardDescription>
+          <div className="text-white">
+            <CardTitle className="text-white">Assistant AgriMarket</CardTitle>
+            <CardDescription className="text-white/90">Posez vos questions sur l'agriculture biologique et nos services</CardDescription>
           </div>
         </div>
       </CardHeader>

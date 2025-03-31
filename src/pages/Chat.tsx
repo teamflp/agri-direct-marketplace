@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import FloatingChatButton from '@/components/chat/FloatingChatButton';
 
 const Chat = () => {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const Chat = () => {
         </div>
       </main>
       <Footer />
+      <FloatingChatButton />
     </div>
   );
 };
