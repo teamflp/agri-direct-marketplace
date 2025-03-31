@@ -1,392 +1,303 @@
-import React, { useState, useEffect } from 'react';
-import { useSubscription, Subscription as ContextSubscription, SubscriptionItem } from '@/contexts/SubscriptionContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, XCircle, Pause, Play, RotateCcw, Clock, Package, Calendar, CreditCard } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
-interface Subscription extends ContextSubscription {
-  planName: string;
-  farmerName: string;
-  frequency: 'weekly' | 'biweekly' | 'monthly';
-  nextDelivery: string;
-  isAutoRenew: boolean;
-  items: SubscriptionItem[];
-}
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, Package, AlertCircle, CheckCircle, PauseCircle } from 'lucide-react';
+import { Subscription, useSubscription } from '@/contexts/SubscriptionContext';
+import { useToast } from '@/hooks/use-toast';
+
+// Helper function to format dates properly
+const formatDate = (date: Date | string): string => {
+  if (typeof date === 'string') {
+    return new Date(date).toLocaleDateString();
+  }
+  return date.toLocaleDateString();
+};
 
 const UserSubscriptions = () => {
-  const [activeSubscriptions, setActiveSubscriptions] = useState<Subscription[]>([]);
-  const [pastSubscriptions, setPastSubscriptions] = useState<Subscription[]>([]);
-  const [selectedTab, setSelectedTab] = useState('active');
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<number | string>('');
-  
-  const { 
-    getUserSubscriptions,
-    unsubscribe, 
-    pauseSubscription, 
-    resumeSubscription, 
-    toggleAutoRenew 
-  } = useSubscription();
-  
+  const { getUserSubscriptions, pauseSubscription, resumeSubscription, unsubscribe, toggleAutoRenew } = useSubscription();
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const { toast } = useToast();
-
+  
   useEffect(() => {
-    const loadSubscriptions = async () => {
-      try {
-        const contextSubscriptions = await getUserSubscriptions();
-        
-        const convertedSubscriptions = contextSubscriptions.map(sub => ({
-          ...sub,
-          id: sub.id,
-          status: sub.status,
-          startDate: sub.startDate instanceof Date ? sub.startDate.toISOString() : String(sub.startDate),
-          endDate: sub.endDate instanceof Date ? sub.endDate.toISOString() : (sub.endDate ? String(sub.endDate) : ''),
-          price: sub.price,
-          planName: sub.plan || '',
-          farmerName: sub.farmerName || '',
-          frequency: sub.frequency || 'monthly',
-          nextDelivery: sub.nextDelivery instanceof Date ? sub.nextDelivery.toISOString() : 
-                     (typeof sub.nextDelivery === 'string' ? sub.nextDelivery : ''),
-          isAutoRenew: sub.isAutoRenew || false,
-          items: sub.items || []
-        })) as Subscription[];
-        
-        const active = convertedSubscriptions.filter(sub => ['active', 'paused'].includes(sub.status));
-        const past = convertedSubscriptions.filter(sub => ['cancelled', 'expired'].includes(sub.status));
-        
-        setActiveSubscriptions(active);
-        setPastSubscriptions(past);
-      } catch (error) {
-        console.error('Erreur lors du chargement des abonnements:', error);
-      }
-    };
+    // Get user subscriptions and convert any date strings to Date objects
+    const userSubs = getUserSubscriptions();
     
-    loadSubscriptions();
+    // Handle subscriptions with type compatibility
+    setSubscriptions(userSubs.map(sub => ({
+      ...sub,
+      startDate: sub.startDate instanceof Date ? sub.startDate : new Date(sub.startDate)
+    })));
   }, [getUserSubscriptions]);
-
-  const handleCancelSubscription = async () => {
-    try {
-      await unsubscribe(selectedSubscriptionId);
-      
-      const cancelledSub = activeSubscriptions.find(sub => sub.id === selectedSubscriptionId);
-      if (cancelledSub) {
-        setActiveSubscriptions(prev => prev.filter(sub => sub.id !== selectedSubscriptionId));
-        
-        const updatedSub = { ...cancelledSub, status: 'cancelled' as const };
-        setPastSubscriptions(prev => [...prev, updatedSub]);
-      }
-      
-      setCancelDialogOpen(false);
-      
-      toast({
-        title: "Abonnement annulé",
-        description: "Votre abonnement a été annulé avec succès.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de l\'annulation de l\'abonnement:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible d'annuler l'abonnement. Veuillez réessayer.",
-      });
-    }
+  
+  // Handle subscription actions
+  const handlePauseSubscription = (id: string | number) => {
+    pauseSubscription(id);
+    toast({
+      title: "Abonnement mis en pause",
+      description: "Votre abonnement a été mis en pause avec succès."
+    });
+    
+    // Update local state
+    setSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, status: 'paused' as const } : sub
+      )
+    );
   };
-
-  const handlePauseSubscription = async (id: number | string) => {
-    try {
-      await pauseSubscription(id);
-      
-      setActiveSubscriptions(prev => 
-        prev.map(sub => sub.id === id ? { ...sub, status: 'paused' as const } : sub)
-      );
-      
-      toast({
-        title: "Abonnement mis en pause",
-        description: "Votre abonnement a été mis en pause. Vous pouvez le reprendre à tout moment.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de la mise en pause de l\'abonnement:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de mettre en pause l'abonnement. Veuillez réessayer.",
-      });
-    }
+  
+  const handleResumeSubscription = (id: string | number) => {
+    resumeSubscription(id);
+    toast({
+      title: "Abonnement réactivé",
+      description: "Votre abonnement a été réactivé avec succès."
+    });
+    
+    // Update local state
+    setSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, status: 'active' as const } : sub
+      )
+    );
   };
-
-  const handleResumeSubscription = async (id: number | string) => {
-    try {
-      await resumeSubscription(id);
-      
-      setActiveSubscriptions(prev => 
-        prev.map(sub => sub.id === id ? { ...sub, status: 'active' as const } : sub)
-      );
-      
-      toast({
-        title: "Abonnement repris",
-        description: "Votre abonnement a été réactivé avec succès.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de la reprise de l\'abonnement:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de reprendre l'abonnement. Veuillez réessayer.",
-      });
-    }
+  
+  const handleCancelSubscription = (id: string | number) => {
+    unsubscribe(id);
+    toast({
+      title: "Abonnement annulé",
+      description: "Votre abonnement a été annulé avec succès."
+    });
+    
+    // Update local state
+    setSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, status: 'cancelled' as const, endDate: new Date() } : sub
+      )
+    );
   };
-
-  const handleToggleAutoRenew = async (id: number | string) => {
-    try {
-      await toggleAutoRenew(id);
-      
-      setActiveSubscriptions(prev => 
-        prev.map(sub => sub.id === id ? { ...sub, isAutoRenew: !sub.isAutoRenew } : sub)
-      );
-      
-      toast({
-        title: "Renouvellement automatique modifié",
-        description: "Vos préférences de renouvellement ont été mises à jour.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de la modification du renouvellement automatique:', error);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de modifier le renouvellement automatique. Veuillez réessayer.",
-      });
-    }
+  
+  const handleToggleAutoRenew = (id: string | number) => {
+    toggleAutoRenew(id);
+    
+    // Update local state
+    const subscription = subscriptions.find(sub => sub.id === id);
+    const isAutoRenew = subscription?.isAutoRenew;
+    
+    toast({
+      title: isAutoRenew ? "Renouvellement automatique désactivé" : "Renouvellement automatique activé",
+      description: isAutoRenew
+        ? "Votre abonnement ne sera pas renouvelé automatiquement."
+        : "Votre abonnement sera renouvelé automatiquement à la fin de la période."
+    });
+    
+    setSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, isAutoRenew: !sub.isAutoRenew } : sub
+      )
+    );
   };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, 'd MMMM yyyy', { locale: fr });
-  };
-
-  const getFrequencyLabel = (frequency: string) => {
-    switch (frequency) {
-      case 'weekly':
-        return 'Hebdomadaire';
-      case 'biweekly':
-        return 'Bimensuelle';
-      case 'monthly':
-        return 'Mensuelle';
+  
+  if (subscriptions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+          <div className="rounded-full bg-gray-100 p-3 mb-4">
+            <Package className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium mb-2">Aucun abonnement actif</h3>
+          <p className="text-gray-500 mb-4">
+            Vous n'avez pas encore d'abonnement actif. Découvrez nos formules d'abonnement pour recevoir des produits frais régulièrement.
+          </p>
+          <Button className="bg-agrimarket-green hover:bg-agrimarket-darkGreen">
+            Découvrir les abonnements
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return (
+          <Badge className="bg-green-500">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Actif
+          </Badge>
+        );
+      case 'paused':
+        return (
+          <Badge className="bg-amber-500">
+            <PauseCircle className="h-3 w-3 mr-1" />
+            En pause
+          </Badge>
+        );
+      case 'cancelled':
+      case 'expired':
+        return (
+          <Badge className="bg-gray-500">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            {status === 'cancelled' ? 'Annulé' : 'Expiré'}
+          </Badge>
+        );
       default:
-        return frequency;
+        return null;
     }
   };
-
+  
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="active" value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="active">Abonnements actifs</TabsTrigger>
-          <TabsTrigger value="past">Abonnements passés</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="active" className="space-y-4 mt-4">
-          {activeSubscriptions.length === 0 ? (
-            <div className="text-center py-10 border rounded-lg bg-gray-50">
-              <h3 className="text-lg font-medium text-gray-700">Vous n'avez pas d'abonnements actifs</h3>
-              <p className="text-gray-500 mt-2">Explorez nos différentes options d'abonnement</p>
-              <Button className="mt-4 bg-agrimarket-green hover:bg-agrimarket-darkGreen">
-                Découvrir les abonnements
+      {subscriptions.map((subscription) => (
+        <Card key={subscription.id} className="overflow-hidden">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>{subscription.plan || subscription.planName}</CardTitle>
+                <CardDescription>
+                  {subscription.farmerName}
+                </CardDescription>
+              </div>
+              <div>
+                {getStatusBadge(subscription.status)}
+              </div>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Date de début
+                  </div>
+                  <span className="font-medium">{formatDate(subscription.startDate)}</span>
+                </div>
+                {subscription.endDate && (
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      Date de fin
+                    </div>
+                    <span className="font-medium">{formatDate(subscription.endDate)}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Clock className="h-4 w-4 mr-1" />
+                    Fréquence
+                  </div>
+                  <span className="font-medium">
+                    {subscription.frequency === 'weekly' && 'Hebdomadaire'}
+                    {subscription.frequency === 'biweekly' && 'Bimensuelle'}
+                    {subscription.frequency === 'monthly' && 'Mensuelle'}
+                  </span>
+                </div>
+                {subscription.nextDelivery && (
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Package className="h-4 w-4 mr-1" />
+                      Prochaine livraison
+                    </div>
+                    <span className="font-medium">
+                      {typeof subscription.nextDelivery === 'string' 
+                        ? formatDate(subscription.nextDelivery)
+                        : formatDate(subscription.nextDelivery)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="border-t pt-4">
+              <h4 className="font-medium mb-2">Contenu du panier</h4>
+              <ul className="space-y-2">
+                {subscription.items && subscription.items.map((item) => (
+                  <li key={item.id} className="flex justify-between">
+                    <span>{item.name}</span>
+                    <span className="text-gray-500">x{item.quantity}</span>
+                  </li>
+                ))}
+                {!subscription.items && (
+                  <li className="text-gray-500 italic">Contenu variable selon la saison</li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="border-t border-b py-4 my-4">
+              <div className="flex justify-between items-center font-medium">
+                <span>Montant</span>
+                <span className="text-lg text-agrimarket-orange">
+                  {(subscription.price / 100).toFixed(2)} €
+                  <span className="text-sm text-gray-500 font-normal">
+                    {subscription.frequency === 'weekly' && '/semaine'}
+                    {subscription.frequency === 'biweekly' && '/2 semaines'}
+                    {subscription.frequency === 'monthly' && '/mois'}
+                  </span>
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">Renouvellement automatique</span>
+              <Badge 
+                className={subscription.isAutoRenew ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+                variant="outline"
+              >
+                {subscription.isAutoRenew ? "Activé" : "Désactivé"}
+              </Badge>
+            </div>
+          </CardContent>
+          
+          <CardFooter className="flex flex-wrap gap-2">
+            {subscription.status === 'active' && (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handlePauseSubscription(subscription.id)}
+                  className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                >
+                  Mettre en pause
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleToggleAutoRenew(subscription.id)}
+                >
+                  {subscription.isAutoRenew ? "Désactiver" : "Activer"} le renouvellement
+                </Button>
+              </>
+            )}
+            
+            {subscription.status === 'paused' && (
+              <Button 
+                variant="outline" 
+                onClick={() => handleResumeSubscription(subscription.id)}
+                className="text-green-600 border-green-600 hover:bg-green-50"
+              >
+                Reprendre l'abonnement
               </Button>
-            </div>
-          ) : (
-            activeSubscriptions.map((subscription) => (
-              <Card key={subscription.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl font-bold">{subscription.planName}</CardTitle>
-                      <CardDescription>Agriculteur: {subscription.farmerName}</CardDescription>
-                    </div>
-                    
-                    <div>
-                      {subscription.status === 'active' ? (
-                        <Badge className="bg-green-500 hover:bg-green-600">Actif</Badge>
-                      ) : subscription.status === 'paused' ? (
-                        <Badge variant="outline" className="text-amber-500 border-amber-500">En pause</Badge>
-                      ) : null}
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="pb-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Fréquence: </span>
-                        <span>{getFrequencyLabel(subscription.frequency)}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Prochaine livraison: </span>
-                        <span>{formatDate(subscription.nextDelivery)}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <CreditCard className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Renouvellement automatique: </span>
-                        <span>{subscription.isAutoRenew ? 'Activé' : 'Désactivé'}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm">
-                        <Package className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">Contenu: </span>
-                        <span>{subscription.items.map(item => `${item.quantity} ${item.name}`).join(', ')}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="text-sm flex justify-between border-b pb-2">
-                        <span>Prix par livraison:</span>
-                        <span className="font-semibold">{subscription.price.toFixed(2)} €</span>
-                      </div>
-                      
-                      <div className="text-sm flex justify-between">
-                        <span>Date de début:</span>
-                        <span>{formatDate(subscription.startDate)}</span>
-                      </div>
-                      
-                      <div className="text-sm flex justify-between">
-                        <span>Date de fin:</span>
-                        <span>{subscription.endDate ? formatDate(subscription.endDate) : 'Indéterminée'}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                
-                <CardFooter className="flex justify-between pt-3 flex-wrap gap-2">
-                  <div className="flex flex-wrap gap-2">
-                    {subscription.status === 'active' ? (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handlePauseSubscription(subscription.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <Pause className="h-4 w-4" />
-                        Mettre en pause
-                      </Button>
-                    ) : subscription.status === 'paused' ? (
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleResumeSubscription(subscription.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <Play className="h-4 w-4" />
-                        Reprendre
-                      </Button>
-                    ) : null}
-                    
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleToggleAutoRenew(subscription.id)}
-                      className={`flex items-center gap-1 ${subscription.isAutoRenew ? 'text-amber-600 border-amber-600' : 'text-green-600 border-green-600'}`}
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                      {subscription.isAutoRenew ? 'Désactiver' : 'Activer'} le renouvellement
-                    </Button>
-                  </div>
-                  
-                  <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => setSelectedSubscriptionId(subscription.id)}
-                        className="flex items-center gap-1"
-                      >
-                        <XCircle className="h-4 w-4" />
-                        Annuler
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Êtes-vous sûr de vouloir annuler cet abonnement ?</DialogTitle>
-                        <DialogDescription>
-                          Cette action est irréversible. Vous ne recevrez plus de livraisons pour cet abonnement.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setCancelDialogOpen(false)}>
-                          Annuler
-                        </Button>
-                        <Button variant="destructive" onClick={handleCancelSubscription}>
-                          Confirmer l'annulation
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </CardFooter>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-        
-        <TabsContent value="past" className="space-y-4 mt-4">
-          {pastSubscriptions.length === 0 ? (
-            <div className="text-center py-10 border rounded-lg bg-gray-50">
-              <h3 className="text-lg font-medium text-gray-700">Aucun historique d'abonnement</h3>
-              <p className="text-gray-500 mt-2">Vos abonnements passés apparaîtront ici</p>
-            </div>
-          ) : (
-            pastSubscriptions.map((subscription) => (
-              <Card key={subscription.id} className="overflow-hidden opacity-80">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl font-bold">{subscription.planName}</CardTitle>
-                      <CardDescription>Agriculteur: {subscription.farmerName}</CardDescription>
-                    </div>
-                    
-                    <div>
-                      {subscription.status === 'cancelled' ? (
-                        <Badge variant="outline" className="text-red-500 border-red-500">Annulé</Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-gray-500 border-gray-500">Expiré</Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="pb-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="text-sm flex justify-between">
-                        <span>Fréquence:</span>
-                        <span>{getFrequencyLabel(subscription.frequency)}</span>
-                      </div>
-                      
-                      <div className="text-sm flex justify-between">
-                        <span>Date de début:</span>
-                        <span>{formatDate(subscription.startDate)}</span>
-                      </div>
-                      
-                      <div className="text-sm flex justify-between">
-                        <span>Date de fin:</span>
-                        <span>{formatDate(subscription.endDate)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+            )}
+            
+            {subscription.status !== 'cancelled' && subscription.status !== 'expired' && (
+              <Button 
+                variant="outline" 
+                onClick={() => handleCancelSubscription(subscription.id)}
+                className="text-red-600 border-red-600 hover:bg-red-50"
+              >
+                Annuler l'abonnement
+              </Button>
+            )}
+            
+            <Button className="ml-auto bg-agrimarket-green hover:bg-agrimarket-darkGreen">
+              Modifier le panier
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 };
