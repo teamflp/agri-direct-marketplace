@@ -50,13 +50,14 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo - aligné à gauche */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center">
+            {/* Rendre visible le logo sur mobile en ajustant le conteneur */}
             <Link to="/" className="flex items-center">
               <AgrimarketLogo />
             </Link>
           </div>
           
-          {/* Navigation - centrée et mise à jour avec le style orange */}
+          {/* Navigation - centrée */}
           <HeaderNavigation links={navLinks} />
           
           {/* Actions à droite */}
