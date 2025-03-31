@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
@@ -111,10 +110,10 @@ export function MiniCart() {
                   </Button>
                   
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 border-white/30 text-white hover:bg-orange-600 hover:text-white" onClick={() => navigate('/cart')}>
+                    <Button variant="outline" onClick={() => navigate('/cart')} className="flex-1 border-white/30 bg-white text-orange-500">
                       Voir le panier
                     </Button>
-                    <Button variant="outline" className="text-white border-white/30 hover:bg-orange-600 hover:text-white" onClick={clearCart}>
+                    <Button variant="outline" onClick={clearCart} className="border-white/30 text-orange-500 bg-white">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
