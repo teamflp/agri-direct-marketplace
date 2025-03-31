@@ -117,15 +117,13 @@ const ProductCard = ({
         </div>
         
         <AddToCartButton 
-          product={{
-            id,
-            name,
-            price,
-            image,
-            unit,
-            farmerName,
-            farmerId
-          }}
+          productId={id}
+          productName={name}
+          productPrice={price}
+          productImage={image}
+          productUnit={unit}
+          farmerName={farmerName}
+          farmerId={farmerId}
           className="w-full"
         />
       </CardContent>

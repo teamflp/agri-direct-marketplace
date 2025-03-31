@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useSubscription } from '@/contexts/SubscriptionContext';
+import { useSubscription, Subscription as ContextSubscription, SubscriptionItem } from '@/contexts/SubscriptionContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,28 +10,21 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-// Définition des types pour l'état local
-interface Subscription {
-  id: number;
-  status: 'active' | 'paused' | 'cancelled' | 'expired';
-  startDate: string;
-  endDate: string;
-  price: number;
+interface Subscription extends ContextSubscription {
   planName: string;
   farmerName: string;
   frequency: 'weekly' | 'biweekly' | 'monthly';
   nextDelivery: string;
   isAutoRenew: boolean;
-  items: { name: string; quantity: number }[];
+  items: SubscriptionItem[];
 }
 
 const UserSubscriptions = () => {
-  // État pour les données des abonnements
   const [activeSubscriptions, setActiveSubscriptions] = useState<Subscription[]>([]);
   const [pastSubscriptions, setPastSubscriptions] = useState<Subscription[]>([]);
   const [selectedTab, setSelectedTab] = useState('active');
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<number>(0);
+  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<number | string>('');
   
   const { 
     getUserSubscriptions,
@@ -44,15 +36,13 @@ const UserSubscriptions = () => {
   
   const { toast } = useToast();
 
-  // Charger les abonnements au montage du composant
   useEffect(() => {
     const loadSubscriptions = async () => {
       try {
-        // Appel à l'API pour récupérer les abonnements
-        const subscriptions = await getUserSubscriptions();
+        const contextSubscriptions = await getUserSubscriptions();
         
-        // Convertir les abonnements au format attendu par notre interface locale
-        const convertedSubscriptions = subscriptions.map(sub => ({
+        const convertedSubscriptions = contextSubscriptions.map(sub => ({
+          ...sub,
           id: sub.id,
           status: sub.status,
           startDate: sub.startDate instanceof Date ? sub.startDate.toISOString() : String(sub.startDate),
@@ -65,9 +55,8 @@ const UserSubscriptions = () => {
                      (typeof sub.nextDelivery === 'string' ? sub.nextDelivery : ''),
           isAutoRenew: sub.isAutoRenew || false,
           items: sub.items || []
-        }));
+        })) as Subscription[];
         
-        // Filtrer les abonnements actifs et passés
         const active = convertedSubscriptions.filter(sub => ['active', 'paused'].includes(sub.status));
         const past = convertedSubscriptions.filter(sub => ['cancelled', 'expired'].includes(sub.status));
         
@@ -81,17 +70,14 @@ const UserSubscriptions = () => {
     loadSubscriptions();
   }, [getUserSubscriptions]);
 
-  // Gestionnaires d'événements
   const handleCancelSubscription = async () => {
     try {
       await unsubscribe(selectedSubscriptionId);
       
-      // Mettre à jour l'état local
-      setActiveSubscriptions(prev => prev.filter(sub => sub.id !== selectedSubscriptionId));
-      
-      // Ajouter l'abonnement annulé aux abonnements passés
       const cancelledSub = activeSubscriptions.find(sub => sub.id === selectedSubscriptionId);
       if (cancelledSub) {
+        setActiveSubscriptions(prev => prev.filter(sub => sub.id !== selectedSubscriptionId));
+        
         const updatedSub = { ...cancelledSub, status: 'cancelled' as const };
         setPastSubscriptions(prev => [...prev, updatedSub]);
       }
@@ -112,11 +98,10 @@ const UserSubscriptions = () => {
     }
   };
 
-  const handlePauseSubscription = async (id: number) => {
+  const handlePauseSubscription = async (id: number | string) => {
     try {
       await pauseSubscription(id);
       
-      // Mettre à jour l'état local
       setActiveSubscriptions(prev => 
         prev.map(sub => sub.id === id ? { ...sub, status: 'paused' as const } : sub)
       );
@@ -135,11 +120,10 @@ const UserSubscriptions = () => {
     }
   };
 
-  const handleResumeSubscription = async (id: number) => {
+  const handleResumeSubscription = async (id: number | string) => {
     try {
       await resumeSubscription(id);
       
-      // Mettre à jour l'état local
       setActiveSubscriptions(prev => 
         prev.map(sub => sub.id === id ? { ...sub, status: 'active' as const } : sub)
       );
@@ -158,11 +142,10 @@ const UserSubscriptions = () => {
     }
   };
 
-  const handleToggleAutoRenew = async (id: number) => {
+  const handleToggleAutoRenew = async (id: number | string) => {
     try {
       await toggleAutoRenew(id);
       
-      // Mettre à jour l'état local
       setActiveSubscriptions(prev => 
         prev.map(sub => sub.id === id ? { ...sub, isAutoRenew: !sub.isAutoRenew } : sub)
       );
@@ -199,7 +182,6 @@ const UserSubscriptions = () => {
     }
   };
 
-  // Rendu du composant
   return (
     <div className="space-y-6">
       <Tabs defaultValue="active" value={selectedTab} onValueChange={setSelectedTab}>

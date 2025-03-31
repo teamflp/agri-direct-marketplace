@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Check, Plus, Minus } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
 
 interface AddToCartButtonProps {
@@ -14,6 +14,7 @@ interface AddToCartButtonProps {
   farmerName: string;
   farmerId: number;
   variant?: 'default' | 'outline' | 'small';
+  className?: string;
 }
 
 const AddToCartButton: React.FC<AddToCartButtonProps> = ({
@@ -24,7 +25,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   productUnit,
   farmerName,
   farmerId,
-  variant = 'default'
+  variant = 'default',
+  className = ''
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
@@ -66,7 +68,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       <Button 
         onClick={handleAddToCart} 
         size="sm" 
-        className="bg-agrimarket-green hover:bg-agrimarket-darkGreen"
+        className={`bg-agrimarket-green hover:bg-agrimarket-darkGreen ${className}`}
       >
         <ShoppingCart className="h-4 w-4 mr-1" />
         Ajouter
@@ -76,7 +78,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
   if (variant === 'outline') {
     return (
-      <div className="flex items-center">
+      <div className={`flex items-center ${className}`}>
         <div className="flex items-center border rounded-l-md">
           <Button
             variant="ghost"
@@ -117,7 +119,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   }
 
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 ${className}`}>
       <div className="flex items-center justify-between border rounded-md p-1">
         <Button
           variant="ghost"
@@ -139,7 +141,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       </div>
       <Button
         onClick={handleAddToCart}
-        className="w-full bg-agrimarket-green hover:bg-agrimarket-darkGreen"
+        className={`w-full bg-agrimarket-green hover:bg-agrimarket-darkGreen`}
       >
         {isAdded ? (
           <>

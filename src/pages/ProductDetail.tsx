@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -9,11 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProductSocialActions from '@/components/products/ProductSocialActions';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
-import { Star, MapPin, Truck, Store, Leaf, ChevronLeft, Plus, Minus } from 'lucide-react';
+import { Star, MapPin, Truck, Store, Leaf, ChevronLeft, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from '@/hooks/use-toast';
 
-// Données fictives pour le démo
-// Dans une vraie application, ces données viendraient d'une API
 const productsData = [
   {
     id: 1,
@@ -113,8 +112,9 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [quantity, setQuantity] = useState(1);
   const productId = parseInt(id || "1");
+  const { addItem } = useCart();
+  const { toast } = useToast();
   
-  // Trouver le produit correspondant à l'ID
   const product = productsData.find(p => p.id === productId) || productsData[0];
   
   const incrementQuantity = () => {
@@ -128,6 +128,24 @@ const ProductDetail = () => {
       setQuantity(quantity - 1);
     }
   };
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      unit: product.unit,
+      farmerName: product.farmerName,
+      farmerId: product.farmerId,
+      quantity: quantity
+    });
+
+    toast({
+      title: "Produit ajouté au panier",
+      description: `${quantity} × ${product.name} a été ajouté à votre panier`,
+    });
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -135,7 +153,6 @@ const ProductDetail = () => {
       
       <main className="flex-grow pt-20 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
-          {/* Chemin de navigation */}
           <div className="mb-8">
             <Link to="/products" className="flex items-center text-agrimarket-green hover:text-agrimarket-orange transition-colors">
               <ChevronLeft className="w-4 h-4 mr-1" />
@@ -143,10 +160,8 @@ const ProductDetail = () => {
             </Link>
           </div>
           
-          {/* Détails du produit */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
-              {/* Image du produit */}
               <div className="relative">
                 <div className="aspect-square rounded-lg overflow-hidden">
                   <img 
@@ -156,7 +171,6 @@ const ProductDetail = () => {
                   />
                 </div>
                 
-                {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   {product.organic && (
                     <Badge className="bg-green-600 hover:bg-green-700 text-white px-3 py-1">
@@ -181,10 +195,8 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              {/* Informations du produit */}
               <div className="flex flex-col">
                 <div className="mb-auto">
-                  {/* Producteur */}
                   <div className="flex items-center mb-4">
                     <Link to={`/farmers/${product.farmerId}`} className="flex items-center group">
                       <img 
@@ -204,7 +216,6 @@ const ProductDetail = () => {
                     </Link>
                   </div>
                   
-                  {/* Nom et note */}
                   <div className="flex justify-between items-start mb-4">
                     <h1 className="text-3xl font-bold">{product.name}</h1>
                     <div className="flex items-center mt-1">
@@ -216,10 +227,8 @@ const ProductDetail = () => {
                     </div>
                   </div>
                   
-                  {/* Description courte */}
                   <p className="mb-8 text-gray-600 text-lg leading-relaxed">{product.description}</p>
                   
-                  {/* Prix et unité */}
                   <div className="flex items-baseline mb-8">
                     <span className="text-3xl font-bold text-agrimarket-orange">{product.price.toFixed(2)} €</span>
                     <span className="ml-2 text-gray-500">/ {product.unit}</span>
@@ -228,7 +237,6 @@ const ProductDetail = () => {
                     </span>
                   </div>
                   
-                  {/* Quantité */}
                   <div className="mb-8">
                     <label className="block text-lg font-medium mb-3">Quantité</label>
                     <div className="flex items-center">
@@ -257,26 +265,13 @@ const ProductDetail = () => {
                   </div>
                 </div>
                 
-                {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-4 mt-6">
                   <Button 
                     variant="default"
                     className="py-6 px-8 text-lg w-full bg-agrimarket-orange hover:bg-orange-600"
-                    onClick={() => {
-                      // Directly use the AddToCartButton's functionality
-                      const { addToCart } = require('@/contexts/CartContext').useCart();
-                      addToCart({
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        image: product.image,
-                        unit: product.unit,
-                        farmerName: product.farmerName,
-                        farmerId: product.farmerId,
-                        quantity: quantity
-                      });
-                    }}
+                    onClick={handleAddToCart}
                   >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
                     Ajouter au panier
                   </Button>
                   
@@ -296,7 +291,6 @@ const ProductDetail = () => {
               </div>
             </div>
             
-            {/* Onglets d'informations supplémentaires */}
             <div className="border-t mt-8">
               <Tabs defaultValue="details" className="px-6 py-6">
                 <TabsList className="grid w-full md:w-2/3 grid-cols-3 mb-4">
