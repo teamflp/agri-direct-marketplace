@@ -48,6 +48,7 @@ import { useNotifications } from '@/components/ui/notifications';
 import { DeliveryTracker } from '@/components/delivery/DeliveryTracker';
 import { DeliveryMethodSelector } from '@/components/delivery/DeliveryMethodSelector';
 import { DeliverySlotSelector } from '@/components/delivery/DeliverySlotSelector';
+import { DeliveryProvider } from '@/contexts/DeliveryContext';
 import { 
   Dialog,
   DialogContent,
@@ -199,303 +200,300 @@ const FarmerOrders = () => {
   };
 
   return (
-    <DashboardLayout
-      name="Sophie Dubois"
-      email="sophie.d@email.com"
-      avatar={
-        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop" alt="Sophie Dubois" />
-      }
-      menuItems={menuItems}
-    >
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-3xl font-bold">Commandes</h1>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-              <Input
-                type="text"
-                placeholder="Rechercher une commande..."
-                className="pl-8 pr-4"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
+    <DeliveryProvider>
+      <DashboardLayout
+        name="Sophie Dubois"
+        email="sophie.d@email.com"
+        avatar={
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop" alt="Sophie Dubois" />
+        }
+        menuItems={menuItems}
+      >
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <h1 className="text-3xl font-bold">Commandes</h1>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="text"
+                  placeholder="Rechercher une commande..."
+                  className="pl-8 pr-4"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+              </div>
+              <Select value={statusFilter || ""} onValueChange={(value) => setStatusFilter(value || null)}>
+                <SelectTrigger className="w-[180px]">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    {statusFilter || "Tous les statuts"}
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="Nouvelle">Nouvelle</SelectItem>
+                  <SelectItem value="En préparation">En préparation</SelectItem>
+                  <SelectItem value="En livraison">En livraison</SelectItem>
+                  <SelectItem value="Livrée">Livrée</SelectItem>
+                  <SelectItem value="Annulée">Annulée</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={statusFilter || ""} onValueChange={(value) => setStatusFilter(value || null)}>
-              <SelectTrigger className="w-[180px]">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  {statusFilter || "Tous les statuts"}
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="Nouvelle">Nouvelle</SelectItem>
-                <SelectItem value="En préparation">En préparation</SelectItem>
-                <SelectItem value="En livraison">En livraison</SelectItem>
-                <SelectItem value="Livrée">Livrée</SelectItem>
-                <SelectItem value="Annulée">Annulée</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </div>
-        
-        {/* Zone de notifications en temps réel */}
-        <div ref={notificationsContainerRef}></div>
-        
-        {/* Boutons de démonstration */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Button onClick={handleNewOrder} className="bg-green-600 hover:bg-green-700">
-            <Bell className="mr-2 h-4 w-4" />
-            Simuler nouvelle commande
-          </Button>
-          <Button onClick={handleNewMessage} variant="outline">
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Simuler nouveau message
-          </Button>
-        </div>
+          
+          <div ref={notificationsContainerRef}></div>
+          
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Button onClick={handleNewOrder} className="bg-green-600 hover:bg-green-700">
+              <Bell className="mr-2 h-4 w-4" />
+              Simuler nouvelle commande
+            </Button>
+            <Button onClick={handleNewMessage} variant="outline">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Simuler nouveau message
+            </Button>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Gestion des commandes</CardTitle>
-            <CardDescription>
-              Suivez et gérez les commandes de vos clients
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Commande <ArrowUpDown className="inline h-4 w-4 ml-1" /></TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Montant</TableHead>
-                  <TableHead>Articles</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Paiement</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredOrders.length === 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des commandes</CardTitle>
+              <CardDescription>
+                Suivez et gérez les commandes de vos clients
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center">
-                      Aucune commande trouvée
-                    </TableCell>
+                    <TableHead>Commande <ArrowUpDown className="inline h-4 w-4 ml-1" /></TableHead>
+                    <TableHead>Client</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Montant</TableHead>
+                    <TableHead>Articles</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Paiement</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ) : (
-                  filteredOrders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell className="font-medium">{order.id}</TableCell>
-                      <TableCell>{order.customer}</TableCell>
-                      <TableCell>{order.date}</TableCell>
-                      <TableCell>{order.total.toLocaleString()} FCFA</TableCell>
-                      <TableCell>{order.items}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                          order.status === "Livrée" 
-                            ? "bg-green-100 text-green-800" 
-                            : order.status === "En livraison"
-                            ? "bg-blue-100 text-blue-800"
-                            : order.status === "En préparation"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : order.status === "Nouvelle"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-red-100 text-red-800"
-                        }`}>
-                          {order.status === "Livrée" && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                          {order.status === "En préparation" && <Clock className="w-3 h-3 mr-1" />}
-                          {order.status === "En livraison" && <TruckIcon className="w-3 h-3 mr-1" />}
-                          {order.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {order.paid ? (
-                          <span className="text-green-600 font-medium">Payée</span>
-                        ) : (
-                          <span className="text-red-600 font-medium">Non payée</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="inline-flex items-center gap-1"
-                          onClick={() => handleViewOrder(order.id)}
-                        >
-                          <Eye size={16} />
-                          <span className="hidden sm:inline">Détails</span>
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="inline-flex items-center gap-1 ml-2"
-                              disabled={order.status === "Annulée" || order.status === "Livrée"}
-                            >
-                              Statut
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Changer le statut</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleStatusChange(order.id, "En préparation")}>
-                              En préparation
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleStatusChange(order.id, "En livraison")}>
-                              En livraison
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleStatusChange(order.id, "Livrée")}>
-                              Livrée
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleStatusChange(order.id, "Annulée")} className="text-red-600">
-                              Annuler
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                </TableHeader>
+                <TableBody>
+                  {filteredOrders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="h-24 text-center">
+                        Aucune commande trouvée
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Nouvelles commandes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-purple-600">
-                {orders.filter(o => o.status === "Nouvelle").length}
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                Commandes en attente de traitement
-              </p>
+                  ) : (
+                    filteredOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.id}</TableCell>
+                        <TableCell>{order.customer}</TableCell>
+                        <TableCell>{order.date}</TableCell>
+                        <TableCell>{order.total.toLocaleString()} FCFA</TableCell>
+                        <TableCell>{order.items}</TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
+                            order.status === "Livrée" 
+                              ? "bg-green-100 text-green-800" 
+                              : order.status === "En livraison"
+                              ? "bg-blue-100 text-blue-800"
+                              : order.status === "En préparation"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : order.status === "Nouvelle"
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-red-100 text-red-800"
+                          }`}>
+                            {order.status === "Livrée" && <CheckCircle2 className="w-3 h-3 mr-1" />}
+                            {order.status === "En préparation" && <Clock className="w-3 h-3 mr-1" />}
+                            {order.status === "En livraison" && <TruckIcon className="w-3 h-3 mr-1" />}
+                            {order.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {order.paid ? (
+                            <span className="text-green-600 font-medium">Payée</span>
+                          ) : (
+                            <span className="text-red-600 font-medium">Non payée</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="inline-flex items-center gap-1"
+                            onClick={() => handleViewOrder(order.id)}
+                          >
+                            <Eye size={16} />
+                            <span className="hidden sm:inline">Détails</span>
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="inline-flex items-center gap-1 ml-2"
+                                disabled={order.status === "Annulée" || order.status === "Livrée"}
+                              >
+                                Statut
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Changer le statut</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "En préparation")}>
+                                En préparation
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "En livraison")}>
+                                En livraison
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "Livrée")}>
+                                Livrée
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "Annulée")} className="text-red-600">
+                                Annuler
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">En préparation</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-yellow-600">
-                {orders.filter(o => o.status === "En préparation").length}
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                Commandes en cours de préparation
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Nouvelles commandes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-purple-600">
+                  {orders.filter(o => o.status === "Nouvelle").length}
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Commandes en attente de traitement
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Chiffre d'affaires</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-agrimarket-green">
-                {orders
-                  .filter(o => o.status !== "Annulée")
-                  .reduce((sum, order) => sum + order.total, 0)
-                  .toLocaleString()} FCFA
-              </div>
-              <p className="text-sm text-gray-500 mt-1">
-                Total des commandes ce mois-ci
-              </p>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">En préparation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-yellow-600">
+                  {orders.filter(o => o.status === "En préparation").length}
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Commandes en cours de préparation
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Chiffre d'affaires</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-agrimarket-green">
+                  {orders
+                    .filter(o => o.status !== "Annulée")
+                    .reduce((sum, order) => sum + order.total, 0)
+                    .toLocaleString()} FCFA
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Total des commandes ce mois-ci
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {/* Dialogue de suivi de livraison */}
-      <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
-        <DialogContent className="sm:max-w-[650px]">
-          <DialogHeader>
-            <DialogTitle>Détails de livraison</DialogTitle>
-            <DialogDescription>
-              Suivi de la commande {selectedOrder}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedOrder && (
-            <div className="space-y-4 mt-4">
-              <DeliveryTracker orderId={selectedOrder} />
-              
-              <div className="flex flex-wrap gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowDeliveryDialog(false);
-                    setShowDeliveryMethodDialog(true);
-                  }}
-                >
-                  <TruckIcon className="mr-2 h-4 w-4" />
-                  Changer la méthode de livraison
-                </Button>
-                <Button
-                  onClick={() => {
-                    setShowDeliveryDialog(false);
-                    setShowDeliverySlotDialog(true);
-                  }}
-                >
-                  <Clock className="mr-2 h-4 w-4" />
-                  Planifier un créneau
-                </Button>
+        <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
+          <DialogContent className="sm:max-w-[650px]">
+            <DialogHeader>
+              <DialogTitle>Détails de livraison</DialogTitle>
+              <DialogDescription>
+                Suivi de la commande {selectedOrder}
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedOrder && (
+              <div className="space-y-4 mt-4">
+                <DeliveryTracker orderId={selectedOrder} />
+                
+                <div className="flex flex-wrap gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowDeliveryDialog(false);
+                      setShowDeliveryMethodDialog(true);
+                    }}
+                  >
+                    <TruckIcon className="mr-2 h-4 w-4" />
+                    Changer la méthode de livraison
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowDeliveryDialog(false);
+                      setShowDeliverySlotDialog(true);
+                    }}
+                  >
+                    <Clock className="mr-2 h-4 w-4" />
+                    Planifier un créneau
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Dialogue de sélection de méthode de livraison */}
-      <Dialog open={showDeliveryMethodDialog} onOpenChange={setShowDeliveryMethodDialog}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Choisir une méthode de livraison</DialogTitle>
-            <DialogDescription>
-              Sélectionnez comment vous souhaitez être livré
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedOrder && (
-            <DeliveryMethodSelector 
-              orderId={selectedOrder} 
-              onSelect={() => {
-                setShowDeliveryMethodDialog(false);
-                setShowDeliveryDialog(true);
-              }} 
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Dialogue de sélection de créneau */}
-      <Dialog open={showDeliverySlotDialog} onOpenChange={setShowDeliverySlotDialog}>
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Planifier la livraison</DialogTitle>
-            <DialogDescription>
-              Choisissez un créneau horaire pour votre livraison
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedOrder && (
-            <DeliverySlotSelector 
-              orderId={selectedOrder} 
-              onSelect={() => {
-                setShowDeliverySlotDialog(false);
-                setShowDeliveryDialog(true);
-              }} 
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </DashboardLayout>
+            )}
+          </DialogContent>
+        </Dialog>
+        
+        <Dialog open={showDeliveryMethodDialog} onOpenChange={setShowDeliveryMethodDialog}>
+          <DialogContent className="sm:max-w-[550px]">
+            <DialogHeader>
+              <DialogTitle>Choisir une méthode de livraison</DialogTitle>
+              <DialogDescription>
+                Sélectionnez comment vous souhaitez être livré
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedOrder && (
+              <DeliveryMethodSelector 
+                orderId={selectedOrder} 
+                onSelect={() => {
+                  setShowDeliveryMethodDialog(false);
+                  setShowDeliveryDialog(true);
+                }} 
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+        
+        <Dialog open={showDeliverySlotDialog} onOpenChange={setShowDeliverySlotDialog}>
+          <DialogContent className="sm:max-w-[550px]">
+            <DialogHeader>
+              <DialogTitle>Planifier la livraison</DialogTitle>
+              <DialogDescription>
+                Choisissez un créneau horaire pour votre livraison
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedOrder && (
+              <DeliverySlotSelector 
+                orderId={selectedOrder} 
+                onSelect={() => {
+                  setShowDeliverySlotDialog(false);
+                  setShowDeliveryDialog(true);
+                }} 
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+      </DashboardLayout>
+    </DeliveryProvider>
   );
 };
 
