@@ -146,7 +146,11 @@ const OrderDetailsDialog: React.FC<OrderDetailsDialogProps> = ({ open, onOpenCha
                 </>
               )}
 
-              <InvoiceDownloader invoiceId={order.id} invoiceNumber={invoiceNumber} />
+              <InvoiceDownloader 
+                invoiceId={order.id} 
+                invoiceNumber={invoiceNumber} 
+                order={order} 
+              />
             </div>
           </div>
         </div>
