@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
+import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 
 const Footer = () => {
   return (
@@ -9,51 +10,53 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-lg font-bold mb-4">AgriMarket</h3>
+            <div className="mb-4">
+              <AgrimarketLogo />
+            </div>
             <p className="text-gray-600 mb-4">
               Plateforme qui connecte les agriculteurs directement aux consommateurs, pour des produits frais, locaux et durables.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-500 hover:text-agrimarket-orange">
+              <a href="#" className="text-gray-500 hover:text-agrimarket-green transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-gray-500 hover:text-agrimarket-orange">
+              <a href="#" className="text-gray-500 hover:text-agrimarket-green transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-gray-500 hover:text-agrimarket-orange">
+              <a href="#" className="text-gray-500 hover:text-agrimarket-green transition-colors">
                 <Twitter size={20} />
               </a>
             </div>
           </div>
           
           <div>
-            <h3 className="text-lg font-bold mb-4">Navigation</h3>
+            <h3 className="text-lg font-bold mb-4 text-gray-800">Navigation</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-600 hover:text-agrimarket-orange">Accueil</Link></li>
-              <li><Link to="/products" className="text-gray-600 hover:text-agrimarket-orange">Produits</Link></li>
-              <li><Link to="/farmers" className="text-gray-600 hover:text-agrimarket-orange">Agriculteurs</Link></li>
-              <li><Link to="/subscriptions" className="text-gray-600 hover:text-agrimarket-orange">Abonnements</Link></li>
-              <li><Link to="/contact" className="text-gray-600 hover:text-agrimarket-orange">Contact</Link></li>
+              <li><Link to="/" className="text-gray-600 hover:text-agrimarket-green transition-colors">Accueil</Link></li>
+              <li><Link to="/products" className="text-gray-600 hover:text-agrimarket-green transition-colors">Produits</Link></li>
+              <li><Link to="/farmers" className="text-gray-600 hover:text-agrimarket-green transition-colors">Agriculteurs</Link></li>
+              <li><Link to="/subscriptions" className="text-gray-600 hover:text-agrimarket-green transition-colors">Abonnements</Link></li>
+              <li><Link to="/contact" className="text-gray-600 hover:text-agrimarket-green transition-colors">Contact</Link></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-bold mb-4">Ressources</h3>
+            <h3 className="text-lg font-bold mb-4 text-gray-800">Ressources</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Blog</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Guide agriculteurs</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">FAQ</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Support</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Blog</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Guide agriculteurs</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">FAQ</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Support</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-bold mb-4">Légal</h3>
+            <h3 className="text-lg font-bold mb-4 text-gray-800">Légal</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Conditions d'utilisation</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Politique de confidentialité</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Mentions légales</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-orange">Cookies</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Conditions d'utilisation</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Politique de confidentialité</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Mentions légales</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Cookies</a></li>
             </ul>
           </div>
         </div>

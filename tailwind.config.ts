@@ -64,9 +64,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				agrimarket: {
-					orange: '#F97316',
+					orange: '#E67E22',
 					green: '#84CC16',
-					lightGreen: '#EDF7E3'
+					darkGreen: '#65A30D',
+					lightGreen: '#EDF7E3',
+					brown: '#D18942'
 				}
 			},
 			borderRadius: {

@@ -1,35 +1,48 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
-const HeroBanner = () => {
+const HeroBanner: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="relative bg-gradient-to-r from-agrimarket-lightGreen to-agrimarket-green/20 overflow-hidden">
-      <div className="absolute inset-0 z-0 opacity-20">
+    <div className="relative">
+      {/* Image de fond */}
+      <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07" 
-          alt="Fond agricole" 
+          src="https://images.unsplash.com/photo-1470107355970-2ace9f20ab8d?q=80&w=1920&auto=format&fit=crop"
+          alt="Champ agricole" 
           className="w-full h-full object-cover"
         />
+        {/* Overlay dégradé */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
       </div>
       
-      <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            Des produits frais <span className="text-agrimarket-orange">directement</span> des agriculteurs à votre table
+      {/* Contenu */}
+      <div className="container mx-auto px-4 py-24 md:py-32 lg:py-40 relative z-10">
+        <div className="max-w-xl">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Des produits frais, de la ferme à votre table
           </h1>
-          
-          <p className="text-lg md:text-xl mb-8 text-gray-700">
-            Soutenez les producteurs locaux et profitez de produits frais, de saison et de qualité, livrés près de chez vous.
+          <p className="text-lg text-white/90 mb-8">
+            Découvrez des produits locaux cultivés avec passion par nos agriculteurs partenaires, livrés directement chez vous.
           </p>
-          
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button asChild className="bg-agrimarket-orange hover:bg-orange-600 text-white text-lg py-6 px-8">
-              <Link to="/products">Découvrir les produits</Link>
+            <Button 
+              size="lg" 
+              className="bg-agrimarket-green hover:bg-agrimarket-darkGreen text-white"
+              onClick={() => navigate('/products')}
+            >
+              Découvrir nos produits
             </Button>
-            <Button asChild variant="outline" className="border-agrimarket-green text-agrimarket-green hover:bg-agrimarket-green hover:text-white text-lg py-6 px-8">
-              <Link to="/register">Rejoindre la plateforme</Link>
+            <Button 
+              variant="outline"
+              size="lg"
+              className="border-white text-white hover:bg-white/20"
+              onClick={() => navigate('/farmers')}
+            >
+              Rencontrer nos agriculteurs
             </Button>
           </div>
         </div>

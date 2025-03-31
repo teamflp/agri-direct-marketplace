@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, X } from 'lucide-react';
+import { Search, User, X, Menu } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { MiniCart } from '@/components/cart/MiniCart';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { Input } from "@/components/ui/input";
+import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,39 +58,37 @@ const Header = () => {
     <header 
       className={`${
         scrolled 
-          ? 'bg-green-600/95 backdrop-blur-sm shadow-lg py-2' 
-          : 'bg-green-600 py-3'
-      } text-white fixed w-full z-50 transition-all duration-300 top-0 left-0`}
+          ? 'bg-white shadow-md py-2' 
+          : 'bg-white py-3'
+      } fixed w-full z-50 transition-all duration-300 top-0 left-0`}
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo - aligné à gauche */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <span className={`font-bold text-white ${scrolled ? 'text-lg' : 'text-xl'} transition-all duration-300`}>
-                AgriMarket
-              </span>
+              <AgrimarketLogo />
             </Link>
           </div>
           
           {/* Navigation - centrée */}
           <nav className="hidden md:flex items-center justify-center space-x-4 lg:space-x-8">
-            <Link to="/" className="text-white hover:text-green-100 font-medium transition-colors px-2 py-1 rounded-md hover:bg-green-500/30">
+            <Link to="/" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.home')}
             </Link>
-            <Link to="/products" className="text-white hover:text-green-100 font-medium transition-colors px-2 py-1 rounded-md hover:bg-green-500/30">
+            <Link to="/products" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.products')}
             </Link>
-            <Link to="/farmers" className="text-white hover:text-green-100 font-medium transition-colors px-2 py-1 rounded-md hover:bg-green-500/30">
+            <Link to="/farmers" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.farmers')}
             </Link>
-            <Link to="/seasonal-calendar" className="text-white hover:text-green-100 font-medium transition-colors px-2 py-1 rounded-md hover:bg-green-500/30">
+            <Link to="/seasonal-calendar" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.seasonal')}
             </Link>
-            <Link to="/subscriptions" className="text-white hover:text-green-100 font-medium transition-colors px-2 py-1 rounded-md hover:bg-green-500/30">
+            <Link to="/subscriptions" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.subscriptions')}
             </Link>
-            <Link to="/contact" className="text-white hover:text-green-100 font-medium transition-colors px-2 py-1 rounded-md hover:bg-green-500/30">
+            <Link to="/contact" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.contact')}
             </Link>
           </nav>
@@ -111,7 +110,7 @@ const Header = () => {
                     />
                     <Button 
                       type="submit" 
-                      className="absolute right-0 top-0 h-full rounded-l-none bg-green-500 hover:bg-green-400 transition-colors"
+                      className="absolute right-0 top-0 h-full rounded-l-none bg-agrimarket-green hover:bg-agrimarket-darkGreen transition-colors"
                     >
                       <Search className="h-5 w-5" />
                     </Button>
@@ -120,7 +119,7 @@ const Header = () => {
                     type="button"
                     variant="ghost" 
                     size="icon" 
-                    className="ml-2 text-white hover:bg-green-500 transition-colors"
+                    className="ml-2 text-gray-600 hover:bg-gray-100 transition-colors"
                     onClick={() => setSearchOpen(false)}
                     aria-label="Fermer la recherche"
                   >
@@ -131,7 +130,7 @@ const Header = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="text-white hover:bg-green-500 transition-colors"
+                  className="text-gray-600 hover:bg-gray-100 transition-colors"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Rechercher"
                 >
@@ -151,11 +150,11 @@ const Header = () => {
               asChild 
               variant="ghost" 
               size="icon" 
-              className="text-white hover:bg-green-500/50 transition-colors relative group"
+              className="text-gray-600 hover:bg-gray-100 transition-colors relative group"
             >
               <Link to="/login" className="relative flex items-center justify-center">
                 <User className="h-5 w-5" />
-                <span className="absolute -bottom-7 whitespace-nowrap bg-green-700 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="absolute -bottom-7 whitespace-nowrap bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   Connexion
                 </span>
               </Link>
@@ -165,77 +164,69 @@ const Header = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              className="md:hidden text-white hover:bg-green-500"
+              className="md:hidden text-gray-600 hover:bg-gray-100"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Menu principal"
             >
               <span className="sr-only">Menu</span>
-              <svg
-                className="h-6 w-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {menuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {menuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>
         
         {/* Menu mobile - visible uniquement sur mobile quand menuOpen est true */}
         {menuOpen && (
-          <div className="md:hidden py-3 mt-2 border-t border-green-500 bg-green-600/95 backdrop-blur-sm">
+          <div className="md:hidden py-3 mt-2 border-t border-gray-200 bg-white">
             <nav className="flex flex-col space-y-3 px-2">
               <Link 
                 to="/" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.home')}
               </Link>
               <Link 
                 to="/products" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.products')}
               </Link>
               <Link 
                 to="/farmers" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.farmers')}
               </Link>
               <Link 
                 to="/seasonal-calendar" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.seasonal')}
               </Link>
               <Link 
                 to="/subscriptions" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.subscriptions')}
               </Link>
               <Link 
                 to="/contact" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50"
                 onClick={() => setMenuOpen(false)}
               >
                 {t('header.contact')}
               </Link>
               <Link 
                 to="/login" 
-                className="text-white hover:text-green-100 font-medium transition-colors p-2 rounded-md hover:bg-green-500/30 flex items-center"
+                className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
                 onClick={() => setMenuOpen(false)}
               >
                 <User className="h-5 w-5 mr-2" />

@@ -14,26 +14,37 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         <HeroBanner />
-        <div className="container mx-auto px-4 py-12">
-          {/* Section Produits recommandés */}
-          <div className="mb-8">
-            <div className="mb-4">
-              <h2 className="text-3xl font-bold">Produits recommandés</h2>
+        
+        <div className="bg-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                Produits recommandés
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Découvrez notre sélection de produits de saison, cultivés avec passion par nos agriculteurs partenaires
+              </p>
             </div>
             <SeasonalProductsRecommendations />
           </div>
-          
-          {/* Section Conseils personnalisés */}
-          <div className="mb-8">
-            <div className="mb-4">
-              <h2 className="text-3xl font-bold">Conseils personnalisés</h2>
-              <p className="text-gray-600">Des idées et astuces pour vous aider à consommer et produire mieux</p>
+        </div>
+        
+        <div className="bg-gray-50 py-16">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                Conseils personnalisés
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Des idées et astuces pour vous aider à consommer et produire mieux
+              </p>
             </div>
             <MemberOnlyAdvice />
           </div>
         </div>
+        
         <FeaturesSection />
         <MapSection />
         <TestimonialsSection />

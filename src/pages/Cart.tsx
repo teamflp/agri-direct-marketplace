@@ -34,18 +34,18 @@ const Cart = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-grow pt-16 bg-gray-50 pb-10">
+      <main className="flex-grow pt-24 bg-gray-50 pb-10">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center mb-6">
             <Button 
               variant="ghost" 
-              className="mr-2" 
+              className="mr-2 text-gray-600 hover:text-agrimarket-green" 
               onClick={() => navigate(-1)}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>
-            <h1 className="text-3xl font-bold">Mon Panier</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Mon Panier</h1>
           </div>
           
           {cart.items.length === 0 ? (
@@ -53,10 +53,10 @@ const Cart = () => {
               <div className="mb-4 flex justify-center">
                 <ShoppingCart className="h-16 w-16 text-gray-300" />
               </div>
-              <h2 className="text-xl font-medium mb-2">Votre panier est vide</h2>
+              <h2 className="text-xl font-medium mb-2 text-gray-700">Votre panier est vide</h2>
               <p className="text-gray-500 mb-6">Découvrez nos produits frais et locaux pour remplir votre panier</p>
               <Button 
-                className="bg-agrimarket-orange hover:bg-orange-600"
+                className="bg-agrimarket-green hover:bg-agrimarket-darkGreen text-white"
                 onClick={() => navigate('/products')}
               >
                 Découvrir les produits
@@ -67,7 +67,7 @@ const Cart = () => {
               <div className="lg:col-span-2 space-y-6">
                 <div className="bg-white rounded-lg shadow-sm p-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-medium">Articles ({cart.totalItems})</h2>
+                    <h2 className="text-xl font-medium text-gray-800">Articles ({cart.totalItems})</h2>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -81,16 +81,16 @@ const Cart = () => {
                   
                   <div className="space-y-6">
                     {farmerGroups.map((group) => (
-                      <div key={group.farmerId} className="border rounded-lg overflow-hidden">
+                      <div key={group.farmerId} className="border rounded-lg overflow-hidden shadow-sm">
                         <div className="bg-gray-50 p-4">
-                          <h3 className="font-medium">{group.farmerName}</h3>
+                          <h3 className="font-medium text-gray-700">{group.farmerName}</h3>
                         </div>
                         
                         <div className="divide-y">
                           {group.items.map((item) => (
                             <div key={item.id} className="p-4 flex flex-col sm:flex-row sm:items-center">
                               <div className="flex items-center flex-grow">
-                                <div className="h-20 w-20 rounded overflow-hidden">
+                                <div className="h-20 w-20 rounded-md overflow-hidden">
                                   <img 
                                     src={item.image} 
                                     alt={item.name} 
@@ -98,7 +98,7 @@ const Cart = () => {
                                   />
                                 </div>
                                 <div className="ml-4">
-                                  <h4 className="font-medium">{item.name}</h4>
+                                  <h4 className="font-medium text-gray-800">{item.name}</h4>
                                   <p className="text-sm text-gray-500">{item.price.toFixed(2)} € / {item.unit}</p>
                                 </div>
                               </div>
@@ -108,17 +108,17 @@ const Cart = () => {
                                   <Button 
                                     variant="outline" 
                                     size="icon" 
-                                    className="h-8 w-8 rounded-full bg-white border-orange-200 text-orange-500 hover:bg-orange-50 hover:text-orange-700"
+                                    className="h-8 w-8 rounded-full bg-white border-gray-200 text-agrimarket-green hover:bg-gray-50 hover:text-agrimarket-darkGreen"
                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                     disabled={item.quantity <= 1}
                                   >
                                     <Minus className="h-4 w-4" />
                                   </Button>
-                                  <span className="mx-3 w-8 text-center">{item.quantity}</span>
+                                  <span className="mx-3 w-8 text-center text-gray-800">{item.quantity}</span>
                                   <Button 
                                     variant="outline" 
                                     size="icon" 
-                                    className="h-8 w-8 rounded-full bg-white border-orange-200 text-orange-500 hover:bg-orange-50 hover:text-orange-700"
+                                    className="h-8 w-8 rounded-full bg-white border-gray-200 text-agrimarket-green hover:bg-gray-50 hover:text-agrimarket-darkGreen"
                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                   >
                                     <Plus className="h-4 w-4" />
@@ -126,7 +126,7 @@ const Cart = () => {
                                 </div>
                                 
                                 <div className="ml-6 text-right">
-                                  <p className="font-bold">{(item.price * item.quantity).toFixed(2)} €</p>
+                                  <p className="font-bold text-gray-800">{(item.price * item.quantity).toFixed(2)} €</p>
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
@@ -149,12 +149,12 @@ const Cart = () => {
               
               <div>
                 <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-                  <h2 className="text-xl font-medium mb-4">Récapitulatif</h2>
+                  <h2 className="text-xl font-medium mb-4 text-gray-800">Récapitulatif</h2>
                   
                   <div className="space-y-4">
                     <div className="flex justify-between">
-                      <span>Sous-total</span>
-                      <span>{cart.totalPrice.toFixed(2)} €</span>
+                      <span className="text-gray-600">Sous-total</span>
+                      <span className="text-gray-800">{cart.totalPrice.toFixed(2)} €</span>
                     </div>
                     
                     <div className="flex justify-between items-center text-gray-600">
@@ -166,10 +166,10 @@ const Cart = () => {
                       <div className="relative">
                         <Input 
                           placeholder="Code promotionnel" 
-                          className="pr-24"
+                          className="pr-24 border-gray-200"
                         />
                         <Button 
-                          className="absolute right-1 top-1 h-8 px-4"
+                          className="absolute right-1 top-1 h-8 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700"
                           variant="secondary"
                         >
                           Appliquer
@@ -177,15 +177,15 @@ const Cart = () => {
                       </div>
                     </div>
                     
-                    <Separator />
+                    <Separator className="bg-gray-200" />
                     
                     <div className="flex justify-between font-bold">
-                      <span>Total (TTC)</span>
-                      <span>{cart.totalPrice.toFixed(2)} €</span>
+                      <span className="text-gray-800">Total (TTC)</span>
+                      <span className="text-agrimarket-green">{cart.totalPrice.toFixed(2)} €</span>
                     </div>
                     
                     <Button 
-                      className="w-full bg-agrimarket-orange hover:bg-orange-600 mt-4" 
+                      className="w-full bg-agrimarket-orange hover:bg-agrimarket-brown text-white mt-4" 
                       onClick={() => navigate('/checkout')}
                     >
                       Procéder au paiement
@@ -193,7 +193,7 @@ const Cart = () => {
                     
                     <Button 
                       variant="outline" 
-                      className="w-full" 
+                      className="w-full border-gray-200 text-gray-700 hover:text-agrimarket-green" 
                       onClick={() => navigate('/products')}
                     >
                       Continuer les achats
