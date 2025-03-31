@@ -62,7 +62,11 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 text-sm">&copy; {new Date().getFullYear()} AgriMarket. Tous droits réservés.</p>
             <div className="mt-4 md:mt-0">
-              <img src="https://via.placeholder.com/240x40" alt="Payment methods" className="h-8" />
+              <img 
+                src="/lovable-uploads/6ca1f9ee-2c05-447b-a54b-a0c40c93438b.png"
+                alt="Méthodes de paiement"
+                className="h-8" 
+              />
             </div>
           </div>
         </div>

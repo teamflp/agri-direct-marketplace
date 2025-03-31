@@ -41,8 +41,11 @@ const PlanUpgradeDialog = ({
     // Fermer le dialogue
     setOpen(false);
     
-    // Dans une application réelle, redirection vers le processus de paiement
-    // window.location.href = '/checkout?plan=' + planName;
+    // Redirection vers une page de paiement simulée
+    // Dans une application réelle, cela devrait pointer vers un processus de paiement Stripe ou un autre fournisseur
+    setTimeout(() => {
+      window.location.href = `/checkout?plan=${encodeURIComponent(planName)}&price=${planPrice}`;
+    }, 1000);
   };
 
   if (currentPlan) {

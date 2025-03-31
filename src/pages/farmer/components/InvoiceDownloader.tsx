@@ -13,20 +13,32 @@ const InvoiceDownloader = ({ invoiceId, invoiceNumber }: InvoiceDownloaderProps)
   const { toast } = useToast();
 
   const handleDownloadInvoice = () => {
-    // Dans une application réelle, cela déclencherait un téléchargement de fichier
-    // Ici, nous montrons simplement un toast pour indiquer que le téléchargement a commencé
     toast({
       title: "Téléchargement de facture",
       description: `La facture ${invoiceNumber} a été téléchargée`,
     });
     
-    // Simulation d'un téléchargement de PDF
+    // Utilisation d'un blob PDF plus robuste pour le téléchargement - dans une application réelle, 
+    // cela serait un vrai fichier PDF généré côté serveur
+    const pdfBlob = new Blob(
+      [
+        // Contenu PDF minimal mais valide
+        '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Resources<<>>/Contents 4 0 R/Parent 2 0 R>>endobj 4 0 obj<</Length 21>>stream\nBT /F1 12 Tf 100 700 Td (Facture '+invoiceNumber+') Tj ET\nendstream\nendobj\nxref\n0 5\n0000000000 65535 f\n0000000010 00000 n\n0000000053 00000 n\n0000000102 00000 n\n0000000199 00000 n\ntrailer<</Size 5/Root 1 0 R>>\nstartxref\n270\n%%EOF'
+      ],
+      { type: 'application/pdf' }
+    );
+    
+    const blobUrl = URL.createObjectURL(pdfBlob);
+    
     const dummyLink = document.createElement('a');
-    dummyLink.href = `data:application/pdf;base64,JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwgL0xlbmd0aCA1IDAgUiAvRmlsdGVyIC9GbGF0ZURlY29kZSA+PgpzdHJlYW0KeF4=`;
+    dummyLink.href = blobUrl;
     dummyLink.download = `Facture_${invoiceNumber}.pdf`;
     document.body.appendChild(dummyLink);
     dummyLink.click();
     document.body.removeChild(dummyLink);
+    
+    // Libération de l'URL pour éviter les fuites de mémoire
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
   };
 
   return (
