@@ -8,12 +8,14 @@ type InventoryOverviewProps = {
   products: InventoryProductType[];
   filteredProducts: InventoryProductType[];
   onUpdateClick: (product: InventoryProductType) => void;
+  onHistoryClick: (product: InventoryProductType) => void;
 };
 
 const InventoryOverview = ({
   products,
   filteredProducts,
-  onUpdateClick
+  onUpdateClick,
+  onHistoryClick
 }: InventoryOverviewProps) => {
   return (
     <Card>
@@ -27,6 +29,7 @@ const InventoryOverview = ({
         <InventoryTable 
           products={filteredProducts} 
           onUpdateClick={onUpdateClick}
+          onHistoryClick={onHistoryClick}
         />
       </CardContent>
     </Card>

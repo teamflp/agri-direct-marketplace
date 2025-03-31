@@ -2,14 +2,19 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, FileText, Box, Package } from 'lucide-react';
+import { Search, FileText } from 'lucide-react';
 
 type InventoryHeaderProps = {
   searchTerm: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onReportClick: () => void;
 };
 
-const InventoryHeader = ({ searchTerm, onSearchChange }: InventoryHeaderProps) => {
+const InventoryHeader = ({ 
+  searchTerm, 
+  onSearchChange,
+  onReportClick
+}: InventoryHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
@@ -29,7 +34,10 @@ const InventoryHeader = ({ searchTerm, onSearchChange }: InventoryHeaderProps) =
           />
         </div>
         
-        <Button className="bg-agrimarket-green hover:bg-agrimarket-green/90">
+        <Button 
+          className="bg-agrimarket-green hover:bg-agrimarket-green/90"
+          onClick={onReportClick}
+        >
           <FileText className="mr-2 h-4 w-4" />
           Rapport d'inventaire
         </Button>

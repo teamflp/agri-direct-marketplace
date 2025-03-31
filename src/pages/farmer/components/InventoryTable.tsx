@@ -15,18 +15,21 @@ import {
   ArrowUpDown,
   Plus,
   Minus,
-  Calendar
+  Calendar,
+  History
 } from 'lucide-react';
 import { InventoryProductType } from '../FarmerInventory';
 
 type InventoryTableProps = {
   products: InventoryProductType[];
   onUpdateClick: (product: InventoryProductType) => void;
+  onHistoryClick: (product: InventoryProductType) => void;
 };
 
 const InventoryTable = ({ 
   products, 
-  onUpdateClick 
+  onUpdateClick,
+  onHistoryClick
 }: InventoryTableProps) => {
   return (
     <Table>
@@ -98,8 +101,9 @@ const InventoryTable = ({
                   variant="outline" 
                   size="sm" 
                   className="inline-flex items-center gap-1 ml-2"
+                  onClick={() => onHistoryClick(product)}
                 >
-                  <Eye size={16} />
+                  <History size={16} />
                   <span className="hidden sm:inline">Historique</span>
                 </Button>
               </TableCell>

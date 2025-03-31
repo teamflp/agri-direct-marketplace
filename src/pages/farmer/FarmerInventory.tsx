@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { 
   ShoppingBag, 
@@ -17,7 +17,10 @@ import InventoryOverview from './components/InventoryOverview';
 import InventoryStats from './components/InventoryStats';
 import LowStockProducts from './components/LowStockProducts';
 import InventoryUpdateDialog from './components/InventoryUpdateDialog';
+import InventoryReportDialog from './components/InventoryReportDialog';
+import ProductHistoryDialog from './components/ProductHistoryDialog';
 import { ProductType } from './components/ProductDeleteDialog';
+import { useInventoryUpdate } from './hooks/useInventoryUpdate';
 
 // Enrichir le type ProductType avec des informations d'inventaire
 export type InventoryProductType = ProductType & {
@@ -147,6 +150,8 @@ const inventoryProducts: InventoryProductType[] = [
 const FarmerInventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<null | InventoryProductType>(null);
   const [products, setProducts] = useState<InventoryProductType[]>(inventoryProducts);
   const { toast } = useToast();
@@ -172,6 +177,15 @@ const FarmerInventory = () => {
   const handleUpdateClick = (product: InventoryProductType) => {
     setSelectedProduct(product);
     setShowUpdateDialog(true);
+  };
+  
+  const handleHistoryClick = (product: InventoryProductType) => {
+    setSelectedProduct(product);
+    setShowHistoryDialog(true);
+  };
+  
+  const handleReportClick = () => {
+    setShowReportDialog(true);
   };
   
   const handleUpdateInventory = (productId: number, quantity: number, type: 'add' | 'remove', reason: string) => {
@@ -234,12 +248,14 @@ const FarmerInventory = () => {
         <InventoryHeader 
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
+          onReportClick={handleReportClick}
         />
 
         <InventoryOverview 
           products={products}
           filteredProducts={filteredProducts}
           onUpdateClick={handleUpdateClick}
+          onHistoryClick={handleHistoryClick}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -263,6 +279,18 @@ const FarmerInventory = () => {
           onUpdateInventory={handleUpdateInventory}
         />
       )}
+      
+      <InventoryReportDialog
+        open={showReportDialog}
+        onOpenChange={setShowReportDialog}
+        products={products}
+      />
+      
+      <ProductHistoryDialog
+        open={showHistoryDialog}
+        onOpenChange={setShowHistoryDialog}
+        product={selectedProduct}
+      />
     </DashboardLayout>
   );
 };
