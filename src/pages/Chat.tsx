@@ -3,8 +3,12 @@ import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { MessageSquare } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const Chat = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -20,7 +24,7 @@ const Chat = () => {
           
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-4">Comment puis-je vous aider ?</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="p-4 border rounded-lg bg-green-50">
                 <h3 className="font-bold text-lg mb-2">Produits de saison</h3>
                 <p className="text-gray-700">Découvrez quels produits sont disponibles en ce moment et comment les cuisiner.</p>
@@ -33,6 +37,16 @@ const Chat = () => {
                 <h3 className="font-bold text-lg mb-2">Support AgriMarket</h3>
                 <p className="text-gray-700">Besoin d'aide avec votre commande, votre compte ou nos services ? Demandez-moi !</p>
               </div>
+            </div>
+            
+            <div className="text-center">
+              <Button 
+                onClick={() => navigate('/')} 
+                className="bg-agrimarket-green hover:bg-agrimarket-darkGreen"
+              >
+                Retour à l'accueil
+              </Button>
+              <p className="mt-4 text-sm text-gray-500">Utilisez l'icône de chat flottante pour poser vos questions</p>
             </div>
           </div>
         </div>
