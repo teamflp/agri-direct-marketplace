@@ -1,16 +1,46 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export interface Subscription {
-  id: string;
+export interface SubscriptionItem {
+  id: number;
   name: string;
-  description: string;
+  quantity: number;
+  image?: string;
+}
+
+export interface Subscription {
+  id: string | number;
+  name?: string;
+  description?: string;
   price: number;
-  billingCycle: 'monthly' | 'annual';
-  status: 'active' | 'cancelled' | 'expired';
+  billingCycle?: 'monthly' | 'annual';
+  status: 'active' | 'cancelled' | 'expired' | 'paused';
   startDate: Date;
   endDate?: Date;
-  features: string[];
+  features?: string[];
+  
+  // Propriétés additionnelles utilisées dans les composants
+  plan?: string;
+  farmerName?: string;
+  frequency?: 'weekly' | 'biweekly' | 'monthly';
+  nextDelivery?: string | Date;
+  isAutoRenew?: boolean;
+  items?: SubscriptionItem[];
+}
+
+interface SubscriptionData {
+  farmerId: number;
+  farmerName: string;
+  farmerAvatar?: string;
+  userId: number;
+  plan: string;
+  frequency: 'weekly' | 'biweekly' | 'monthly';
+  price: number;
+  startDate: string;
+  nextDelivery: string;
+  items: SubscriptionItem[];
+  status: 'active' | 'cancelled' | 'expired' | 'paused';
+  isAutoRenew: boolean;
 }
 
 interface SubscriptionContextType {
@@ -18,8 +48,16 @@ interface SubscriptionContextType {
   isLoading: boolean;
   error: string | null;
   setSubscription: (subscription: Subscription | null) => void;
-  cancelSubscription: (id: string) => Promise<void>;
+  cancelSubscription: (id: string | number) => Promise<void>;
   upgradeSubscription: (newPlan: Omit<Subscription, 'id' | 'status' | 'startDate'>) => Promise<void>;
+  
+  // Méthodes additionnelles utilisées dans les composants
+  subscribe: (data: SubscriptionData) => void;
+  unsubscribe: (id: string | number) => void;
+  pauseSubscription: (id: string | number) => void;
+  resumeSubscription: (id: string | number) => void;
+  toggleAutoRenew: (id: string | number) => void;
+  getUserSubscriptions: () => Subscription[];
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
@@ -28,6 +66,7 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
 
   // Charger l'abonnement depuis le localStorage au démarrage (mock)
   useEffect(() => {
@@ -47,6 +86,16 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setError("Failed to load subscription data");
       }
     }
+    
+    // Charger les abonnements utilisateur
+    const storedUserSubscriptions = localStorage.getItem('userSubscriptions');
+    if (storedUserSubscriptions) {
+      try {
+        setUserSubscriptions(JSON.parse(storedUserSubscriptions));
+      } catch (err) {
+        console.error("Error loading user subscriptions:", err);
+      }
+    }
   }, []);
 
   // Sauvegarder l'abonnement dans le localStorage quand il change
@@ -57,8 +106,13 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       localStorage.removeItem('subscription');
     }
   }, [subscription]);
+  
+  // Sauvegarder les abonnements utilisateur
+  useEffect(() => {
+    localStorage.setItem('userSubscriptions', JSON.stringify(userSubscriptions));
+  }, [userSubscriptions]);
 
-  const cancelSubscription = async (id: string): Promise<void> => {
+  const cancelSubscription = async (id: string | number): Promise<void> => {
     setIsLoading(true);
     setError(null);
     
@@ -107,6 +161,84 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsLoading(false);
     }
   };
+  
+  // Méthodes additionnelles pour gérer les abonnements utilisateur
+  const subscribe = (data: SubscriptionData) => {
+    const newSubscription: Subscription = {
+      id: `sub_${Date.now()}`,
+      plan: data.plan,
+      price: data.price,
+      status: 'active',
+      startDate: new Date(),
+      farmerName: data.farmerName,
+      frequency: data.frequency,
+      nextDelivery: data.nextDelivery,
+      isAutoRenew: data.isAutoRenew,
+      items: data.items
+    };
+    
+    setUserSubscriptions([...userSubscriptions, newSubscription]);
+  };
+  
+  const unsubscribe = (id: string | number) => {
+    setUserSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, status: 'cancelled', endDate: new Date() } : sub
+      )
+    );
+  };
+  
+  const pauseSubscription = (id: string | number) => {
+    setUserSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, status: 'paused' } : sub
+      )
+    );
+  };
+  
+  const resumeSubscription = (id: string | number) => {
+    setUserSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, status: 'active' } : sub
+      )
+    );
+  };
+  
+  const toggleAutoRenew = (id: string | number) => {
+    setUserSubscriptions(prev => 
+      prev.map(sub => 
+        sub.id === id ? { ...sub, isAutoRenew: !sub.isAutoRenew } : sub
+      )
+    );
+  };
+  
+  const getUserSubscriptions = () => {
+    // Mock data
+    if (userSubscriptions.length === 0) {
+      const mockSubscriptions: Subscription[] = [
+        {
+          id: 'sub_1',
+          plan: 'Panier de légumes bio',
+          price: 2500,
+          status: 'active',
+          startDate: new Date(),
+          farmerName: 'Ferme des Quatre Saisons',
+          frequency: 'weekly',
+          nextDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          isAutoRenew: true,
+          items: [
+            { id: 1, name: 'Tomates bio', quantity: 3 },
+            { id: 2, name: 'Courgettes', quantity: 2 },
+            { id: 3, name: 'Salades', quantity: 1 }
+          ]
+        }
+      ];
+      
+      return mockSubscriptions;
+    }
+    
+    return userSubscriptions;
+  };
 
   return (
     <SubscriptionContext.Provider
@@ -116,7 +248,13 @@ export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ 
         error,
         setSubscription,
         cancelSubscription,
-        upgradeSubscription
+        upgradeSubscription,
+        subscribe,
+        unsubscribe,
+        pauseSubscription,
+        resumeSubscription,
+        toggleAutoRenew,
+        getUserSubscriptions
       }}
     >
       {children}

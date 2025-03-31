@@ -1,22 +1,33 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-interface CartItem {
-  id: string;
+export interface CartItem {
+  id: string | number;
   name: string;
   price: number;
   quantity: number;
   image?: string;
+  farmerName?: string;
+  farmerId?: number;
+  unit?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeItem: (id: string | number) => void;
+  updateQuantity: (id: string | number, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  // Aliases pour maintenir la compatibilité avec les composants existants
+  cart: {
+    items: CartItem[];
+    totalItems: number;
+    totalPrice: number;
+  };
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (id: string | number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -69,11 +80,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const removeItem = (id: string) => {
+  const removeItem = (id: string | number) => {
     setItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (id: string | number, quantity: number) => {
     if (quantity <= 0) {
       removeItem(id);
       return;
@@ -90,6 +101,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems([]);
   };
 
+  // Créer un objet cart pour la compatibilité avec les composants existants
+  const cart = {
+    items,
+    totalItems,
+    totalPrice
+  };
+
+  // Aliases de fonctions pour la compatibilité
+  const addToCart = addItem;
+  const removeFromCart = removeItem;
+
   return (
     <CartContext.Provider 
       value={{ 
@@ -99,7 +121,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateQuantity, 
         clearCart, 
         totalItems, 
-        totalPrice 
+        totalPrice,
+        // Ajout des alias pour compatibilité
+        cart,
+        addToCart,
+        removeFromCart
       }}
     >
       {children}

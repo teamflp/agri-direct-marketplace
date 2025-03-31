@@ -91,12 +91,8 @@ const ChatInterface = () => {
     }
   };
 
-  // Formater la date
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('fr-FR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -104,7 +100,7 @@ const ChatInterface = () => {
       <CardHeader className="pb-3">
         <div className="flex items-center">
           <div className="mr-2">
-            <AgrimarketLogo size="small" />
+            <AgrimarketLogo size="sm" />
           </div>
           <div>
             <CardTitle>Assistant AgriMarket</CardTitle>
@@ -113,46 +109,49 @@ const ChatInterface = () => {
         </div>
       </CardHeader>
       
-      <CardContent className="flex-grow overflow-hidden p-0 relative">
-        <ScrollArea ref={scrollAreaRef} className="h-full p-4 pb-0">
-          <div className="space-y-4">
+      <CardContent className="flex-grow overflow-hidden p-0">
+        <ScrollArea ref={scrollAreaRef} className="h-full px-4">
+          <div className="space-y-4 pb-4">
             {messages.map((message, index) => (
               <div 
                 key={index} 
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div 
-                  className={`flex items-start max-w-[80%] ${
-                    message.role === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted'
-                  } rounded-lg p-3`}
-                >
-                  <div className="flex-shrink-0 mr-2">
+                <div className={`flex ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start gap-2 max-w-[80%]`}>
+                  <Avatar className={`mt-0.5 ${message.role === 'user' ? 'bg-agrimarket-orange' : 'bg-agrimarket-green'}`}>
                     {message.role === 'user' ? (
-                      <Avatar className="h-8 w-8 bg-primary-foreground">
-                        <User className="h-4 w-4 text-primary" />
-                      </Avatar>
+                      <User className="h-4 w-4 text-white" />
                     ) : (
-                      <Avatar className="h-8 w-8 bg-green-100">
-                        <Bot className="h-4 w-4 text-green-600" />
-                      </Avatar>
+                      <Bot className="h-4 w-4 text-white" />
                     )}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                    <div className="text-xs text-muted-foreground">{formatTime(message.timestamp)}</div>
+                  </Avatar>
+                  
+                  <div>
+                    <div 
+                      className={`rounded-lg px-3 py-2 text-sm ${
+                        message.role === 'user' 
+                          ? 'bg-agrimarket-orange text-white' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {message.content}
+                    </div>
+                    <div className={`text-xs mt-1 text-gray-500 ${message.role === 'user' ? 'text-right' : ''}`}>
+                      {formatTime(message.timestamp)}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="flex items-center bg-muted rounded-lg p-3">
-                  <Avatar className="h-8 w-8 bg-green-100 mr-2">
-                    <Bot className="h-4 w-4 text-green-600" />
+                <div className="flex items-start gap-2 max-w-[80%]">
+                  <Avatar className="mt-0.5 bg-agrimarket-green">
+                    <Bot className="h-4 w-4 text-white" />
                   </Avatar>
-                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  <div className="rounded-lg px-3 py-2 bg-gray-100 text-gray-800">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
                 </div>
               </div>
             )}
@@ -161,32 +160,35 @@ const ChatInterface = () => {
         </ScrollArea>
         
         {showScrollBtn && (
-          <Button
-            size="icon"
-            variant="outline"
-            className="absolute bottom-2 right-3 rounded-full shadow-md z-10"
-            onClick={scrollToBottom}
-          >
-            <ArrowDown className="h-4 w-4" />
-          </Button>
+          <div className="absolute bottom-16 right-4">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="rounded-full w-8 h-8 p-0 bg-white shadow-md"
+              onClick={scrollToBottom}
+            >
+              <ArrowDown className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </CardContent>
       
-      <CardFooter className="pt-0">
-        <form onSubmit={handleSendMessage} className="w-full flex items-center space-x-2 pt-2">
-          <Input
-            placeholder="Écrivez votre message..."
+      <CardFooter className="border-t p-3">
+        <form onSubmit={handleSendMessage} className="flex w-full gap-2">
+          <Input 
+            placeholder="Tapez votre message..." 
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={e => setInput(e.target.value)}
             disabled={isLoading}
-            className="flex-grow"
+            className="border-agrimarket-lightGreen focus-visible:ring-agrimarket-green"
           />
           <Button 
             type="submit" 
             size="icon" 
-            disabled={!input.trim() || isLoading}
+            disabled={isLoading || !input.trim()}
+            className="bg-agrimarket-green hover:bg-agrimarket-darkGreen"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <Send className="h-4 w-4" />
           </Button>
         </form>
       </CardFooter>
