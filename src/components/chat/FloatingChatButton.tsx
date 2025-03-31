@@ -22,41 +22,8 @@ const FloatingChatButton = () => {
 
   return (
     <>
-      {/* Version desktop */}
-      <div className="fixed bottom-6 right-6 z-50 hidden md:block">
-        <div className="relative">
-          {isOpen ? (
-            <div className="absolute bottom-0 right-0 mb-20 w-[400px]">
-              <div className="rounded-lg shadow-2xl">
-                <div className="flex justify-end bg-agrimarket-green text-white p-2 rounded-t-lg">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setIsOpen(false)}
-                    className="text-white hover:bg-agrimarket-darkGreen"
-                  >
-                    <X size={20} />
-                  </Button>
-                </div>
-                <ChatInterface compact={true} />
-              </div>
-            </div>
-          ) : null}
-          
-          <Button
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              "rounded-full w-16 h-16 shadow-lg bg-agrimarket-green hover:bg-agrimarket-darkGreen transition-all duration-300",
-              isAnimating && "animate-pulse scale-110"
-            )}
-          >
-            <MessageCircle size={28} className="text-white" />
-          </Button>
-        </div>
-      </div>
-
       {/* Version mobile - utilise le composant Drawer */}
-      <div className="fixed bottom-16 right-6 z-50 md:hidden">
+      <div className="fixed bottom-16 right-6 z-50">
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
           <DrawerTrigger asChild>
             <Button
