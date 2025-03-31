@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import FarmerSeasonalAdvice from '@/components/farmer/FarmerSeasonalAdvice';
 import { ShoppingBag, Users, BarChart2, MessageSquare, Package, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 // Import des composants du tableau de bord agriculteur
 import DashboardOverview from '@/pages/farmer/components/DashboardOverview';
@@ -12,8 +13,14 @@ import RecentOrders from '@/pages/farmer/components/RecentOrders';
 import TopProducts from '@/pages/farmer/components/TopProducts';
 import LowStockProducts from '@/pages/farmer/components/LowStockProducts';
 import { InventoryProductType } from '@/pages/farmer/FarmerInventory';
+import InventoryUpdateDialog from '@/pages/farmer/components/InventoryUpdateDialog';
 
 const FarmerDashboard = () => {
+  const { toast } = useToast();
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<null | InventoryProductType>(null);
+  const [lowStockProducts, setLowStockProducts] = useState<InventoryProductType[]>([]);
+  
   const menuItems = [
     { title: "Produits", path: "/farmer-dashboard/products", icon: <Package size={20} /> },
     { title: "Commandes", path: "/farmer-dashboard/orders", icon: <ShoppingBag size={20} /> },
@@ -81,63 +88,68 @@ const FarmerDashboard = () => {
     }
   ];
 
-  // Mock data for LowStockProducts
-  const lowStockProducts: InventoryProductType[] = [
-    {
-      id: 4,
-      name: "Laitue",
-      price: 1.50,
-      inventory: 3,
-      minimumStock: 5,
-      unit: "pièce",
-      image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=500&h=500&fit=crop",
-      category: "Légumes",
-      organic: true,
-      published: true,
-      stockHistory: [
-        {
-          date: "2023-05-01",
-          quantity: 10,
-          type: "add",
-          reason: "Livraison initiale"
-        },
-        {
-          date: "2023-05-10",
-          quantity: 7,
-          type: "remove",
-          reason: "Ventes"
-        }
-      ],
-      lastUpdated: "2023-05-10"
-    },
-    {
-      id: 5,
-      name: "Aubergines",
-      price: 2.80,
-      inventory: 4,
-      minimumStock: 10,
-      unit: "kg",
-      image: "https://images.unsplash.com/photo-1613878501069-18e97ac2dacf?w=500&h=500&fit=crop",
-      category: "Légumes",
-      organic: false,
-      published: true,
-      stockHistory: [
-        {
-          date: "2023-05-05",
-          quantity: 15,
-          type: "add",
-          reason: "Livraison initiale"
-        },
-        {
-          date: "2023-05-15",
-          quantity: 11,
-          type: "remove",
-          reason: "Ventes"
-        }
-      ],
-      lastUpdated: "2023-05-15"
-    }
-  ];
+  // Initialize lowStockProducts state with mock data
+  React.useEffect(() => {
+    // Mock data for LowStockProducts
+    const initialLowStockProducts: InventoryProductType[] = [
+      {
+        id: 4,
+        name: "Laitue",
+        price: 1.50,
+        inventory: 3,
+        minimumStock: 5,
+        unit: "pièce",
+        image: "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=500&h=500&fit=crop",
+        category: "Légumes",
+        organic: true,
+        published: true,
+        stockHistory: [
+          {
+            date: "2023-05-01",
+            quantity: 10,
+            type: "add",
+            reason: "Livraison initiale"
+          },
+          {
+            date: "2023-05-10",
+            quantity: 7,
+            type: "remove",
+            reason: "Ventes"
+          }
+        ],
+        lastUpdated: "2023-05-10"
+      },
+      {
+        id: 5,
+        name: "Aubergines",
+        price: 2.80,
+        inventory: 4,
+        minimumStock: 10,
+        unit: "kg",
+        image: "https://images.unsplash.com/photo-1613878501069-18e97ac2dacf?w=500&h=500&fit=crop",
+        category: "Légumes",
+        organic: false,
+        published: true,
+        stockHistory: [
+          {
+            date: "2023-05-05",
+            quantity: 15,
+            type: "add",
+            reason: "Livraison initiale"
+          },
+          {
+            date: "2023-05-15",
+            quantity: 11,
+            type: "remove",
+            reason: "Ventes"
+          }
+        ],
+        lastUpdated: "2023-05-15"
+      }
+    ];
+
+    setLowStockProducts(initialLowStockProducts);
+  }, []);
 
   // Event handlers
   const handleViewAllOrders = () => {
@@ -148,9 +160,46 @@ const FarmerDashboard = () => {
     window.location.href = "/farmer-dashboard/products";
   };
 
-  const handleUpdateInventory = (product: InventoryProductType) => {
-    console.log("Update inventory for product:", product);
-    // Actual implementation would open a dialog to update the inventory
+  const handleUpdateClick = (product: InventoryProductType) => {
+    setSelectedProduct(product);
+    setShowUpdateDialog(true);
+  };
+
+  const handleUpdateInventory = (productId: number, quantity: number, type: 'add' | 'remove', reason: string) => {
+    setLowStockProducts(prevProducts => {
+      return prevProducts.map(product => {
+        if (product.id === productId) {
+          // Calculer le nouveau stock
+          const newInventory = type === 'add' 
+            ? product.inventory + quantity
+            : Math.max(0, product.inventory - quantity);
+          
+          // Créer un nouvel enregistrement d'historique
+          const newHistoryEntry = {
+            date: new Date().toISOString().split('T')[0],
+            quantity,
+            type,
+            reason
+          };
+          
+          // Retourner le produit mis à jour
+          return {
+            ...product,
+            inventory: newInventory,
+            stockHistory: [newHistoryEntry, ...product.stockHistory],
+            lastUpdated: new Date().toISOString().split('T')[0]
+          };
+        }
+        return product;
+      });
+    });
+    
+    setShowUpdateDialog(false);
+    
+    toast({
+      title: "Inventaire mis à jour",
+      description: `${selectedProduct?.name} : ${quantity} unités ${type === 'add' ? 'ajoutées' : 'retirées'}`,
+    });
   };
 
   return (
@@ -189,7 +238,7 @@ const FarmerDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <LowStockProducts 
             lowStockProducts={lowStockProducts} 
-            onUpdateClick={handleUpdateInventory} 
+            onUpdateClick={handleUpdateClick} 
           />
           
           <Card>
@@ -220,6 +269,16 @@ const FarmerDashboard = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Dialog for inventory updates */}
+      {selectedProduct && (
+        <InventoryUpdateDialog 
+          open={showUpdateDialog}
+          onOpenChange={setShowUpdateDialog}
+          product={selectedProduct}
+          onUpdateInventory={handleUpdateInventory}
+        />
+      )}
     </DashboardLayout>
   );
 };
