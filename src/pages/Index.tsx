@@ -10,6 +10,8 @@ import SubscriptionSection from "@/components/home/SubscriptionSection";
 import SeasonalProductsRecommendations from "@/components/seasonal/SeasonalProductsRecommendations";
 import MemberOnlyAdvice from "@/components/home/MemberOnlyAdvice";
 import SecuritySection from "@/components/home/SecuritySection";
+import MarketStats from "@/components/home/MarketStats";
+import HowItWorks from "@/components/home/HowItWorks";
 
 const Index = () => {
   return (
@@ -17,6 +19,12 @@ const Index = () => {
       <Header />
       <main className="flex-grow pt-16">
         <HeroBanner />
+        
+        {/* Statistiques du marché */}
+        <MarketStats />
+        
+        {/* Comment ça marche */}
+        <HowItWorks />
         
         <div className="bg-white py-16">
           <div className="container mx-auto px-4">
