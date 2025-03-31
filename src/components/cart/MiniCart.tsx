@@ -11,34 +11,38 @@ import { Separator } from '@/components/ui/separator';
 
 export function MiniCart() {
   const {
-    cart,
-    removeFromCart,
+    items,
+    totalItems,
+    totalPrice,
+    removeItem,
     updateQuantity,
     clearCart
   } = useCart();
+  
   const navigate = useNavigate();
   
   const handleCheckout = () => {
     navigate('/checkout');
   };
   
-  const handleIncreaseQuantity = (id: number, currentQuantity: number) => {
+  const handleIncreaseQuantity = (id: string | number, currentQuantity: number) => {
     updateQuantity(id, currentQuantity + 1);
   };
   
-  const handleDecreaseQuantity = (id: number, currentQuantity: number) => {
+  const handleDecreaseQuantity = (id: string | number, currentQuantity: number) => {
     if (currentQuantity > 1) {
       updateQuantity(id, currentQuantity - 1);
     }
   };
   
-  return <Popover>
+  return (
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="icon" className="relative text-agrimarket-green border-gray-200 bg-white hover:bg-gray-50 hover:text-agrimarket-darkGreen">
           <ShoppingCart className="h-5 w-5" />
-          {cart.totalItems > 0 && 
+          {totalItems > 0 && 
             <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-agrimarket-orange text-white border-white">
-              {cart.totalItems}
+              {totalItems}
             </Badge>
           }
         </Button>
@@ -47,11 +51,11 @@ export function MiniCart() {
       <PopoverContent className="w-80 bg-white border-gray-200 shadow-lg" align="end">
         <div className="flex flex-col">
           <div className="flex justify-between items-center pb-2 mb-2">
-            <h3 className="font-medium text-gray-800">Mon Panier ({cart.totalItems})</h3>
-            <span className="font-medium text-agrimarket-green">{cart.totalPrice.toFixed(2)} €</span>
+            <h3 className="font-medium text-gray-800">Mon Panier ({totalItems})</h3>
+            <span className="font-medium text-agrimarket-green">{totalPrice.toFixed(2)} €</span>
           </div>
           
-          {cart.items.length === 0 ? 
+          {items.length === 0 ? 
             <div className="py-8 text-center text-gray-500">
               Votre panier est vide
             </div> 
@@ -59,7 +63,7 @@ export function MiniCart() {
             <>
               <ScrollArea className="h-[300px]">
                 <div className="space-y-3 pr-3">
-                  {cart.items.map(item => 
+                  {items.map(item => (
                     <div key={item.id} className="flex flex-col p-2 border border-gray-200 rounded-md bg-white shadow-sm">
                       <div className="flex items-center gap-3">
                         <div className="h-14 w-14 rounded-md overflow-hidden flex-shrink-0">
@@ -80,7 +84,7 @@ export function MiniCart() {
                           variant="ghost" 
                           size="icon" 
                           className="h-8 w-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100" 
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => removeItem(item.id)}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -114,7 +118,7 @@ export function MiniCart() {
                         </div>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               </ScrollArea>
               
@@ -123,7 +127,7 @@ export function MiniCart() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Sous-total</span>
-                  <span className="text-sm text-gray-800">{cart.totalPrice.toFixed(2)} €</span>
+                  <span className="text-sm text-gray-800">{totalPrice.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">Livraison</span>
@@ -131,7 +135,7 @@ export function MiniCart() {
                 </div>
                 <div className="flex justify-between items-center font-medium py-1">
                   <span className="text-gray-800">Total (estimé)</span>
-                  <span className="text-agrimarket-green">{cart.totalPrice.toFixed(2)} €</span>
+                  <span className="text-agrimarket-green">{totalPrice.toFixed(2)} €</span>
                 </div>
                 
                 <div className="flex flex-col gap-2 mt-2">
@@ -164,5 +168,6 @@ export function MiniCart() {
           }
         </div>
       </PopoverContent>
-    </Popover>;
+    </Popover>
+  );
 }

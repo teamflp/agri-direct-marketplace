@@ -20,7 +20,7 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
-  // Aliases pour maintenir la compatibilité avec les composants existants
+  // Aliases for maintaining compatibility with existing components
   cart: {
     items: CartItem[];
     totalItems: number;
@@ -37,7 +37,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [totalItems, setTotalItems] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  // Calculer les totaux lorsque les articles changent
+  // Calculate totals when items change
   useEffect(() => {
     const itemCount = items.reduce((total, item) => total + item.quantity, 0);
     const price = items.reduce((total, item) => total + (item.price * item.quantity), 0);
@@ -46,35 +46,35 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTotalPrice(price);
   }, [items]);
 
-  // Charger le panier depuis le localStorage au démarrage
+  // Load cart from localStorage on startup
   useEffect(() => {
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
       try {
         setItems(JSON.parse(storedCart));
       } catch (error) {
-        console.error("Erreur lors du chargement du panier:", error);
+        console.error("Error loading cart:", error);
       }
     }
   }, []);
 
-  // Sauvegarder le panier dans le localStorage quand il change
+  // Save cart to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
 
   const addItem = (item: CartItem) => {
     setItems(prevItems => {
-      // Vérifier si l'article existe déjà
+      // Check if item already exists
       const existingItemIndex = prevItems.findIndex(i => i.id === item.id);
       
       if (existingItemIndex !== -1) {
-        // Mettre à jour la quantité si l'article existe déjà
+        // Update quantity if item already exists
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += item.quantity;
         return updatedItems;
       } else {
-        // Ajouter nouvel article
+        // Add new item
         return [...prevItems, item];
       }
     });
@@ -101,14 +101,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems([]);
   };
 
-  // Créer un objet cart pour la compatibilité avec les composants existants
+  // Create cart object for compatibility with existing components
   const cart = {
     items,
     totalItems,
     totalPrice
   };
 
-  // Aliases de fonctions pour la compatibilité
+  // Function aliases for compatibility
   const addToCart = addItem;
   const removeFromCart = removeItem;
 
@@ -122,7 +122,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearCart, 
         totalItems, 
         totalPrice,
-        // Ajout des alias pour compatibilité
+        // Add aliases for compatibility
         cart,
         addToCart,
         removeFromCart

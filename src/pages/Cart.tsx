@@ -10,22 +10,22 @@ import { ShoppingCart, ArrowLeft, Trash2, Plus, Minus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { items, totalItems, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
   const navigate = useNavigate();
   
   // Group items by farmer
-  const groupedByFarmer = cart.items.reduce((acc, item) => {
-    const farmerId = item.farmerId;
+  const groupedByFarmer = items.reduce((acc, item) => {
+    const farmerId = item.farmerId || 0;
     if (!acc[farmerId]) {
       acc[farmerId] = {
-        farmerName: item.farmerName,
-        farmerId: item.farmerId,
+        farmerName: item.farmerName || 'Unknown Farmer',
+        farmerId: farmerId,
         items: []
       };
     }
     acc[farmerId].items.push(item);
     return acc;
-  }, {} as Record<number, { farmerName: string; farmerId: number; items: typeof cart.items }>);
+  }, {} as Record<number, { farmerName: string; farmerId: number; items: typeof items }>);
   
   // Convert to array for rendering
   const farmerGroups = Object.values(groupedByFarmer);
@@ -48,7 +48,7 @@ const Cart = () => {
             <h1 className="text-3xl font-bold text-gray-800">Mon Panier</h1>
           </div>
           
-          {cart.items.length === 0 ? (
+          {items.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-8 text-center">
               <div className="mb-4 flex justify-center">
                 <ShoppingCart className="h-16 w-16 text-gray-300" />
@@ -67,7 +67,7 @@ const Cart = () => {
               <div className="lg:col-span-2 space-y-6">
                 <div className="bg-white rounded-lg shadow-sm p-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-medium text-gray-800">Articles ({cart.totalItems})</h2>
+                    <h2 className="text-xl font-medium text-gray-800">Articles ({totalItems})</h2>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -131,7 +131,7 @@ const Cart = () => {
                                     variant="ghost" 
                                     size="sm" 
                                     className="text-red-500 hover:text-red-700 p-0 h-auto"
-                                    onClick={() => removeFromCart(item.id)}
+                                    onClick={() => removeItem(item.id)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                     <span className="sr-only">Supprimer</span>
@@ -154,7 +154,7 @@ const Cart = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Sous-total</span>
-                      <span className="text-gray-800">{cart.totalPrice.toFixed(2)} €</span>
+                      <span className="text-gray-800">{totalPrice.toFixed(2)} €</span>
                     </div>
                     
                     <div className="flex justify-between items-center text-gray-600">
@@ -181,7 +181,7 @@ const Cart = () => {
                     
                     <div className="flex justify-between font-bold">
                       <span className="text-gray-800">Total (TTC)</span>
-                      <span className="text-agrimarket-green">{cart.totalPrice.toFixed(2)} €</span>
+                      <span className="text-agrimarket-green">{totalPrice.toFixed(2)} €</span>
                     </div>
                     
                     <Button 
