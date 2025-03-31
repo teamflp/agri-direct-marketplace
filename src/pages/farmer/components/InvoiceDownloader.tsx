@@ -147,9 +147,13 @@ const InvoiceDownloader = ({ invoiceId, invoiceNumber, amount = 0, period }: Inv
     items.forEach((item, index) => {
       doc.text(item.name, colPos[0], yPosition);
       doc.text(item.quantity.toString(), colPos[1], yPosition);
+      
       // Correction du format d'affichage des prix pour éviter les espaces entre caractères
-      doc.text(`${Math.round(item.unitPrice).toLocaleString()} FCFA`, colPos[2], yPosition);
-      doc.text(`${Math.round(item.total).toLocaleString()} FCFA`, colPos[3], yPosition);
+      const unitPriceFormatted = Math.round(item.unitPrice).toString();
+      const totalFormatted = Math.round(item.total).toString();
+      
+      doc.text(`${unitPriceFormatted} FCFA`, colPos[2], yPosition);
+      doc.text(`${totalFormatted} FCFA`, colPos[3], yPosition);
       
       // Ligne séparatrice entre les articles
       yPosition += lineHeight;
@@ -165,12 +169,16 @@ const InvoiceDownloader = ({ invoiceId, invoiceNumber, amount = 0, period }: Inv
     yPosition += 10;
     
     // Totaux - Correction du format d'affichage des montants
+    const totalHTFormatted = Math.round(totalHT).toString();
+    const tvaFormatted = Math.round(tva).toString();
+    const totalTTCFormatted = Math.round(totalTTC).toString();
+    
     doc.setFont("helvetica", "normal");
-    doc.text(`Montant total HT: ${Math.round(totalHT).toLocaleString()} FCFA`, leftMargin, yPosition + 10);
-    doc.text(`TVA (20%): ${Math.round(tva).toLocaleString()} FCFA`, leftMargin, yPosition + 20);
+    doc.text(`Montant total HT: ${totalHTFormatted} FCFA`, leftMargin, yPosition + 10);
+    doc.text(`TVA (20%): ${tvaFormatted} FCFA`, leftMargin, yPosition + 20);
     
     doc.setFont("helvetica", "bold");
-    doc.text(`Total TTC: ${Math.round(totalTTC).toLocaleString()} FCFA`, leftMargin, yPosition + 30);
+    doc.text(`Total TTC: ${totalTTCFormatted} FCFA`, leftMargin, yPosition + 30);
     
     // Pied de page
     doc.setFontSize(smallFontSize);
