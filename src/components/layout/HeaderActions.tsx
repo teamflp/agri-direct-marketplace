@@ -17,24 +17,6 @@ interface HeaderActionsProps {
 const HeaderActions = ({ menuOpen, toggleMenu, isMobile, searchPlaceholder }: HeaderActionsProps) => {
   return (
     <div className="flex items-center space-x-2 sm:space-x-3">
-      {/* Bouton menu mobile - visible seulement sur mobile et placé en premier */}
-      {isMobile && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="text-gray-600 hover:bg-gray-100 order-first"
-          onClick={toggleMenu}
-          aria-label="Menu principal"
-        >
-          <span className="sr-only">Menu</span>
-          {menuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </Button>
-      )}
-      
       {/* Recherche */}
       <HeaderSearch placeholder={searchPlaceholder} />
       
