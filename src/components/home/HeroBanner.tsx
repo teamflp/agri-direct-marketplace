@@ -11,12 +11,12 @@ const HeroBanner: React.FC = () => {
       {/* Image de fond */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1470107355970-2ace9f20ab8d?q=80&w=1920&auto=format&fit=crop"
-          alt="Champ agricole" 
+          src="https://images.unsplash.com/photo-1536657464919-892534f60d6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+          alt="Agriculteurs dans un champ" 
           className="w-full h-full object-cover"
         />
-        {/* Overlay dégradé */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+        {/* Overlay orangé pour correspondre au design de référence */}
+        <div className="absolute inset-0 bg-gradient-to-r from-agrimarket-orange/70 to-agrimarket-orange/40"></div>
       </div>
       
       {/* Contenu */}
@@ -31,7 +31,7 @@ const HeroBanner: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <Button 
               size="lg" 
-              className="bg-agrimarket-green hover:bg-agrimarket-darkGreen text-white"
+              className="bg-white text-agrimarket-orange hover:bg-gray-100"
               onClick={() => navigate('/products')}
             >
               Découvrir nos produits

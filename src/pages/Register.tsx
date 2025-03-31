@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import AgrimarketLogo from "@/components/logo/AgrimarketLogo";
 
 const registerFormSchema = z.object({
   firstName: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
@@ -70,7 +71,6 @@ const Register = () => {
         variant: "success",
       });
       
-      // Correction ici : utiliser la route correcte "verify-email" au lieu de "email-verification"
       navigate("/verify-email", { state: { email: values.email } });
       
       setIsLoading(false);
@@ -82,8 +82,11 @@ const Register = () => {
       <Header />
       <main className="container mx-auto px-4 pt-32 pb-16">
         <div className="flex justify-center items-center">
-          <Card className="w-full max-w-xl shadow-lg">
+          <Card className="w-full max-w-xl shadow-lg border-t-4 border-t-agrimarket-orange">
             <CardHeader className="space-y-1">
+              <div className="flex justify-center mb-4">
+                <AgrimarketLogo size="lg" />
+              </div>
               <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
               <CardDescription className="text-center">
                 Rejoignez AgriMarket et profitez de produits frais directement des agriculteurs
@@ -92,8 +95,18 @@ const Register = () => {
             <CardContent>
               <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="buyer">Je suis Acheteur</TabsTrigger>
-                  <TabsTrigger value="farmer">Je suis Agriculteur</TabsTrigger>
+                  <TabsTrigger 
+                    value="buyer"
+                    className="data-[state=active]:bg-agrimarket-orange data-[state=active]:text-white"
+                  >
+                    Je suis Acheteur
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="farmer"
+                    className="data-[state=active]:bg-agrimarket-green data-[state=active]:text-white"
+                  >
+                    Je suis Agriculteur
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="buyer">
                   <p className="text-sm text-muted-foreground mb-4">
@@ -238,6 +251,7 @@ const Register = () => {
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
+                            className="data-[state=checked]:bg-agrimarket-orange data-[state=checked]:border-agrimarket-orange"
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
@@ -252,7 +266,7 @@ const Register = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-agrimarket-orange hover:bg-orange-600"
+                    className="w-full bg-agrimarket-orange hover:bg-agrimarket-brown"
                     disabled={isLoading}
                   >
                     {isLoading ? "Création du compte..." : "Créer mon compte"}

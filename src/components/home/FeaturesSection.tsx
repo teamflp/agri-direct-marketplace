@@ -38,7 +38,7 @@ const FeaturesSection = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <div key={index} className="bg-gray-50 p-6 rounded-lg border border-gray-100">
+            <div key={index} className="border border-gray-100 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow bg-white">
               <div className="flex justify-center mb-4">
                 {feature.icon}
               </div>

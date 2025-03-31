@@ -62,7 +62,7 @@ const MapSection = () => {
   };
   
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-4">Trouvez des agriculteurs près de chez vous</h2>
@@ -71,7 +71,7 @@ const MapSection = () => {
           </p>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow-md mb-8">
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-8">
           <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -86,7 +86,7 @@ const MapSection = () => {
             <div>
               <Button 
                 type="submit"
-                className="w-full md:w-auto bg-agrimarket-orange hover:bg-orange-600 text-white"
+                className="w-full md:w-auto bg-agrimarket-orange hover:bg-agrimarket-brown text-white"
               >
                 Rechercher
               </Button>
@@ -94,7 +94,7 @@ const MapSection = () => {
           </form>
         </div>
         
-        <div className="bg-white rounded-lg overflow-hidden shadow-md mb-8" style={{ height: '500px' }}>
+        <div className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-200 mb-8" style={{ height: '500px' }}>
           <InteractiveMap 
             farmers={homepageFarmers} 
             googleMapsApiKey={GOOGLE_MAPS_API_KEY}
@@ -102,7 +102,7 @@ const MapSection = () => {
         </div>
         
         <div className="text-center">
-          <Button asChild className="bg-agrimarket-orange hover:bg-orange-600 text-white">
+          <Button asChild className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white">
             <Link to="/farmers-map" className="flex items-center gap-2">
               <Navigation className="w-4 h-4" />
               Explorer la carte complète

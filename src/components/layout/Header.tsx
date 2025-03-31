@@ -71,24 +71,24 @@ const Header = () => {
             </Link>
           </div>
           
-          {/* Navigation - centrée */}
+          {/* Navigation - centrée et mise à jour avec le style orange */}
           <nav className="hidden md:flex items-center justify-center space-x-4 lg:space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
+            <Link to="/" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.home')}
             </Link>
-            <Link to="/products" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
+            <Link to="/products" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.products')}
             </Link>
-            <Link to="/farmers" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
+            <Link to="/farmers" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.farmers')}
             </Link>
-            <Link to="/seasonal-calendar" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
+            <Link to="/seasonal-calendar" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.seasonal')}
             </Link>
-            <Link to="/subscriptions" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
+            <Link to="/subscriptions" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.subscriptions')}
             </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
+            <Link to="/contact" className="text-gray-700 hover:text-agrimarket-orange font-medium transition-colors px-2 py-1 rounded-md hover:bg-gray-50">
               {t('header.contact')}
             </Link>
           </nav>
@@ -110,7 +110,7 @@ const Header = () => {
                     />
                     <Button 
                       type="submit" 
-                      className="absolute right-0 top-0 h-full rounded-l-none bg-agrimarket-green hover:bg-agrimarket-darkGreen transition-colors"
+                      className="absolute right-0 top-0 h-full rounded-l-none bg-agrimarket-orange hover:bg-agrimarket-brown transition-colors"
                     >
                       <Search className="h-5 w-5" />
                     </Button>

@@ -31,7 +31,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 82 60% 44%;
+    --ring: 33 76% 52%;
 
     --radius: 0.5rem;
 
@@ -72,7 +72,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 82 60% 44%;
+    --ring: 33 76% 52%;
     
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -131,11 +131,11 @@
 
 /* Nouveaux styles pour le redesign */
 .btn-primary {
-  @apply bg-agrimarket-green text-white hover:bg-agrimarket-darkGreen transition-colors;
+  @apply bg-agrimarket-orange text-white hover:bg-agrimarket-brown transition-colors;
 }
 
 .btn-secondary {
-  @apply bg-agrimarket-orange text-white hover:bg-agrimarket-brown transition-colors;
+  @apply bg-agrimarket-green text-white hover:bg-agrimarket-darkGreen transition-colors;
 }
 
 .section-title {
@@ -148,4 +148,37 @@
 
 .card-hover {
   @apply transition-all duration-300 hover:-translate-y-1;
+}
+
+/* Nouveaux styles inspirés de l'image de référence */
+.orange-gradient {
+  @apply bg-gradient-to-r from-agrimarket-orange to-agrimarket-brown;
+}
+
+.green-gradient {
+  @apply bg-gradient-to-r from-agrimarket-green to-agrimarket-darkGreen;
+}
+
+.product-tile {
+  @apply rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow;
+}
+
+.product-tile-image {
+  @apply w-full h-48 object-cover;
+}
+
+.product-tile-content {
+  @apply p-4 bg-white;
+}
+
+.product-tile-title {
+  @apply font-bold text-lg mb-1;
+}
+
+.product-tile-farmer {
+  @apply text-sm text-gray-600 mb-2;
+}
+
+.product-tile-price {
+  @apply font-bold text-agrimarket-orange;
 }

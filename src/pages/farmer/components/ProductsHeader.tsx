@@ -30,7 +30,7 @@ const ProductsHeader = ({
           />
         </div>
         <Button 
-          className="bg-agrimarket-green hover:bg-agrimarket-darkGreen text-white flex items-center gap-2"
+          className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white flex items-center gap-2"
           onClick={onAddClick}
         >
           <Plus className="h-4 w-4" /> Ajouter un produit
