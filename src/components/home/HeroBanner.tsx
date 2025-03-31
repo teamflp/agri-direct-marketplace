@@ -1,20 +1,12 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-
 const HeroBanner: React.FC = () => {
   const navigate = useNavigate();
-
-  return (
-    <div className="relative">
+  return <div className="relative">
       {/* Image de fond */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1536657464919-892534f60d6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-          alt="Agriculteurs dans un champ" 
-          className="w-full h-full object-cover"
-        />
+        <img src="https://images.unsplash.com/photo-1536657464919-892534f60d6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Agriculteurs dans un champ" className="w-full h-full object-cover" />
         {/* Overlay orangé pour correspondre au design de référence */}
         <div className="absolute inset-0 bg-gradient-to-r from-agrimarket-orange/70 to-agrimarket-orange/40"></div>
       </div>
@@ -29,26 +21,15 @@ const HeroBanner: React.FC = () => {
             Découvrez des produits locaux cultivés avec passion par nos agriculteurs partenaires, livrés directement chez vous.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button 
-              size="lg" 
-              className="bg-white text-agrimarket-orange hover:bg-gray-100"
-              onClick={() => navigate('/products')}
-            >
+            <Button size="lg" className="bg-white text-agrimarket-orange hover:bg-gray-100" onClick={() => navigate('/products')}>
               Découvrir nos produits
             </Button>
-            <Button 
-              variant="outline"
-              size="lg"
-              className="border-white text-white hover:bg-white/20"
-              onClick={() => navigate('/farmers')}
-            >
+            <Button variant="outline" size="lg" onClick={() => navigate('/farmers')} className="border-white text-white bg-orange-500 hover:bg-orange-400">
               Rencontrer nos agriculteurs
             </Button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default HeroBanner;
