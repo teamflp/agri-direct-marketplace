@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -10,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useSocial } from '@/contexts/SocialContext';
 import { useMessages } from '@/contexts/MessageContext';
-import { FavoriteFarmerButton } from '@/components/social/FavoriteFarmerButton';
+import FavoriteFarmerButton from '@/components/social/FavoriteFarmerButton';
 
 // Mock data for favorite farmers
 const farmers = [
