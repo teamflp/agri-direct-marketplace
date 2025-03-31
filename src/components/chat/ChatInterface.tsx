@@ -1,7 +1,6 @@
 
 import React, { useRef, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
 import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 import ChatMessageList from './ChatMessageList';
 import ChatInputForm from './ChatInputForm';
