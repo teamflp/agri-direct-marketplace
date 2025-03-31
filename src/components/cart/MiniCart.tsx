@@ -28,7 +28,7 @@ export function MiniCart() {
   };
   return <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="relative bg-transparent text-orange-500">
+        <Button variant="outline" size="icon" className="relative text-lime-600 bg-transparent">
           <ShoppingCart className="h-5 w-5 text-white" />
           {cart.totalItems > 0 && <Badge className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-white text-orange-500 border-orange-500">
               {cart.totalItems}
