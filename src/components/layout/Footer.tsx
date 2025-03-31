@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Facebook, Instagram, Twitter, CreditCard } from 'lucide-react';
 import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 
 const Footer = () => {
@@ -65,11 +65,35 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 text-sm">&copy; {new Date().getFullYear()} AgriMarket. Tous droits réservés.</p>
             <div className="mt-4 md:mt-0">
-              <img 
-                src="/lovable-uploads/6ca1f9ee-2c05-447b-a54b-a0c40c93438b.png"
-                alt="Méthodes de paiement"
-                className="h-8" 
-              />
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex flex-col items-center">
+                  <div className="bg-yellow-500 rounded-full w-10 h-10 flex items-center justify-center mb-1">
+                    <span className="text-white font-bold text-xs">MTN</span>
+                  </div>
+                  <span className="text-xs text-gray-600">MTN Money</span>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="bg-orange-500 rounded-full w-10 h-10 flex items-center justify-center mb-1">
+                    <span className="text-white font-bold text-xs">OM</span>
+                  </div>
+                  <span className="text-xs text-gray-600">Orange Money</span>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center mb-1">
+                    <span className="text-white font-bold text-xs">MV</span>
+                  </div>
+                  <span className="text-xs text-gray-600">Move</span>
+                </div>
+                
+                <div className="flex flex-col items-center">
+                  <div className="bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center mb-1">
+                    <CreditCard className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-xs text-gray-600">Stripe</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
