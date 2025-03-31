@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -7,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Avatar } from '@/components/ui/avatar';
+import BuyerPersonalizedAdvice from '@/components/buyer/BuyerPersonalizedAdvice';
 import { 
   User, 
   ShoppingCart, 
@@ -87,6 +87,25 @@ const messages = [
     date: "Hier, 10:15",
     unread: false
   },
+];
+
+// Mock data for recent purchases
+const recentPurchases = [
+  {
+    id: "prod-001",
+    name: "Panier de légumes bio",
+    category: "Légumes"
+  },
+  {
+    id: "prod-002",
+    name: "Miel de fleurs sauvages",
+    category: "Miel"
+  },
+  {
+    id: "prod-003",
+    name: "Fromage de chèvre frais",
+    category: "Produits laitiers"
+  }
 ];
 
 const BuyerDashboard = () => {
@@ -321,6 +340,12 @@ const BuyerDashboard = () => {
                   </Card>
                 </TabsContent>
               </Tabs>
+              
+              {/* Personalized Advice Section */}
+              <div className="mt-6 mb-6">
+                <h2 className="text-2xl font-bold mb-4">Conseils personnalisés</h2>
+                <BuyerPersonalizedAdvice recentPurchases={recentPurchases} />
+              </div>
               
               {/* Recommended Products */}
               <Card className="mt-6">

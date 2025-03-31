@@ -1,99 +1,80 @@
 
 import React from 'react';
-import { useDashboardData } from './farmer/hooks/useDashboardData';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { BarChart3, FileText, MessageSquare, Newspaper, Package, Settings, ShoppingCart, User } from 'lucide-react';
-import DashboardOverview from './farmer/components/DashboardOverview';
-import SummaryCards from './farmer/components/SummaryCards';
-import RecentOrders from './farmer/components/RecentOrders';
-import LowStockProducts from './farmer/components/LowStockProducts';
-import PopularProducts from './farmer/components/PopularProducts';
-import OptimizationTips from './farmer/components/OptimizationTips';
-import FarmingTipsCard from '@/components/ai/FarmingTipsCard';
-import { InventoryProductType } from './farmer/FarmerInventory';
+import FarmerSeasonalAdvice from '@/components/farmer/FarmerSeasonalAdvice';
+import { ShoppingBag, Users, BarChart2, MessageSquare, Package, Settings } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+// Import des composants du tableau de bord agriculteur
+import DashboardOverview from '@/pages/farmer/components/DashboardOverview';
+import DashboardStatsCards from '@/pages/farmer/components/DashboardStatsCards';
+import RecentOrders from '@/pages/farmer/components/RecentOrders';
+import TopProducts from '@/pages/farmer/components/TopProducts';
+import LowStockProducts from '@/pages/farmer/components/LowStockProducts';
 
 const FarmerDashboard = () => {
-  // Récupération des données du dashboard
-  const { products, orders, subscription } = useDashboardData();
-  
-  // Menu items pour la sidebar
   const menuItems = [
-    { title: "Tableau de bord", path: "/farmer-dashboard", icon: <BarChart3 size={20} /> },
-    { title: "Commandes", path: "/farmer/orders", icon: <ShoppingCart size={20} /> },
-    { title: "Produits", path: "/farmer/products", icon: <Package size={20} /> },
-    { title: "Inventaire", path: "/farmer/inventory", icon: <FileText size={20} /> },
-    { title: "Blog & Actualités", path: "/farmer/blog", icon: <Newspaper size={20} /> },
-    { title: "Messagerie", path: "/farmer/messages", icon: <MessageSquare size={20} /> },
-    { title: "Analytiques", path: "/farmer/analytics", icon: <BarChart3 size={20} /> },
-    { title: "Mon Profil", path: "/farmer/profile", icon: <User size={20} /> },
-    { title: "Abonnement", path: "/farmer/subscription", icon: <Settings size={20} /> }
+    { title: "Produits", path: "/farmer-dashboard/products", icon: <Package size={20} /> },
+    { title: "Commandes", path: "/farmer-dashboard/orders", icon: <ShoppingBag size={20} /> },
+    { title: "Inventaire", path: "/farmer-dashboard/inventory", icon: <Package size={20} /> },
+    { title: "Analytics", path: "/farmer-dashboard/analytics", icon: <BarChart2 size={20} /> },
+    { title: "Messages", path: "/farmer-dashboard/messages", icon: <MessageSquare size={20} /> },
+    { title: "Paramètres", path: "/farmer-dashboard/profile", icon: <Settings size={20} /> },
   ];
-
-  // Handlers pour les actions des composants
-  const handleViewAllOrders = () => {
-    // Navigation vers la page des commandes (à implémenter)
-    console.log("Navigation vers la liste complète des commandes");
-  };
-
-  const handleManageProducts = () => {
-    // Navigation vers la page des produits (à implémenter)
-    console.log("Navigation vers la gestion des produits");
-  };
-
-  const handleUpdateStock = (product: any) => {
-    // Mise à jour du stock (à implémenter)
-    console.log("Mise à jour du stock pour le produit", product.id);
-  };
-
-  // Convert ProductType to InventoryProductType for compatibility with LowStockProducts component
-  const convertedLowStockProducts = products
-    .filter(p => p.stock < 15)
-    .map(p => ({
-      id: p.id,
-      name: p.name,
-      price: p.price * 100, // Convert to cents as expected by InventoryProductType
-      inventory: p.stock,
-      unit: p.unit,
-      category: 'Légumes', // Default category
-      organic: true, // Default to organic
-      published: true, // Default to published
-      image: p.image,
-      stockHistory: [],
-      minimumStock: 10, // Default minimum stock
-      lastUpdated: new Date().toISOString().split('T')[0]
-    } as InventoryProductType));
 
   return (
     <DashboardLayout
-      name="Sophie Dubois"
-      email="sophie.d@quatre-saisons.com"
-      avatar={<img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop" alt="Sophie Dubois" />}
+      name="Jean Dupont"
+      email="jean.dupont@fermelocale.fr"
+      avatar="https://images.unsplash.com/photo-1553787434-dd9eb4ea4d0b?w=150&h=150&fit=crop"
       menuItems={menuItems}
     >
-      <DashboardOverview 
-        products={products}
-        orders={orders}
-        subscription={subscription}
-        onViewAllOrders={handleViewAllOrders}
-        onManageProducts={handleManageProducts}
-      />
-      <SummaryCards />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <RecentOrders 
-          orders={orders}
-          onViewAllOrders={handleViewAllOrders}
-        />
-        <FarmingTipsCard />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <LowStockProducts 
-          lowStockProducts={convertedLowStockProducts}
-          onUpdateClick={handleUpdateStock}
-        />
-        <PopularProducts />
-        <OptimizationTips />
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Tableau de bord Agriculteur</h1>
+        
+        <DashboardStatsCards />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <RecentOrders />
+          <TopProducts />
+        </div>
+        
+        {/* Ajout de la section de conseils saisonniers */}
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold mb-4">Conseils de culture</h2>
+          <FarmerSeasonalAdvice />
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LowStockProducts />
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Événements à venir</CardTitle>
+              <CardDescription>
+                Marchés et événements agricoles prévus
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="border p-3 rounded-md">
+                  <div className="flex justify-between">
+                    <h3 className="font-medium">Marché Bio du Centre</h3>
+                    <span className="text-sm text-gray-500">15 Mai</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Place du Marché, 08:00 - 14:00</p>
+                </div>
+                <div className="border p-3 rounded-md">
+                  <div className="flex justify-between">
+                    <h3 className="font-medium">Foire Agricole Régionale</h3>
+                    <span className="text-sm text-gray-500">22-24 Mai</span>
+                  </div>
+                  <p className="text-sm text-gray-600">Parc des Expositions, Journée</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );
