@@ -7,7 +7,7 @@ import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 const Footer = () => {
   return (
     <footer className="bg-gray-50 pt-12 pb-8 border-t w-full">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="w-full max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="mb-4">
