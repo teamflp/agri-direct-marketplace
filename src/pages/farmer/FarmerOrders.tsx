@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,7 +60,19 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 
-const orders = [
+// Type pour les commandes
+interface Order {
+  id: string;
+  customer: string;
+  date: string;
+  total: number;
+  items: number;
+  status: string;
+  paid: boolean;
+}
+
+// Données des commandes
+const initialOrders: Order[] = [
   {
     id: "CMD-2023-001",
     customer: "Martin Pasquier",
@@ -123,6 +136,8 @@ const FarmerOrders = () => {
   const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
   const [showDeliveryMethodDialog, setShowDeliveryMethodDialog] = useState(false);
   const [showDeliverySlotDialog, setShowDeliverySlotDialog] = useState(false);
+  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [statusUpdateNotification, setStatusUpdateNotification] = useState<{orderId: string, status: string} | null>(null);
   const notificationsContainerRef = useRef<HTMLDivElement>(null);
   
   const { toast } = useToast();
@@ -150,6 +165,14 @@ const FarmerOrders = () => {
   });
   
   const handleStatusChange = (orderId: string, newStatus: string) => {
+    // Mettre à jour l'état des commandes
+    setOrders(prevOrders => 
+      prevOrders.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+    
+    // Afficher la notification toast
     toast({
       title: "Statut mis à jour",
       description: `La commande ${orderId} est maintenant "${newStatus}"`,
@@ -161,10 +184,22 @@ const FarmerOrders = () => {
       type: 'order',
       title: 'Commande mise à jour',
       description: `La commande ${orderId} est maintenant "${newStatus}"`,
-      action: () => setSelectedOrder(orderId)
+      action: () => {
+        setSelectedOrder(orderId);
+        setShowDeliveryDialog(true);
+      }
     });
     
-    // Dans une vraie app, mise à jour de l'état
+    // Afficher la notification de mise à jour de statut
+    setStatusUpdateNotification({
+      orderId,
+      status: newStatus
+    });
+
+    // Cacher la notification après 5 secondes
+    setTimeout(() => {
+      setStatusUpdateNotification(null);
+    }, 5000);
   };
   
   const handleViewOrder = (orderId: string) => {
@@ -175,11 +210,27 @@ const FarmerOrders = () => {
   const handleNewOrder = () => {
     const orderId = `CMD-2023-${Math.floor(Math.random() * 1000)}`;
     
+    // Ajouter une nouvelle commande
+    const newOrder: Order = {
+      id: orderId,
+      customer: "Nouveau Client",
+      date: new Date().toLocaleDateString('fr-FR'),
+      total: Math.floor(Math.random() * 50000),
+      items: Math.floor(Math.random() * 5) + 1,
+      status: "Nouvelle",
+      paid: Math.random() > 0.5
+    };
+    
+    setOrders(prevOrders => [newOrder, ...prevOrders]);
+    
     showNotification({
       type: 'order',
       title: 'Nouvelle commande reçue',
       description: `Vous avez reçu une nouvelle commande : ${orderId}`,
-      action: () => console.log(`Viewing order ${orderId}`)
+      action: () => {
+        setSelectedOrder(orderId);
+        setShowDeliveryDialog(true);
+      }
     });
     
     // Notification dans la page
@@ -197,6 +248,36 @@ const FarmerOrders = () => {
       description: `Vous avez reçu un nouveau message de Martin Pasquier`,
       action: () => console.log('Viewing message')
     });
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch(status) {
+      case "Livrée":
+        return <CheckCircle2 className="w-3 h-3 mr-1" />;
+      case "En préparation":
+        return <Clock className="w-3 h-3 mr-1" />;
+      case "En livraison":
+        return <TruckIcon className="w-3 h-3 mr-1" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusClass = (status: string) => {
+    switch(status) {
+      case "Livrée":
+        return "bg-green-100 text-green-800";
+      case "En livraison":
+        return "bg-blue-100 text-blue-800";
+      case "En préparation":
+        return "bg-yellow-100 text-yellow-800";
+      case "Nouvelle":
+        return "bg-purple-100 text-purple-800";
+      case "Annulée":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   return (
@@ -223,7 +304,7 @@ const FarmerOrders = () => {
                   onChange={handleSearchChange}
                 />
               </div>
-              <Select value={statusFilter || ""} onValueChange={(value) => setStatusFilter(value || null)}>
+              <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}>
                 <SelectTrigger className="w-[180px]">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4" />
@@ -243,6 +324,29 @@ const FarmerOrders = () => {
           </div>
           
           <div ref={notificationsContainerRef}></div>
+          
+          {/* Notification de mise à jour de statut */}
+          {statusUpdateNotification && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4 relative">
+              <div className="flex items-center">
+                <div className="shrink-0">
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">Commande mise à jour</h3>
+                  <div className="mt-1 text-sm text-green-700">
+                    La commande {statusUpdateNotification.orderId} est maintenant "{statusUpdateNotification.status}"
+                  </div>
+                </div>
+              </div>
+              <button 
+                className="absolute top-2 right-2 text-green-600 hover:text-green-800"
+                onClick={() => setStatusUpdateNotification(null)}
+              >
+                &times;
+              </button>
+            </div>
+          )}
           
           <div className="flex flex-wrap gap-2 mb-4">
             <Button onClick={handleNewOrder} className="bg-green-600 hover:bg-green-700">
@@ -292,20 +396,8 @@ const FarmerOrders = () => {
                         <TableCell>{order.total.toLocaleString()} FCFA</TableCell>
                         <TableCell>{order.items}</TableCell>
                         <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                            order.status === "Livrée" 
-                              ? "bg-green-100 text-green-800" 
-                              : order.status === "En livraison"
-                              ? "bg-blue-100 text-blue-800"
-                              : order.status === "En préparation"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : order.status === "Nouvelle"
-                              ? "bg-purple-100 text-purple-800"
-                              : "bg-red-100 text-red-800"
-                          }`}>
-                            {order.status === "Livrée" && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                            {order.status === "En préparation" && <Clock className="w-3 h-3 mr-1" />}
-                            {order.status === "En livraison" && <TruckIcon className="w-3 h-3 mr-1" />}
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${getStatusClass(order.status)}`}>
+                            {getStatusIcon(order.status)}
                             {order.status}
                           </span>
                         </TableCell>
