@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import SeasonalCalendarView from '@/components/seasonal/SeasonalCalendarView';
 import { Leaf } from 'lucide-react';
 import SeasonalLegend from '@/components/seasonal/SeasonalLegend';
+import SeasonalAIRecommendations from '@/components/ai/SeasonalAIRecommendations';
 
 const SeasonalCalendar = () => {
   return (
@@ -18,6 +19,10 @@ const SeasonalCalendar = () => {
               Découvrez les produits disponibles selon les saisons pour manger local, 
               frais et de manière responsable <Leaf className="inline h-5 w-5 text-green-600" />
             </p>
+          </div>
+          
+          <div className="mb-8">
+            <SeasonalAIRecommendations />
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
