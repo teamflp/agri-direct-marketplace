@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { User, ShoppingCart, Users, MessageSquare, FileText, Calendar } from 'lucide-react';
 
@@ -14,7 +14,11 @@ import {
   monthlySalesData, 
   productSalesData, 
   customerLocationData, 
-  weekdaySalesData 
+  weekdaySalesData,
+  weeklySalesData,
+  yearlyProductSalesData,
+  yearlyCustomerLocationData,
+  yearlySalesData
 } from './data/analyticsData';
 
 const FarmerAnalytics = () => {
@@ -28,6 +32,34 @@ const FarmerAnalytics = () => {
     { title: "Analyses", path: "/farmer-dashboard/analytics", icon: <FileText size={20} /> },
     { title: "Abonnement", path: "/farmer-dashboard/subscription", icon: <Calendar size={20} /> },
   ];
+
+  // Filter data based on selected period
+  const filteredData = useMemo(() => {
+    switch (periodFilter) {
+      case 'week':
+        return {
+          salesData: weeklySalesData,
+          productData: productSalesData.slice(0, 3), // Fewer products for weekly view
+          locationData: customerLocationData.slice(0, 3), // Fewer locations for weekly view
+          dayData: weekdaySalesData
+        };
+      case 'year':
+        return {
+          salesData: yearlySalesData,
+          productData: yearlyProductSalesData,
+          locationData: yearlyCustomerLocationData,
+          dayData: weekdaySalesData // Same weekday data for yearly view
+        };
+      case 'month':
+      default:
+        return {
+          salesData: monthlySalesData,
+          productData: productSalesData,
+          locationData: customerLocationData,
+          dayData: weekdaySalesData
+        };
+    }
+  }, [periodFilter]);
 
   return (
     <DashboardLayout
@@ -44,22 +76,26 @@ const FarmerAnalytics = () => {
         {/* Analytics header with period filter and export button */}
         <AnalyticsHeader 
           periodFilter={periodFilter} 
-          setPeriodFilter={setPeriodFilter} 
+          setPeriodFilter={setPeriodFilter}
+          monthlySalesData={filteredData.salesData}
+          productSalesData={filteredData.productData}
+          customerLocationData={filteredData.locationData}
+          weekdaySalesData={filteredData.dayData}
         />
 
         {/* Summary cards showing key metrics */}
-        <SummaryCards />
+        <SummaryCards periodFilter={periodFilter} />
 
         {/* Charts for data visualization */}
         <AnalyticsCharts 
-          monthlySalesData={monthlySalesData}
-          productSalesData={productSalesData}
-          customerLocationData={customerLocationData}
-          weekdaySalesData={weekdaySalesData}
+          monthlySalesData={filteredData.salesData}
+          productSalesData={filteredData.productData}
+          customerLocationData={filteredData.locationData}
+          weekdaySalesData={filteredData.dayData}
         />
 
         {/* Optimization tips based on data analysis */}
-        <OptimizationTips />
+        <OptimizationTips periodFilter={periodFilter} />
       </div>
     </DashboardLayout>
   );
