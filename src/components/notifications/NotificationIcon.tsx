@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { Bell, ShoppingBag, Tag, Package, Info, Calendar } from 'lucide-react';
-import { NotificationType } from '@/contexts/NotificationContext';
+import { Button } from '@/components/ui/button';
+
+export type NotificationType = 'product' | 'promo' | 'stock' | 'order' | 'info';
 
 interface NotificationIconProps {
   type: NotificationType;
@@ -23,19 +25,28 @@ export const getNotificationColor = (type: NotificationType): string => {
   }
 };
 
-export const NotificationIcon: React.FC<NotificationIconProps> = ({ type, className = "h-4 w-4" }) => {
-  switch(type) {
-    case 'product':
-      return <ShoppingBag className={className} />;
-    case 'promo':
-      return <Tag className={className} />;
-    case 'stock':
-      return <Package className={className} />;
-    case 'order':
-      return <Calendar className={className} />;
-    default:
-      return <Info className={className} />;
-  }
+export const NotificationIcon: React.FC<NotificationIconProps> = ({ type = 'info', className = "h-4 w-4" }) => {
+  const renderIcon = () => {
+    switch(type) {
+      case 'product':
+        return <ShoppingBag className={className} />;
+      case 'promo':
+        return <Tag className={className} />;
+      case 'stock':
+        return <Package className={className} />;
+      case 'order':
+        return <Calendar className={className} />;
+      default:
+        return <Info className={className} />;
+    }
+  };
+
+  return (
+    <Button variant="outline" size="icon" className="rounded-full">
+      {renderIcon()}
+      <span className="sr-only">Notifications</span>
+    </Button>
+  );
 };
 
 export default NotificationIcon;

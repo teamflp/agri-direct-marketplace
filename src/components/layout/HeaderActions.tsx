@@ -7,7 +7,14 @@ import { ShoppingCart, Heart } from 'lucide-react';
 import NotificationIcon from '@/components/notifications/NotificationIcon';
 import HeaderAuthActions from './HeaderAuthActions';
 
-const HeaderActions = () => {
+interface HeaderActionsProps {
+  menuOpen?: boolean;
+  toggleMenu?: () => void;
+  isMobile?: boolean;
+  searchPlaceholder?: string;
+}
+
+const HeaderActions: React.FC<HeaderActionsProps> = () => {
   // À remplacer par un vrai compteur provenant du contexte de panier
   const cartItemCount = 3;
   
@@ -33,7 +40,7 @@ const HeaderActions = () => {
           </Link>
         </Button>
         
-        <NotificationIcon />
+        <NotificationIcon type="info" />
       </div>
 
       <HeaderAuthActions />

@@ -73,12 +73,7 @@ const Header = () => {
             
             {/* Actions à droite - visibles uniquement sur desktop */}
             {!isMobile && (
-              <HeaderActions 
-                menuOpen={menuOpen} 
-                toggleMenu={toggleMenu} 
-                isMobile={isMobile}
-                searchPlaceholder={t('header.search.placeholder')}
-              />
+              <HeaderActions />
             )}
             
             {/* Menu hamburger sur mobile */}
