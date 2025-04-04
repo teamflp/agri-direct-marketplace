@@ -1,7 +1,6 @@
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -15,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AgrimarketLogo from "@/components/logo/AgrimarketLogo";
+import { useAuth } from "@/contexts/AuthContext";
 
 const registerFormSchema = z.object({
   firstName: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
@@ -37,10 +37,9 @@ const registerFormSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerFormSchema>;
 
 const Register = () => {
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("buyer");
-  const navigate = useNavigate();
+  const { signUp } = useAuth();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -63,18 +62,17 @@ const Register = () => {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log("Registration attempt with:", values);
-      toast({
-        title: "Inscription réussie !",
-        description: "Veuillez vérifier votre email pour activer votre compte",
-        variant: "success",
-      });
-      
-      navigate("/verify-email", { state: { email: values.email } });
-      
-      setIsLoading(false);
-    }, 1500);
+    
+    const { error } = await signUp({
+      email: values.email,
+      password: values.password,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      phoneNumber: values.phoneNumber,
+      userType: values.userType,
+    });
+    
+    setIsLoading(false);
   };
 
   return (

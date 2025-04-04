@@ -1,59 +1,113 @@
 
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Mail, CheckCircle, RefreshCw } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Mail, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const EmailVerification = () => {
-  const [code, setCode] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
   const location = useLocation();
-  
-  // Récupérer l'email depuis l'état de navigation ou utiliser une valeur par défaut
-  const email = location.state?.email || "votre@email.com";
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
-  const handleVerification = async () => {
-    setIsVerifying(true);
-    
-    // Simulation de vérification
-    setTimeout(() => {
-      if (code.length === 6) {
-        setIsVerified(true);
+  useEffect(() => {
+    // Vérifier si l'email a été passé via location state
+    if (location.state && location.state.email) {
+      setEmail(location.state.email);
+    }
+
+    // Vérifier si l'utilisateur vient d'une URL de confirmation
+    const handleEmailConfirmation = async () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('type=signup')) {
+        try {
+          // Essayer de récupérer le token de confirmation
+          const params = new URLSearchParams(hash.substring(1));
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+          
+          if (accessToken) {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+            });
+
+            if (error) {
+              toast({
+                title: "Erreur de vérification",
+                description: "La vérification de votre email a échoué. Veuillez réessayer.",
+                variant: "destructive",
+              });
+            } else {
+              setIsVerified(true);
+              toast({
+                title: "Email vérifié !",
+                description: "Votre compte a été vérifié avec succès.",
+                variant: "success",
+              });
+
+              // Rediriger vers la page d'accueil après 3 secondes
+              setTimeout(() => {
+                navigate('/');
+              }, 3000);
+            }
+          }
+        } catch (error) {
+          console.error("Erreur lors de la vérification de l'email:", error);
+        }
+      }
+    };
+
+    handleEmailConfirmation();
+  }, [location, navigate, toast]);
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      toast({
+        title: "Email manquant",
+        description: "Veuillez fournir votre adresse email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) {
         toast({
-          title: "Email vérifié avec succès !",
-          description: "Votre compte est maintenant activé.",
-          variant: "success",
-        });
-        
-        // Rediriger après 2 secondes
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      } else {
-        toast({
-          title: "Code incorrect",
-          description: "Veuillez vérifier le code et réessayer.",
+          title: "Erreur",
+          description: error.message,
           variant: "destructive",
         });
+      } else {
+        toast({
+          title: "Email envoyé",
+          description: "Un nouveau lien de vérification a été envoyé à votre adresse email.",
+          variant: "success",
+        });
       }
-      setIsVerifying(false);
-    }, 1500);
-  };
-
-  const handleResendCode = () => {
-    toast({
-      title: "Code envoyé !",
-      description: `Un nouveau code a été envoyé à ${email}`,
-      variant: "info",
-    });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Une erreur s'est produite. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -63,64 +117,72 @@ const EmailVerification = () => {
         <div className="flex justify-center items-center min-h-[60vh]">
           <Card className="w-full max-w-md shadow-lg">
             <CardHeader className="space-y-1">
-              {isVerified ? (
-                <>
-                  <div className="flex justify-center mb-4">
-                    <CheckCircle2 className="h-16 w-16 text-green-500" />
+              <div className="flex justify-center mb-4">
+                {isVerified ? (
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <CheckCircle className="h-12 w-12 text-green-600" />
                   </div>
-                  <CardTitle className="text-2xl font-bold text-center">Email Vérifié !</CardTitle>
-                  <CardDescription className="text-center">
-                    Votre adresse email a été vérifiée avec succès.
-                  </CardDescription>
-                </>
-              ) : (
-                <>
-                  <div className="flex justify-center mb-4">
-                    <Mail className="h-16 w-16 text-agrimarket-orange" />
+                ) : (
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <Mail className="h-12 w-12 text-blue-600" />
                   </div>
-                  <CardTitle className="text-2xl font-bold text-center">Vérifiez votre email</CardTitle>
-                  <CardDescription className="text-center">
-                    Nous avons envoyé un code à {email}
-                  </CardDescription>
-                </>
-              )}
+                )}
+              </div>
+              <CardTitle className="text-2xl font-bold text-center">
+                {isVerified ? "Email vérifié avec succès !" : "Vérifiez votre email"}
+              </CardTitle>
+              <CardDescription className="text-center">
+                {isVerified 
+                  ? "Merci de confirmer votre adresse email. Vous allez être redirigé vers la page d'accueil." 
+                  : `Nous avons envoyé un lien de vérification à ${email || "votre adresse email"}.`}
+              </CardDescription>
             </CardHeader>
-            
+
             {!isVerified && (
-              <CardContent className="space-y-4">
-                <div className="flex flex-col items-center space-y-4">
-                  <InputOTP
-                    maxLength={6}
-                    value={code}
-                    onChange={(value) => setCode(value)}
-                    render={({ slots }) => (
-                      <InputOTPGroup>
-                        {slots.map((slot, index) => (
-                          <InputOTPSlot key={index} {...slot} index={index} />
-                        ))}
-                      </InputOTPGroup>
-                    )}
-                  />
-                  
-                  <Button 
-                    onClick={handleVerification} 
-                    className="w-full bg-agrimarket-orange hover:bg-orange-600"
-                    disabled={isVerifying || code.length !== 6}
-                  >
-                    {isVerifying ? "Vérification..." : "Vérifier"}
-                  </Button>
+              <CardContent className="space-y-4 pt-4">
+                <Alert>
+                  <AlertTitle>Important</AlertTitle>
+                  <AlertDescription>
+                    Veuillez vérifier votre boîte de réception et cliquer sur le lien de vérification pour activer votre compte AgriMarket.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="text-sm text-gray-600">
+                  <p>Si vous ne recevez pas l'email dans les prochaines minutes :</p>
+                  <ul className="list-disc ml-5 mt-2">
+                    <li>Vérifiez votre dossier spam ou courrier indésirable</li>
+                    <li>Assurez-vous que l'adresse email est correcte</li>
+                    <li>Cliquez sur "Renvoyer l'email" ci-dessous</li>
+                  </ul>
                 </div>
               </CardContent>
             )}
-            
-            <CardFooter className="flex flex-col space-y-2">
-              {!isVerified && (
-                <div className="text-sm text-center">
-                  Vous n'avez pas reçu de code ?{" "}
-                  <Button variant="link" className="p-0 h-auto text-agrimarket-orange" onClick={handleResendCode}>
-                    Renvoyer le code
+
+            <CardFooter className="flex flex-col space-y-3">
+              {!isVerified ? (
+                <>
+                  <Button 
+                    onClick={handleResendVerification} 
+                    className="w-full"
+                    disabled={isResending}
+                  >
+                    {isResending ? (
+                      <>
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                        Envoi en cours...
+                      </>
+                    ) : (
+                      "Renvoyer l'email"
+                    )}
                   </Button>
-                </div>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link to="/login">Retour à la connexion</Link>
+                  </Button>
+                </>
+              ) : (
+                <Button className="w-full bg-green-600 hover:bg-green-700" asChild>
+                  <Link to="/">Aller à la page d'accueil</Link>
+                </Button>
               )}
             </CardFooter>
           </Card>
