@@ -343,7 +343,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_profile_by_id: {
+        Args: {
+          user_id: string
+        }
+        Returns: {
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_number: string | null
+          role: string
+        }
+      }
+      update_user_profile: {
+        Args: {
+          user_id: string
+          profile_data: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

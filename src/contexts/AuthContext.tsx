@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -85,14 +86,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      // Use RPC for profiles since it's not in the generated types yet
       const { data, error } = await supabase.rpc('get_profile_by_id', { user_id: userId });
 
       if (error) {
         console.error('Erreur lors du chargement du profil :', error);
         setProfile(null);
-      } else {
+      } else if (data) {
         setProfile(data as UserProfile);
+      } else {
+        setProfile(null);
       }
     } catch (error) {
       console.error('Erreur lors du chargement du profil :', error);
@@ -165,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'success',
       });
 
-      // Redirection vers la page appropriée selon le rôle
+      // Redirect to appropriate page based on role
       if (data.user) {
         // Use custom RPC function to get profile role
         const { data: profileData, error: profileError } = await supabase.rpc('get_profile_by_id', { user_id: data.user.id });
