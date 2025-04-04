@@ -86,7 +86,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase.rpc('get_profile_by_id', { user_id: userId });
+      // Explicitly type the response from the RPC function
+      const { data, error } = await supabase.functions.invoke('get-profile-by-id', {
+        body: { user_id: userId }
+      });
 
       if (error) {
         console.error('Erreur lors du chargement du profil :', error);
@@ -169,8 +172,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Redirect to appropriate page based on role
       if (data.user) {
-        // Use custom RPC function to get profile role
-        const { data: profileData, error: profileError } = await supabase.rpc('get_profile_by_id', { user_id: data.user.id });
+        // Use Edge Function to get profile role
+        const { data: profileData, error: profileError } = await supabase.functions.invoke('get-profile-by-id', {
+          body: { user_id: data.user.id }
+        });
 
         if (profileData && !profileError) {
           if (profileData.role === 'farmer') {
@@ -208,10 +213,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return { error: new Error('Utilisateur non connecté') };
 
     try {
-      // Use RPC for updating profile
-      const { error } = await supabase.rpc('update_user_profile', { 
-        user_id: user.id,
-        profile_data: data
+      // Use Edge Function for updating profile
+      const { error } = await supabase.functions.invoke('update-user-profile', {
+        body: { user_id: user.id, profile_data: data }
       });
 
       if (error) {
