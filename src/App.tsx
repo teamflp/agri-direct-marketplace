@@ -20,6 +20,7 @@ import NotificationsDemo from './pages/NotificationsDemo';
 import Subscriptions from './pages/Subscriptions';
 import NotFound from './pages/NotFound';
 import Chat from './pages/Chat';
+import FloatingChatButton from './components/chat/FloatingChatButton';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { CartProvider } from './contexts/CartContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
@@ -54,6 +55,8 @@ const App = () => {
                 <Route path="/chat" element={<Chat />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              {/* Ajout du bouton de chat flottant à toutes les pages */}
+              <FloatingChatButton />
             </Router>
           </MessageProvider>
         </SubscriptionProvider>
