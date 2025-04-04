@@ -1,14 +1,7 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
-
-export type NotificationType = 
-  | "product" 
-  | "promo" 
-  | "stock" 
-  | "order" 
-  | "system";
+import { NotificationType } from "@/components/notifications/NotificationIcon";
 
 export interface Notification {
   id: string;
@@ -40,19 +33,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [showToast, setShowToast] = useState(true);
   const { toast } = useToast();
 
-  // Calculer le nombre de notifications non lues quand les notifications changent
   useEffect(() => {
     const count = notifications.filter(notification => !notification.read).length;
     setUnreadCount(count);
   }, [notifications]);
 
-  // Charger les notifications depuis le localStorage au démarrage
   useEffect(() => {
     const storedNotifications = localStorage.getItem('notifications');
     if (storedNotifications) {
       try {
         const parsedNotifications = JSON.parse(storedNotifications);
-        // Conversion des dates de chaînes en objets Date
         const notificationsWithDates = parsedNotifications.map((notif: any) => ({
           ...notif,
           date: new Date(notif.date)
@@ -64,7 +54,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, []);
 
-  // Sauvegarder les notifications dans le localStorage quand elles changent
   useEffect(() => {
     localStorage.setItem('notifications', JSON.stringify(notifications));
   }, [notifications]);
@@ -79,11 +68,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     setNotifications(prev => [newNotification, ...prev]);
 
-    // Afficher un toast si l'option est activée
     if (showToast) {
       let variant: "default" | "destructive" | "success" | "warning" | "info" | "notification" = "default";
       
-      // Déterminer la variante du toast en fonction du type de notification
       switch (notification.type) {
         case "product":
           variant = "notification";

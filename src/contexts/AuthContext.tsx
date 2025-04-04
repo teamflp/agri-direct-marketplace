@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,11 +85,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      // Use RPC for profiles since it's not in the generated types yet
+      const { data, error } = await supabase.rpc('get_profile_by_id', { user_id: userId });
 
       if (error) {
         console.error('Erreur lors du chargement du profil :', error);
@@ -171,13 +167,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Redirection vers la page appropriée selon le rôle
       if (data.user) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
+        // Use custom RPC function to get profile role
+        const { data: profileData, error: profileError } = await supabase.rpc('get_profile_by_id', { user_id: data.user.id });
 
-        if (profileData) {
+        if (profileData && !profileError) {
           if (profileData.role === 'farmer') {
             navigate('/farmer/*');
           } else if (profileData.role === 'admin') {
@@ -213,10 +206,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return { error: new Error('Utilisateur non connecté') };
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update(data)
-        .eq('id', user.id);
+      // Use RPC for updating profile
+      const { error } = await supabase.rpc('update_user_profile', { 
+        user_id: user.id,
+        profile_data: data
+      });
 
       if (error) {
         toast({

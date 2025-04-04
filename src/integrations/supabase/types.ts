@@ -178,6 +178,30 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone_number: string | null
+          role: string
+        }
+        Insert: {
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone_number?: string | null
+          role?: string
+        }
+        Update: {
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone_number?: string | null
+          role?: string
+        }
+        Relationships: []
+      }
       ratings: {
         Row: {
           buyer_id: string | null

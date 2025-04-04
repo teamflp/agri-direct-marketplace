@@ -3,7 +3,7 @@ import React from 'react';
 import { Bell, ShoppingBag, Tag, Package, Info, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export type NotificationType = 'product' | 'promo' | 'stock' | 'order' | 'info';
+export type NotificationType = 'product' | 'promo' | 'stock' | 'order' | 'info' | 'system';
 
 interface NotificationIconProps {
   type: NotificationType;
@@ -20,6 +20,8 @@ export const getNotificationColor = (type: NotificationType): string => {
       return "bg-purple-100 text-purple-600";
     case 'order':
       return "bg-amber-100 text-amber-600";
+    case 'system':
+      return "bg-red-100 text-red-600";
     default:
       return "bg-gray-100 text-gray-600";
   }
@@ -36,6 +38,8 @@ export const NotificationIcon: React.FC<NotificationIconProps> = ({ type = 'info
         return <Package className={className} />;
       case 'order':
         return <Calendar className={className} />;
+      case 'system':
+        return <Bell className={className} />;
       default:
         return <Info className={className} />;
     }
