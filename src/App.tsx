@@ -23,6 +23,7 @@ import BuyerMessages from './pages/buyer/BuyerMessages';
 import BuyerFarmers from './pages/buyer/BuyerFarmers';
 import BuyerInvoices from './pages/buyer/BuyerInvoices';
 import BuyerProfile from './pages/buyer/BuyerProfile';
+import BuyerSubscriptions from './pages/buyer/BuyerSubscriptions';
 import NotificationsDemo from './pages/NotificationsDemo';
 import Subscriptions from './pages/Subscriptions';
 import NotFound from './pages/NotFound';
@@ -66,6 +67,7 @@ const App = () => {
                   <Route path="/buyer/farmers" element={<BuyerFarmers />} />
                   <Route path="/buyer/invoices" element={<BuyerInvoices />} />
                   <Route path="/buyer/profile" element={<BuyerProfile />} />
+                  <Route path="/buyer/subscriptions" element={<BuyerSubscriptions />} />
                   
                   {/* Routes précédentes à maintenir temporairement pour la compatibilité */}
                   <Route path="/admin/*" element={<AdminDashboard />} />
