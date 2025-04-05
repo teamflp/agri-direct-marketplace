@@ -17,6 +17,12 @@ import CheckoutProcess from './pages/CheckoutProcess';
 import AdminDashboard from './pages/AdminDashboard';
 import FarmerDashboard from './pages/FarmerDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
+import BuyerFavorites from './pages/buyer/BuyerFavorites';
+import BuyerOrders from './pages/buyer/BuyerOrders';
+import BuyerMessages from './pages/buyer/BuyerMessages';
+import BuyerFarmers from './pages/buyer/BuyerFarmers';
+import BuyerInvoices from './pages/buyer/BuyerInvoices';
+import BuyerProfile from './pages/buyer/BuyerProfile';
 import NotificationsDemo from './pages/NotificationsDemo';
 import Subscriptions from './pages/Subscriptions';
 import NotFound from './pages/NotFound';
@@ -51,9 +57,21 @@ const App = () => {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<CheckoutProcess />} />
+                  
+                  {/* Routes du buyer dashboard */}
+                  <Route path="/buyer" element={<BuyerDashboard />} />
+                  <Route path="/buyer/favorites" element={<BuyerFavorites />} />
+                  <Route path="/buyer/orders" element={<BuyerOrders />} />
+                  <Route path="/buyer/messages" element={<BuyerMessages />} />
+                  <Route path="/buyer/farmers" element={<BuyerFarmers />} />
+                  <Route path="/buyer/invoices" element={<BuyerInvoices />} />
+                  <Route path="/buyer/profile" element={<BuyerProfile />} />
+                  
+                  {/* Routes précédentes à maintenir temporairement pour la compatibilité */}
                   <Route path="/admin/*" element={<AdminDashboard />} />
                   <Route path="/farmer/*" element={<FarmerDashboard />} />
                   <Route path="/buyer/*" element={<BuyerDashboard />} />
+                  
                   <Route path="/notifications-demo" element={<NotificationsDemo />} />
                   <Route path="/subscriptions" element={<Subscriptions />} />
                   <Route path="/chat" element={<Chat />} />
