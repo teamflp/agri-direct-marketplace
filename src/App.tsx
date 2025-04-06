@@ -34,6 +34,7 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import { CartProvider } from './contexts/CartContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { MessageProvider } from './contexts/MessageContext';
+import { SocialProvider } from './contexts/SocialContext';
 
 const App = () => {
   return (
@@ -41,48 +42,50 @@ const App = () => {
       <CartProvider>
         <SubscriptionProvider>
           <MessageProvider>
-            <Router>
-              <AuthProvider>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/farmers" element={<Farmers />} />
-                  <Route path="/farmers-map" element={<FarmersMap />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
-                  <Route path="/email-verification" element={<EmailVerification />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/checkout" element={<CheckoutProcess />} />
-                  
-                  {/* Routes du buyer dashboard */}
-                  <Route path="/buyer" element={<BuyerDashboard />} />
-                  <Route path="/buyer/favorites" element={<BuyerFavorites />} />
-                  <Route path="/buyer/orders" element={<BuyerOrders />} />
-                  <Route path="/buyer/messages" element={<BuyerMessages />} />
-                  <Route path="/buyer/farmers" element={<BuyerFarmers />} />
-                  <Route path="/buyer/invoices" element={<BuyerInvoices />} />
-                  <Route path="/buyer/profile" element={<BuyerProfile />} />
-                  <Route path="/buyer/subscriptions" element={<BuyerSubscriptions />} />
-                  
-                  {/* Routes précédentes à maintenir temporairement pour la compatibilité */}
-                  <Route path="/admin/*" element={<AdminDashboard />} />
-                  <Route path="/farmer/*" element={<FarmerDashboard />} />
-                  <Route path="/buyer/*" element={<BuyerDashboard />} />
-                  
-                  <Route path="/notifications-demo" element={<NotificationsDemo />} />
-                  <Route path="/subscriptions" element={<Subscriptions />} />
-                  <Route path="/chat" element={<Chat />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                {/* Ajout du bouton de chat flottant à toutes les pages */}
-                <FloatingChatButton />
-              </AuthProvider>
-            </Router>
+            <SocialProvider>
+              <Router>
+                <AuthProvider>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/farmers" element={<Farmers />} />
+                    <Route path="/farmers-map" element={<FarmersMap />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
+                    <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
+                    <Route path="/email-verification" element={<EmailVerification />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/checkout" element={<CheckoutProcess />} />
+                    
+                    {/* Routes du buyer dashboard */}
+                    <Route path="/buyer" element={<BuyerDashboard />} />
+                    <Route path="/buyer/favorites" element={<BuyerFavorites />} />
+                    <Route path="/buyer/orders" element={<BuyerOrders />} />
+                    <Route path="/buyer/messages" element={<BuyerMessages />} />
+                    <Route path="/buyer/farmers" element={<BuyerFarmers />} />
+                    <Route path="/buyer/invoices" element={<BuyerInvoices />} />
+                    <Route path="/buyer/profile" element={<BuyerProfile />} />
+                    <Route path="/buyer/subscriptions" element={<BuyerSubscriptions />} />
+                    
+                    {/* Routes précédentes à maintenir temporairement pour la compatibilité */}
+                    <Route path="/admin/*" element={<AdminDashboard />} />
+                    <Route path="/farmer/*" element={<FarmerDashboard />} />
+                    <Route path="/buyer/*" element={<BuyerDashboard />} />
+                    
+                    <Route path="/notifications-demo" element={<NotificationsDemo />} />
+                    <Route path="/subscriptions" element={<Subscriptions />} />
+                    <Route path="/chat" element={<Chat />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  {/* Ajout du bouton de chat flottant à toutes les pages */}
+                  <FloatingChatButton />
+                </AuthProvider>
+              </Router>
+            </SocialProvider>
           </MessageProvider>
         </SubscriptionProvider>
       </CartProvider>
