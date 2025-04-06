@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -51,20 +51,20 @@ const Login = () => {
   };
 
   // Charger l'email sauvegardé si disponible
-  useState(() => {
+  useEffect(() => {
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     if (rememberedEmail) {
       form.setValue('email', rememberedEmail);
       form.setValue('rememberMe', true);
     }
-  });
+  }, [form]);
 
   return (
     <>
       <Header />
       <main className="container mx-auto px-4 pt-32 pb-16">
-        <div className="flex justify-center items-center min-h-[60vh]">
-          <Card className="w-full max-w-md shadow-lg border-t-4 border-t-agrimarket-orange">
+        <div className="flex justify-center items-center">
+          <Card className="w-full max-w-xl shadow-lg border-t-4 border-t-agrimarket-orange">
             <CardHeader className="space-y-1">
               <div className="flex justify-center mb-4">
                 <AgrimarketLogo size="lg" />
