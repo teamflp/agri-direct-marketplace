@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, Bell, ShoppingCart, Search, MessageSquare, Info } from 'lucide-react';
+import { User, Bell, ShoppingCart, Search, MessageSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from '@/contexts/CartContext';
@@ -41,27 +41,6 @@ const MobileBottomNav = ({
             <span className="text-xs mt-1">Chat</span>
           </Link>
         </Button>
-        
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button 
-                asChild
-                variant="ghost" 
-                size="icon" 
-                className="text-gray-600 hover:bg-gray-100 transition-colors flex flex-col items-center"
-              >
-                <Link to="/contact" className="flex flex-col items-center">
-                  <Info className="h-5 w-5" />
-                  <span className="text-xs mt-1">Aide</span>
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Besoin d'aide ? Contactez-nous</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
         
         <Button 
           variant="ghost" 
