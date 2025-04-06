@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, Send } from 'lucide-react';
+import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, Send, CreditCard } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,6 +28,7 @@ const BuyerMessages = () => {
     { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
     { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
     { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
+    { title: "Abonnements", path: "/buyer-dashboard/subscriptions", icon: <CreditCard size={20} /> },
   ];
   
   const handleSendMessage = () => {
@@ -59,7 +59,6 @@ const BuyerMessages = () => {
     }
   };
 
-  // Handle keyboard shortcut for sending message
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
       handleSendMessage();

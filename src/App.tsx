@@ -38,11 +38,11 @@ import { SocialProvider } from './contexts/SocialContext';
 
 const App = () => {
   return (
-    <NotificationProvider>
-      <CartProvider>
-        <SubscriptionProvider>
-          <MessageProvider>
-            <SocialProvider>
+    <SocialProvider>
+      <NotificationProvider>
+        <CartProvider>
+          <SubscriptionProvider>
+            <MessageProvider>
               <Router>
                 <AuthProvider>
                   <Routes>
@@ -61,7 +61,7 @@ const App = () => {
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<CheckoutProcess />} />
                     
-                    {/* Routes du buyer dashboard */}
+                    {/* Routes du buyer dashboard - Ajout des routes avec tiret et maintien des routes originales */}
                     <Route path="/buyer" element={<BuyerDashboard />} />
                     <Route path="/buyer/favorites" element={<BuyerFavorites />} />
                     <Route path="/buyer/orders" element={<BuyerOrders />} />
@@ -70,6 +70,16 @@ const App = () => {
                     <Route path="/buyer/invoices" element={<BuyerInvoices />} />
                     <Route path="/buyer/profile" element={<BuyerProfile />} />
                     <Route path="/buyer/subscriptions" element={<BuyerSubscriptions />} />
+                    
+                    {/* Routes avec le format buyer-dashboard pour l'ancienne structure */}
+                    <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+                    <Route path="/buyer-dashboard/favorites" element={<BuyerFavorites />} />
+                    <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
+                    <Route path="/buyer-dashboard/messages" element={<BuyerMessages />} />
+                    <Route path="/buyer-dashboard/farmers" element={<BuyerFarmers />} />
+                    <Route path="/buyer-dashboard/invoices" element={<BuyerInvoices />} />
+                    <Route path="/buyer-dashboard/profile" element={<BuyerProfile />} />
+                    <Route path="/buyer-dashboard/subscriptions" element={<BuyerSubscriptions />} />
                     
                     {/* Routes précédentes à maintenir temporairement pour la compatibilité */}
                     <Route path="/admin/*" element={<AdminDashboard />} />
@@ -85,11 +95,11 @@ const App = () => {
                   <FloatingChatButton />
                 </AuthProvider>
               </Router>
-            </SocialProvider>
-          </MessageProvider>
-        </SubscriptionProvider>
-      </CartProvider>
-    </NotificationProvider>
+            </MessageProvider>
+          </SubscriptionProvider>
+        </CartProvider>
+      </NotificationProvider>
+    </SocialProvider>
   );
 };
 
