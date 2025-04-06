@@ -29,7 +29,7 @@ const BuyerDashboardSidebar = ({ name, email, avatarInitials }: BuyerDashboardSi
             <h2 className="text-xl font-bold">{name}</h2>
             <p className="text-gray-500">{email}</p>
             <Button variant="outline" className="mt-4 w-full" asChild>
-              <Link to="/buyer-dashboard/profile">
+              <Link to="/buyer/profile">
                 <User className="w-4 h-4 mr-2" /> Éditer mon profil
               </Link>
             </Button>
@@ -49,7 +49,7 @@ const BuyerDashboardSidebar = ({ name, email, avatarInitials }: BuyerDashboardSi
               </Button>
             ))}
             <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link to="/buyer-dashboard/profile">
+              <Link to="/buyer/profile">
                 <Settings className="w-4 h-4 mr-2" /> Paramètres
               </Link>
             </Button>

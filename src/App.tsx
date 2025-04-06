@@ -61,8 +61,9 @@ const App = () => {
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/checkout" element={<CheckoutProcess />} />
                     
-                    {/* Routes du buyer dashboard - Ajout des routes avec tiret et maintien des routes originales */}
+                    {/* Routes principales standardisées pour le tableau de bord acheteur */}
                     <Route path="/buyer" element={<BuyerDashboard />} />
+                    <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
                     <Route path="/buyer/favorites" element={<BuyerFavorites />} />
                     <Route path="/buyer/orders" element={<BuyerOrders />} />
                     <Route path="/buyer/messages" element={<BuyerMessages />} />
@@ -71,7 +72,7 @@ const App = () => {
                     <Route path="/buyer/profile" element={<BuyerProfile />} />
                     <Route path="/buyer/subscriptions" element={<BuyerSubscriptions />} />
                     
-                    {/* Routes avec le format buyer-dashboard pour l'ancienne structure */}
+                    {/* Routes alternatives pour compatibilité avec l'ancien format */}
                     <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
                     <Route path="/buyer-dashboard/favorites" element={<BuyerFavorites />} />
                     <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
@@ -81,10 +82,9 @@ const App = () => {
                     <Route path="/buyer-dashboard/profile" element={<BuyerProfile />} />
                     <Route path="/buyer-dashboard/subscriptions" element={<BuyerSubscriptions />} />
                     
-                    {/* Routes précédentes à maintenir temporairement pour la compatibilité */}
+                    {/* Routes pour les autres tableaux de bord */}
                     <Route path="/admin/*" element={<AdminDashboard />} />
                     <Route path="/farmer/*" element={<FarmerDashboard />} />
-                    <Route path="/buyer/*" element={<BuyerDashboard />} />
                     
                     <Route path="/notifications-demo" element={<NotificationsDemo />} />
                     <Route path="/subscriptions" element={<Subscriptions />} />
