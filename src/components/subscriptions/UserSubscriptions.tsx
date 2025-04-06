@@ -15,7 +15,11 @@ const formatDate = (date: Date | string): string => {
   return date.toLocaleDateString();
 };
 
-const UserSubscriptions = () => {
+type UserSubscriptionsProps = {
+  showTitle?: boolean;
+};
+
+const UserSubscriptions: React.FC<UserSubscriptionsProps> = ({ showTitle = true }) => {
   const { getUserSubscriptions, pauseSubscription, resumeSubscription, unsubscribe, toggleAutoRenew } = useSubscription();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const { toast } = useToast();
