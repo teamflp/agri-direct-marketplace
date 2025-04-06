@@ -26,7 +26,7 @@ const MobileBottomNav = ({
   const { unreadCount } = useNotification();
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 py-2 px-4 hidden md:hidden z-50 bg-lime-100 sm:hidden">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 py-2 px-4 block md:hidden z-50 bg-lime-100">
       <div className="flex items-center justify-around">
         <Button asChild variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100 transition-colors">
           <Link to="/" className="flex flex-col items-center orange-500">
