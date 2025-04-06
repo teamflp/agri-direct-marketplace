@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, Send, CreditCard } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useMessages } from '@/contexts/MessageContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
 
 const BuyerMessages = () => {
   const [newMessage, setNewMessage] = useState("");
@@ -21,29 +22,8 @@ const BuyerMessages = () => {
     ? conversations.find(c => c.id === activeConversationId) 
     : null;
   
-  const menuItems = [
-    { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
-    { title: "Mes commandes", path: "/buyer-dashboard/orders", icon: <ShoppingCart size={20} /> },
-    { title: "Mes favoris", path: "/buyer-dashboard/favorites", icon: <Heart size={20} /> },
-    { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
-    { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
-    { title: "Abonnements", path: "/buyer-dashboard/subscriptions", icon: <CreditCard size={20} /> },
-  ];
+  const menuItems = getBuyerDashboardMenuItems();
   
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-    
-    sendMessage(
-      selectedConversation.id,
-      newMessage,
-      selectedConversation.customerId,
-      'customer'
-    );
-    
-    setNewMessage("");
-  };
-
   const formatMessageDate = (dateString: string) => {
     const date = new Date(dateString);
     const today = new Date();
@@ -63,6 +43,19 @@ const BuyerMessages = () => {
     if (e.key === 'Enter' && e.ctrlKey) {
       handleSendMessage();
     }
+  };
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || !selectedConversation) return;
+    
+    sendMessage(
+      selectedConversation.id,
+      newMessage,
+      selectedConversation.customerId,
+      'customer'
+    );
+    
+    setNewMessage("");
   };
 
   return (

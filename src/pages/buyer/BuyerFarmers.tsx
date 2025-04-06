@@ -3,15 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, MessageCircle, Star } from 'lucide-react';
+import { MessageCircle, Star } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useSocial } from '@/contexts/SocialContext';
 import { useMessages } from '@/contexts/MessageContext';
 import FavoriteFarmerButton from '@/components/social/FavoriteFarmerButton';
+import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
 
-// Mock data for favorite farmers
 const farmers = [
   {
     id: 1,
@@ -54,7 +54,6 @@ const farmers = [
   }
 ];
 
-// Mock data for recommended farmers
 const recommendedFarmers = [
   {
     id: 4,
@@ -90,14 +89,7 @@ const BuyerFarmers = () => {
   const { isFarmerFavorite, addFavoriteFarmer, removeFavoriteFarmer, favoriteFarmers } = useSocial();
   const { messageState, setActiveConversation } = useMessages();
   
-  const menuItems = [
-    { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
-    { title: "Mes commandes", path: "/buyer-dashboard/orders", icon: <ShoppingCart size={20} /> },
-    { title: "Mes favoris", path: "/buyer-dashboard/favorites", icon: <Heart size={20} /> },
-    { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
-    { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
-  ];
+  const menuItems = getBuyerDashboardMenuItems();
   
   const handleFollowFarmer = (farmer) => {
     const isFavorite = isFarmerFavorite(farmer.id);
@@ -149,7 +141,6 @@ const BuyerFarmers = () => {
     navigate(`/farmers/${farmerId}`);
   };
 
-  // Fonction pour afficher un agriculteur dans une carte
   const renderFarmerCard = (farmer) => (
     <Card key={farmer.id} className="overflow-hidden hover:shadow-md transition-shadow">
       <div className="h-32 relative">
