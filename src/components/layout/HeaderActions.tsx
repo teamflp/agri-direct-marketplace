@@ -3,9 +3,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, Info } from 'lucide-react';
 import NotificationIcon from '@/components/notifications/NotificationIcon';
 import HeaderAuthActions from './HeaderAuthActions';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface HeaderActionsProps {
   menuOpen?: boolean;
@@ -39,6 +45,20 @@ const HeaderActions: React.FC<HeaderActionsProps> = () => {
             <span className="sr-only">Favoris</span>
           </Link>
         </Button>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full">
+                <Info className="h-[1.2rem] w-[1.2rem] text-gray-700" />
+                <span className="sr-only">Informations</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Besoin d'aide ? Contactez-nous</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         
         <NotificationIcon type="info" />
       </div>
