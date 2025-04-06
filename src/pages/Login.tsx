@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import AgrimarketLogo from "@/components/logo/AgrimarketLogo";
 import { useAuth } from "@/contexts/AuthContext";
 
 const loginFormSchema = z.object({
@@ -63,8 +64,11 @@ const Login = () => {
       <Header />
       <main className="container mx-auto px-4 pt-32 pb-16">
         <div className="flex justify-center items-center min-h-[60vh]">
-          <Card className="w-full max-w-md shadow-lg">
+          <Card className="w-full max-w-md shadow-lg border-t-4 border-t-agrimarket-orange">
             <CardHeader className="space-y-1">
+              <div className="flex justify-center mb-4">
+                <AgrimarketLogo size="lg" />
+              </div>
               <CardTitle className="text-2xl font-bold text-center">Connexion</CardTitle>
               <CardDescription className="text-center">
                 Connectez-vous à votre compte AgriMarket
@@ -109,6 +113,7 @@ const Login = () => {
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              className="data-[state=checked]:bg-agrimarket-orange data-[state=checked]:border-agrimarket-orange"
                             />
                           </FormControl>
                           <FormLabel className="text-sm cursor-pointer">Se souvenir de moi</FormLabel>
@@ -121,7 +126,7 @@ const Login = () => {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full bg-agrimarket-orange hover:bg-orange-600"
+                    className="w-full bg-agrimarket-orange hover:bg-agrimarket-brown"
                     disabled={isLoading}
                   >
                     {isLoading ? "Connexion en cours..." : "Se connecter"}
