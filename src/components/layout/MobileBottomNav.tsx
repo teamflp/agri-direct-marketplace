@@ -46,12 +46,15 @@ const MobileBottomNav = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button 
+                asChild
                 variant="ghost" 
                 size="icon" 
                 className="text-gray-600 hover:bg-gray-100 transition-colors flex flex-col items-center"
               >
-                <Info className="h-5 w-5" />
-                <span className="text-xs mt-1">Aide</span>
+                <Link to="/contact" className="flex flex-col items-center">
+                  <Info className="h-5 w-5" />
+                  <span className="text-xs mt-1">Aide</span>
+                </Link>
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">

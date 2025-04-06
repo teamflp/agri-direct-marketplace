@@ -49,9 +49,11 @@ const HeaderActions: React.FC<HeaderActionsProps> = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Info className="h-[1.2rem] w-[1.2rem] text-gray-700" />
-                <span className="sr-only">Informations</span>
+              <Button variant="outline" size="icon" className="rounded-full" asChild>
+                <Link to="/contact">
+                  <Info className="h-[1.2rem] w-[1.2rem] text-gray-700" />
+                  <span className="sr-only">Informations</span>
+                </Link>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
