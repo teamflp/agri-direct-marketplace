@@ -61,6 +61,14 @@ const MapSection = () => {
     });
   };
   
+  // Add a handler function for farmer selection
+  const handleFarmerSelect = (farmer: MapFarmer) => {
+    toast({
+      title: "Agriculteur sélectionné",
+      description: `Vous avez sélectionné: ${farmer.name} de ${farmer.farmName}`,
+    });
+  };
+  
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -98,6 +106,7 @@ const MapSection = () => {
           <InteractiveMap 
             farmers={homepageFarmers} 
             googleMapsApiKey={GOOGLE_MAPS_API_KEY}
+            onFarmerSelect={handleFarmerSelect}
           />
         </div>
         
