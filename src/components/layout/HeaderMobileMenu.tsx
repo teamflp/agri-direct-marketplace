@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, LogIn } from 'lucide-react';
 import HeaderNavigation from './HeaderNavigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 interface HeaderMobileMenuProps {
   isOpen: boolean;
@@ -14,6 +16,8 @@ interface HeaderMobileMenuProps {
 }
 
 const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => {
+  const { user, signOut } = useAuth();
+  
   if (!isOpen) return null;
 
   return (
@@ -23,15 +27,49 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
         isMobile={true}
         onClickMobile={onClose}
       />
-      <div className="mt-3 px-2">
-        <Link 
-          to="/login" 
-          className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
-          onClick={onClose}
-        >
-          <User className="h-5 w-5 mr-2" />
-          Connexion
-        </Link>
+      <div className="mt-3 px-2 space-y-2">
+        {user ? (
+          <>
+            <Link 
+              to="/buyer/profile" 
+              className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
+              onClick={onClose}
+            >
+              <User className="h-5 w-5 mr-2" />
+              Mon profil
+            </Link>
+            <Button 
+              variant="ghost"
+              className="w-full justify-start text-gray-700 hover:text-agrimarket-orange font-medium"
+              onClick={() => {
+                signOut();
+                onClose();
+              }}
+            >
+              <LogIn className="h-5 w-5 mr-2" />
+              Déconnexion
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link 
+              to="/login" 
+              className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
+              onClick={onClose}
+            >
+              <LogIn className="h-5 w-5 mr-2" />
+              Connexion
+            </Link>
+            <Link 
+              to="/register" 
+              className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
+              onClick={onClose}
+            >
+              <User className="h-5 w-5 mr-2" />
+              Inscription
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
