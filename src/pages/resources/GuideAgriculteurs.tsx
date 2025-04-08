@@ -1,10 +1,9 @@
-
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plant, Sprout, Droplet, Sun, CloudRain, Shovel, FileSpreadsheet, Truck, Coins, Award } from "lucide-react";
+import { Sprout, Droplet, Sun, CloudRain, Shovel, FileSpreadsheet, Truck, Coins, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 
@@ -30,7 +29,7 @@ const GuideAgriculteurs = () => {
             <Card className="border-l-4 border-l-green-500">
               <CardHeader className="flex flex-row items-center gap-4">
                 <div className="bg-green-100 p-3 rounded-full">
-                  <Plant className="h-6 w-6 text-green-600" />
+                  <Sprout className="h-6 w-6 text-green-600" />
                 </div>
                 <CardTitle>Techniques de culture</CardTitle>
               </CardHeader>
