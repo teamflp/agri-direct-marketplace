@@ -43,20 +43,20 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4 text-gray-800">Ressources</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Blog</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Guide agriculteurs</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Support</a></li>
+              <li><Link to="/resources/blog" className="text-gray-600 hover:text-agrimarket-green transition-colors">Blog</Link></li>
+              <li><Link to="/resources/guide-agriculteurs" className="text-gray-600 hover:text-agrimarket-green transition-colors">Guide agriculteurs</Link></li>
+              <li><Link to="/resources/faq" className="text-gray-600 hover:text-agrimarket-green transition-colors">FAQ</Link></li>
+              <li><Link to="/resources/support" className="text-gray-600 hover:text-agrimarket-green transition-colors">Support</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="text-lg font-bold mb-4 text-gray-800">Légal</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Conditions d'utilisation</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Politique de confidentialité</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Mentions légales</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-agrimarket-green transition-colors">Cookies</a></li>
+              <li><Link to="/legal/terms-of-service" className="text-gray-600 hover:text-agrimarket-green transition-colors">Conditions d'utilisation</Link></li>
+              <li><Link to="/legal/privacy-policy" className="text-gray-600 hover:text-agrimarket-green transition-colors">Politique de confidentialité</Link></li>
+              <li><Link to="/legal/legal-notice" className="text-gray-600 hover:text-agrimarket-green transition-colors">Mentions légales</Link></li>
+              <li><Link to="/legal/cookies" className="text-gray-600 hover:text-agrimarket-green transition-colors">Cookies</Link></li>
             </ul>
           </div>
         </div>

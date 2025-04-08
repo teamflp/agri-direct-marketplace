@@ -36,6 +36,18 @@ import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { MessageProvider } from './contexts/MessageContext';
 import { SocialProvider } from './contexts/SocialContext';
 
+// Import des pages ressources
+import Blog from './pages/resources/Blog';
+import GuideAgriculteurs from './pages/resources/GuideAgriculteurs';
+import FAQ from './pages/resources/FAQ';
+import Support from './pages/resources/Support';
+
+// Import des pages légales
+import TermsOfService from './pages/legal/TermsOfService';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import LegalNotice from './pages/legal/LegalNotice';
+import Cookies from './pages/legal/Cookies';
+
 const App = () => {
   return (
     <SocialProvider>
@@ -89,6 +101,19 @@ const App = () => {
                     <Route path="/notifications-demo" element={<NotificationsDemo />} />
                     <Route path="/subscriptions" element={<Subscriptions />} />
                     <Route path="/chat" element={<Chat />} />
+                    
+                    {/* Routes pour les ressources */}
+                    <Route path="/resources/blog" element={<Blog />} />
+                    <Route path="/resources/guide-agriculteurs" element={<GuideAgriculteurs />} />
+                    <Route path="/resources/faq" element={<FAQ />} />
+                    <Route path="/resources/support" element={<Support />} />
+                    
+                    {/* Routes pour les pages légales */}
+                    <Route path="/legal/terms-of-service" element={<TermsOfService />} />
+                    <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/legal/legal-notice" element={<LegalNotice />} />
+                    <Route path="/legal/cookies" element={<Cookies />} />
+                    
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   {/* Ajout du bouton de chat flottant à toutes les pages */}
