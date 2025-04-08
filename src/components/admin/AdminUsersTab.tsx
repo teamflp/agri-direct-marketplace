@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,9 +11,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { useToast } from '@/components/ui/use-toast';
 import { adminUsers } from './data/adminData';
 
 const AdminUsersTab = () => {
+  const [selectedUser, setSelectedUser] = useState<null | typeof adminUsers[0]>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showSuspendDialog, setShowSuspendDialog] = useState(false);
+  const { toast } = useToast();
+  
+  const handleEdit = (user: typeof adminUsers[0]) => {
+    setSelectedUser(user);
+    setShowEditDialog(true);
+  };
+  
+  const handleSuspend = (user: typeof adminUsers[0]) => {
+    setSelectedUser(user);
+    setShowSuspendDialog(true);
+  };
+  
+  const confirmEdit = () => {
+    toast({
+      title: "Modifications enregistrées",
+      description: `Les informations de ${selectedUser?.name} ont été mises à jour.`,
+    });
+    setShowEditDialog(false);
+  };
+  
+  const confirmSuspend = () => {
+    const action = selectedUser?.status === "Suspendu" ? "réactivé" : "suspendu";
+    toast({
+      title: `Utilisateur ${action}`,
+      description: `${selectedUser?.name} a été ${action} avec succès.`,
+      variant: selectedUser?.status === "Suspendu" ? "default" : "destructive",
+    });
+    setShowSuspendDialog(false);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -61,11 +103,21 @@ const AdminUsersTab = () => {
                 </TableCell>
                 <TableCell>{user.joinDate}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="outline" size="sm" className="mr-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mr-2"
+                    onClick={() => handleEdit(user)}
+                  >
                     Éditer
                   </Button>
-                  <Button variant="outline" size="sm" className="text-red-500 border-red-500 hover:bg-red-50">
-                    Suspendre
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-red-500 border-red-500 hover:bg-red-50"
+                    onClick={() => handleSuspend(user)}
+                  >
+                    {user.status === "Suspendu" ? "Réactiver" : "Suspendre"}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -73,6 +125,65 @@ const AdminUsersTab = () => {
           </TableBody>
         </Table>
       </CardContent>
+
+      {/* Dialog pour éditer un utilisateur */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Éditer l'utilisateur</DialogTitle>
+            <DialogDescription>
+              Modifier les informations de {selectedUser?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-500">
+              Formulaire d'édition pour l'utilisateur ID: {selectedUser?.id}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEditDialog(false)}
+            >
+              Annuler
+            </Button>
+            <Button onClick={confirmEdit}>
+              Enregistrer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog pour suspendre/réactiver un utilisateur */}
+      <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedUser?.status === "Suspendu" ? "Réactiver l'utilisateur" : "Suspendre l'utilisateur"}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedUser?.status === "Suspendu" 
+                ? `Êtes-vous sûr de vouloir réactiver ${selectedUser?.name} ? Cela lui permettra d'accéder à nouveau à la plateforme.`
+                : `Êtes-vous sûr de vouloir suspendre ${selectedUser?.name} ? Cela l'empêchera d'accéder à la plateforme.`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSuspendDialog(false)}
+            >
+              Annuler
+            </Button>
+            <Button 
+              variant={selectedUser?.status === "Suspendu" ? "default" : "destructive"} 
+              onClick={confirmSuspend}
+            >
+              {selectedUser?.status === "Suspendu" ? "Réactiver" : "Suspendre"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

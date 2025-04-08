@@ -1,23 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Avatar } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { 
-  User, 
-  Users,
-  MessageSquare,
-  FileText,
-  Settings,
-  ShieldAlert,
-  Landmark,
-  CreditCard,
-  BarChart4
-} from 'lucide-react';
 
 // Import the components
 import AdminSidebar from '@/components/admin/AdminSidebar';
@@ -44,14 +31,20 @@ const AdminDashboard = () => {
     if (path.includes('/admin/disputes')) return 'disputes';
     if (path.includes('/admin/subscriptions')) return 'subscriptions';
     if (path.includes('/admin/resources')) return 'resources';
+    if (path.includes('/admin/users')) return 'users';
     return 'users'; // Default tab
   };
   
   const [activeTab, setActiveTab] = useState(getActiveTab());
   
+  // Update active tab when URL changes
+  useEffect(() => {
+    setActiveTab(getActiveTab());
+  }, [path]);
+  
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    navigate(`/admin/${value === 'users' ? '' : value}`);
+    navigate(`/admin/${value === 'users' ? 'users' : value}`);
   };
   
   return (
