@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,6 +33,27 @@ import AdminResourcesTab from '@/components/admin/AdminResourcesTab';
 import { adminStatistics } from '@/components/admin/data/adminData';
 
 const AdminDashboard = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const path = location.pathname;
+  
+  // Determine active tab based on URL path
+  const getActiveTab = () => {
+    if (path.includes('/admin/farmers')) return 'farmers';
+    if (path.includes('/admin/messages')) return 'messages';
+    if (path.includes('/admin/disputes')) return 'disputes';
+    if (path.includes('/admin/subscriptions')) return 'subscriptions';
+    if (path.includes('/admin/resources')) return 'resources';
+    return 'users'; // Default tab
+  };
+  
+  const [activeTab, setActiveTab] = useState(getActiveTab());
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    navigate(`/admin/${value === 'users' ? '' : value}`);
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -51,7 +73,7 @@ const AdminDashboard = () => {
               {/* Statistics Cards */}
               <AdminStatisticsCards statistics={adminStatistics} />
               
-              <Tabs defaultValue="users" className="mb-8">
+              <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange} className="mb-8">
                 <TabsList className="mb-4">
                   <TabsTrigger value="users">Utilisateurs</TabsTrigger>
                   <TabsTrigger value="farmers">Agriculteurs</TabsTrigger>
