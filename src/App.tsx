@@ -38,9 +38,11 @@ import { SocialProvider } from './contexts/SocialContext';
 
 // Import des pages ressources
 import Blog from './pages/resources/Blog';
+import BlogPost from './pages/resources/BlogPost';
 import GuideAgriculteurs from './pages/resources/GuideAgriculteurs';
 import FAQ from './pages/resources/FAQ';
 import Support from './pages/resources/Support';
+import KnowledgeBase from './pages/resources/KnowledgeBase';
 
 // Import des pages légales
 import TermsOfService from './pages/legal/TermsOfService';
@@ -104,9 +106,11 @@ const App = () => {
                     
                     {/* Routes pour les ressources */}
                     <Route path="/resources/blog" element={<Blog />} />
+                    <Route path="/resources/blog/:slug" element={<BlogPost />} />
                     <Route path="/resources/guide-agriculteurs" element={<GuideAgriculteurs />} />
                     <Route path="/resources/faq" element={<FAQ />} />
                     <Route path="/resources/support" element={<Support />} />
+                    <Route path="/resources/knowledge-base" element={<KnowledgeBase />} />
                     
                     {/* Routes pour les pages légales */}
                     <Route path="/legal/terms-of-service" element={<TermsOfService />} />

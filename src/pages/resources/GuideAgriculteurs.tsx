@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -6,6 +7,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sprout, Droplet, Sun, CloudRain, Shovel, FileSpreadsheet, Truck, Coins, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
+
+// Données pour les ressources téléchargeables
+const downloadableResources = [
+  {
+    id: 1,
+    title: "Guide d'utilisation de la plateforme",
+    fileType: "PDF",
+    fileSize: "2.4 MB",
+    icon: <FileSpreadsheet className="h-5 w-5 text-green-600" />,
+    iconBg: "bg-green-100",
+    url: "/downloads/guide-utilisation-plateforme.pdf"
+  },
+  {
+    id: 2,
+    title: "Calendrier des cultures saisonnières",
+    fileType: "PDF",
+    fileSize: "1.8 MB",
+    icon: <FileSpreadsheet className="h-5 w-5 text-blue-600" />,
+    iconBg: "bg-blue-100",
+    url: "/downloads/calendrier-cultures-saisonnieres.pdf"
+  },
+  {
+    id: 3,
+    title: "Modèle de plan d'affaires agricole",
+    fileType: "Excel",
+    fileSize: "850 KB",
+    icon: <FileSpreadsheet className="h-5 w-5 text-yellow-600" />,
+    iconBg: "bg-yellow-100",
+    url: "/downloads/modele-plan-affaires-agricole.xlsx"
+  },
+  {
+    id: 4,
+    title: "Guide des certifications disponibles",
+    fileType: "PDF",
+    fileSize: "3.1 MB",
+    icon: <FileSpreadsheet className="h-5 w-5 text-purple-600" />,
+    iconBg: "bg-purple-100",
+    url: "/downloads/guide-certifications.pdf"
+  }
+];
 
 const GuideAgriculteurs = () => {
   return (
@@ -173,50 +214,34 @@ const GuideAgriculteurs = () => {
             <h2 className="text-2xl font-bold mb-6">Ressources utiles</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Button variant="outline" className="flex items-center justify-start gap-3 h-auto p-4">
-                <div className="bg-green-100 p-2 rounded-full">
-                  <FileSpreadsheet className="h-5 w-5 text-green-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Guide d'utilisation de la plateforme</h3>
-                  <p className="text-sm text-gray-600">PDF - 2.4 MB</p>
-                </div>
-              </Button>
-              
-              <Button variant="outline" className="flex items-center justify-start gap-3 h-auto p-4">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <FileSpreadsheet className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Calendrier des cultures saisonnières</h3>
-                  <p className="text-sm text-gray-600">PDF - 1.8 MB</p>
-                </div>
-              </Button>
-              
-              <Button variant="outline" className="flex items-center justify-start gap-3 h-auto p-4">
-                <div className="bg-yellow-100 p-2 rounded-full">
-                  <FileSpreadsheet className="h-5 w-5 text-yellow-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Modèle de plan d'affaires agricole</h3>
-                  <p className="text-sm text-gray-600">Excel - 850 KB</p>
-                </div>
-              </Button>
-              
-              <Button variant="outline" className="flex items-center justify-start gap-3 h-auto p-4">
-                <div className="bg-purple-100 p-2 rounded-full">
-                  <FileSpreadsheet className="h-5 w-5 text-purple-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-semibold">Guide des certifications disponibles</h3>
-                  <p className="text-sm text-gray-600">PDF - 3.1 MB</p>
-                </div>
-              </Button>
+              {downloadableResources.map((resource) => (
+                <a 
+                  key={resource.id} 
+                  href={resource.url} 
+                  download
+                  className="block"
+                >
+                  <Button variant="outline" className="flex items-center justify-start gap-3 h-auto p-4 w-full">
+                    <div className={`${resource.iconBg} p-2 rounded-full`}>
+                      {resource.icon}
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold">{resource.title}</h3>
+                      <p className="text-sm text-gray-600">{resource.fileType} - {resource.fileSize}</p>
+                    </div>
+                  </Button>
+                </a>
+              ))}
             </div>
             
             <div className="mt-10 text-center">
-              <Button className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white">
-                Accéder à tous les documents
+              <Button 
+                asChild
+                className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white"
+              >
+                <Link to="/resources/knowledge-base">
+                  Accéder à tous les documents
+                </Link>
               </Button>
             </div>
           </div>

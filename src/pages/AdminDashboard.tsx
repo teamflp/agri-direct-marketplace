@@ -18,7 +18,7 @@ import {
   BarChart4
 } from 'lucide-react';
 
-// Import the new component files
+// Import the components
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminStatisticsCards from '@/components/admin/AdminStatisticsCards';
 import AdminUsersTab from '@/components/admin/AdminUsersTab';
@@ -26,6 +26,7 @@ import AdminFarmersTab from '@/components/admin/AdminFarmersTab';
 import AdminMessagesTab from '@/components/admin/AdminMessagesTab';
 import AdminDisputesTab from '@/components/admin/AdminDisputesTab';
 import AdminSubscriptionsTab from '@/components/admin/AdminSubscriptionsTab';
+import AdminResourcesTab from '@/components/admin/AdminResourcesTab';
 
 // Import the statistics data
 import { adminStatistics } from '@/components/admin/data/adminData';
@@ -57,6 +58,7 @@ const AdminDashboard = () => {
                   <TabsTrigger value="messages">Messages</TabsTrigger>
                   <TabsTrigger value="disputes">Litiges</TabsTrigger>
                   <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
+                  <TabsTrigger value="resources">Ressources</TabsTrigger>
                 </TabsList>
                 
                 {/* Users Tab */}
@@ -82,6 +84,11 @@ const AdminDashboard = () => {
                 {/* Subscriptions Tab */}
                 <TabsContent value="subscriptions">
                   <AdminSubscriptionsTab />
+                </TabsContent>
+                
+                {/* Resources Tab */}
+                <TabsContent value="resources">
+                  <AdminResourcesTab />
                 </TabsContent>
               </Tabs>
             </div>

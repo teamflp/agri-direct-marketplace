@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,8 @@ const blogPosts = [
     date: "22 Mar 2025",
     author: "Sophie Dubois",
     image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800&auto=format&fit=crop",
-    category: "Agriculture Durable"
+    category: "Agriculture Durable",
+    slug: "agriculture-durable-afrique-ouest"
   },
   {
     id: 2,
@@ -25,7 +26,8 @@ const blogPosts = [
     date: "15 Mar 2025",
     author: "Jean Leclerc",
     image: "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?q=80&w=800&auto=format&fit=crop",
-    category: "Économie Locale"
+    category: "Économie Locale",
+    slug: "avantages-circuits-courts"
   },
   {
     id: 3,
@@ -34,7 +36,8 @@ const blogPosts = [
     date: "10 Mar 2025",
     author: "Amadou Diop",
     image: "https://images.unsplash.com/photo-1586771107445-d3ca888129ce?q=80&w=800&auto=format&fit=crop",
-    category: "Innovation"
+    category: "Innovation",
+    slug: "adaptation-changement-climatique"
   },
   {
     id: 4,
@@ -43,7 +46,8 @@ const blogPosts = [
     date: "02 Mar 2025",
     author: "Marie Koné",
     image: "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=800&auto=format&fit=crop",
-    category: "Gestion des Ressources"
+    category: "Gestion des Ressources",
+    slug: "optimiser-gestion-eau"
   },
   {
     id: 5,
@@ -52,11 +56,18 @@ const blogPosts = [
     date: "25 Fév 2025",
     author: "Paul Mensah",
     image: "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=800&auto=format&fit=crop",
-    category: "Agriculture Biologique"
+    category: "Agriculture Biologique",
+    slug: "certifications-biologiques"
   },
 ];
 
 const Blog = () => {
+  const [visiblePosts, setVisiblePosts] = useState(5);
+  
+  const handleShowMore = () => {
+    setVisiblePosts(prevCount => prevCount + 5);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -74,7 +85,7 @@ const Blog = () => {
         
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
+            {blogPosts.slice(0, visiblePosts).map((post) => (
               <Card key={post.id} className="overflow-hidden h-full flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img 
@@ -111,19 +122,27 @@ const Blog = () => {
                   <Button 
                     variant="ghost" 
                     className="text-agrimarket-green hover:text-agrimarket-orange hover:bg-transparent p-0"
+                    asChild
                   >
-                    Lire l'article <ArrowRight className="ml-1 h-4 w-4" />
+                    <Link to={`/resources/blog/${post.slug}`}>
+                      Lire l'article <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
                   </Button>
                 </CardFooter>
               </Card>
             ))}
           </div>
           
-          <div className="mt-12 text-center">
-            <Button className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white">
-              Voir plus d'articles
-            </Button>
-          </div>
+          {visiblePosts < blogPosts.length && (
+            <div className="mt-12 text-center">
+              <Button 
+                className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white"
+                onClick={handleShowMore}
+              >
+                Voir plus d'articles
+              </Button>
+            </div>
+          )}
         </div>
       </main>
       

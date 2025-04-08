@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, HeadphonesIcon, MessageCircleIcon, SendIcon, FileTextIcon, Clock, Calendar, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -44,6 +44,8 @@ const supportFormSchema = z.object({
 
 const Support = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof supportFormSchema>>({
     resolver: zodResolver(supportFormSchema),
@@ -80,6 +82,15 @@ const Support = () => {
     { value: "autre", label: "Autre" }
   ];
   
+  const handleStartChat = () => {
+    setIsChatOpen(true);
+    navigate('/chat', { state: { startChat: true } });
+  };
+  
+  const handleViewSchedule = () => {
+    toast.info("Nos horaires de support: Du lundi au vendredi de 8h à 18h (UTC+0)");
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -111,7 +122,7 @@ const Support = () => {
                 <p className="text-gray-600 mb-4">
                   Discutez directement avec un membre de notre équipe de support pour une assistance immédiate.
                 </p>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleStartChat}>
                   Démarrer un chat
                 </Button>
               </CardContent>
@@ -130,7 +141,7 @@ const Support = () => {
                 <p className="text-gray-600 mb-4">
                   Appelez notre service client au +225 07 XX XX XX XX du lundi au vendredi, de 8h à 18h.
                 </p>
-                <Button className="bg-green-600 hover:bg-green-700">
+                <Button className="bg-green-600 hover:bg-green-700" onClick={handleViewSchedule}>
                   Voir nos horaires
                 </Button>
               </CardContent>
@@ -149,8 +160,13 @@ const Support = () => {
                 <p className="text-gray-600 mb-4">
                   Consultez notre documentation détaillée et les guides pour trouver rapidement des réponses.
                 </p>
-                <Button className="bg-purple-600 hover:bg-purple-700">
-                  Parcourir les guides
+                <Button 
+                  className="bg-purple-600 hover:bg-purple-700" 
+                  asChild
+                >
+                  <Link to="/resources/knowledge-base">
+                    Parcourir les guides
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
