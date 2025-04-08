@@ -32,7 +32,8 @@ const AdminDashboard = () => {
     if (path.includes('/admin/subscriptions')) return 'subscriptions';
     if (path.includes('/admin/resources')) return 'resources';
     if (path.includes('/admin/users')) return 'users';
-    return 'users'; // Default tab
+    if (path === '/admin') return 'dashboard';
+    return 'dashboard'; // Default tab
   };
   
   const [activeTab, setActiveTab] = useState(getActiveTab());
@@ -44,7 +45,11 @@ const AdminDashboard = () => {
   
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    navigate(`/admin/${value === 'users' ? 'users' : value}`);
+    if (value === 'dashboard') {
+      navigate('/admin');
+    } else {
+      navigate(`/admin/${value}`);
+    }
   };
   
   return (
@@ -68,6 +73,7 @@ const AdminDashboard = () => {
               
               <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange} className="mb-8">
                 <TabsList className="mb-4">
+                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                   <TabsTrigger value="users">Utilisateurs</TabsTrigger>
                   <TabsTrigger value="farmers">Agriculteurs</TabsTrigger>
                   <TabsTrigger value="messages">Messages</TabsTrigger>
@@ -75,6 +81,22 @@ const AdminDashboard = () => {
                   <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
                   <TabsTrigger value="resources">Ressources</TabsTrigger>
                 </TabsList>
+                
+                {/* Dashboard Tab (This is new to show the dashboard view) */}
+                <TabsContent value="dashboard">
+                  <Card>
+                    <div className="p-6">
+                      <h2 className="text-xl font-semibold mb-4">Bienvenue dans votre tableau de bord administrateur</h2>
+                      <p className="text-gray-600 mb-4">
+                        Ici, vous pouvez gérer tous les aspects de la plateforme AgriMarket. 
+                        Utilisez les onglets ci-dessus ou le menu latéral pour naviguer entre les différentes sections.
+                      </p>
+                      <p className="text-gray-600">
+                        Consultez les statistiques en haut pour avoir un aperçu rapide de l'état de la plateforme.
+                      </p>
+                    </div>
+                  </Card>
+                </TabsContent>
                 
                 {/* Users Tab */}
                 <TabsContent value="users">

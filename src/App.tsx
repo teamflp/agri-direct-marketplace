@@ -44,6 +44,9 @@ import FAQ from './pages/resources/FAQ';
 import Support from './pages/resources/Support';
 import KnowledgeBase from './pages/resources/KnowledgeBase';
 
+// Import admin pages
+import AdminReports from './pages/admin/AdminReports';
+
 // Import des pages légales
 import TermsOfService from './pages/legal/TermsOfService';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
@@ -97,7 +100,15 @@ const App = () => {
                     <Route path="/buyer-dashboard/subscriptions" element={<BuyerSubscriptions />} />
                     
                     {/* Routes pour les autres tableaux de bord */}
-                    <Route path="/admin/*" element={<AdminDashboard />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin/users" element={<AdminDashboard />} />
+                    <Route path="/admin/farmers" element={<AdminDashboard />} />
+                    <Route path="/admin/messages" element={<AdminDashboard />} />
+                    <Route path="/admin/disputes" element={<AdminDashboard />} />
+                    <Route path="/admin/subscriptions" element={<AdminDashboard />} />
+                    <Route path="/admin/finances" element={<AdminDashboard />} />
+                    <Route path="/admin/reports" element={<AdminReports />} />
+                    <Route path="/admin/settings" element={<AdminDashboard />} />
                     <Route path="/farmer/*" element={<FarmerDashboard />} />
                     
                     <Route path="/notifications-demo" element={<NotificationsDemo />} />
