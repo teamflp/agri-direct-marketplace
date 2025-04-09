@@ -54,7 +54,7 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
           <>
             <Link 
               to="/login" 
-              className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
+              className="text-agrimarket-orange hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
               onClick={onClose}
             >
               <LogIn className="h-5 w-5 mr-2" />
@@ -62,7 +62,7 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
             </Link>
             <Link 
               to="/register" 
-              className="text-gray-700 hover:text-agrimarket-green font-medium transition-colors p-2 rounded-md hover:bg-gray-50 flex items-center"
+              className="bg-agrimarket-orange text-white hover:bg-agrimarket-brown font-medium transition-colors p-2 rounded-md flex items-center"
               onClick={onClose}
             >
               <User className="h-5 w-5 mr-2" />
