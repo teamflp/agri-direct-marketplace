@@ -1,591 +1,86 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  ShoppingBag, 
-  MessageSquare, 
-  CreditCard, 
-  User, 
-  Eye, 
-  TruckIcon,
-  Search,
-  ArrowUpDown,
-  Filter,
-  CheckCircle2,
-  Clock,
-  Bell
-} from 'lucide-react';
-import { 
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from '@/hooks/use-toast';
-import { useNotifications } from '@/components/ui/notifications';
-import { DeliveryTracker } from '@/components/delivery/DeliveryTracker';
-import { DeliveryMethodSelector } from '@/components/delivery/DeliveryMethodSelector';
-import { DeliverySlotSelector } from '@/components/delivery/DeliverySlotSelector';
-import { DeliveryProvider } from '@/contexts/DeliveryContext';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter
-} from "@/components/ui/dialog";
-
-// Type pour les commandes
-interface Order {
-  id: string;
-  customer: string;
-  date: string;
-  total: number;
-  items: number;
-  status: string;
-  paid: boolean;
-}
-
-// Données des commandes
-const initialOrders: Order[] = [
-  {
-    id: "CMD-2023-001",
-    customer: "Martin Pasquier",
-    date: "27/09/2023",
-    total: 23450,
-    items: 3,
-    status: "En livraison",
-    paid: true
-  },
-  {
-    id: "CMD-2023-002",
-    customer: "Lucie Martin",
-    date: "26/09/2023",
-    total: 12700,
-    items: 2,
-    status: "En préparation",
-    paid: true
-  },
-  {
-    id: "CMD-2023-003",
-    customer: "Thomas Leroy",
-    date: "25/09/2023",
-    total: 8900,
-    items: 1,
-    status: "Nouvelle",
-    paid: true
-  },
-  {
-    id: "CMD-2023-004",
-    customer: "Julie Moreau",
-    date: "24/09/2023",
-    total: 35600,
-    items: 4,
-    status: "Livrée",
-    paid: true
-  },
-  {
-    id: "CMD-2023-005",
-    customer: "Antoine Dubois",
-    date: "23/09/2023",
-    total: 29800,
-    items: 3,
-    status: "Livrée",
-    paid: true
-  },
-  {
-    id: "CMD-2023-006",
-    customer: "Marie Lambert",
-    date: "22/09/2023",
-    total: 17350,
-    items: 2,
-    status: "Annulée",
-    paid: false
-  }
-];
+import { ShoppingBag, Package, BarChart2, MessageSquare, Settings } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import OrdersList from './components/OrdersList';
 
 const FarmerOrders = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
-  const [showDeliveryMethodDialog, setShowDeliveryMethodDialog] = useState(false);
-  const [showDeliverySlotDialog, setShowDeliverySlotDialog] = useState(false);
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
-  const [statusUpdateNotification, setStatusUpdateNotification] = useState<{orderId: string, status: string} | null>(null);
-  const notificationsContainerRef = useRef<HTMLDivElement>(null);
-  
-  const { toast } = useToast();
-  const { showNotification, showInlineNotification } = useNotifications();
+  const { user, profile } = useAuth();
   
   const menuItems = [
-    { title: "Tableau de bord", path: "/farmer-dashboard", icon: <User size={20} /> },
-    { title: "Mes produits", path: "/farmer-dashboard/products", icon: <ShoppingBag size={20} /> },
-    { title: "Commandes", path: "/farmer-dashboard/orders", icon: <ShoppingBag size={20} /> },
-    { title: "Messagerie", path: "/farmer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Mon abonnement", path: "/farmer-dashboard/subscription", icon: <CreditCard size={20} /> },
+    { title: "Tableau de bord", path: "/farmer", icon: <BarChart2 size={20} /> },
+    { title: "Produits", path: "/farmer/products", icon: <Package size={20} /> },
+    { title: "Commandes", path: "/farmer/orders", icon: <ShoppingBag size={20} /> },
+    { title: "Inventaire", path: "/farmer/inventory", icon: <Package size={20} /> },
+    { title: "Analytics", path: "/farmer/analytics", icon: <BarChart2 size={20} /> },
+    { title: "Messages", path: "/farmer/messages", icon: <MessageSquare size={20} /> },
+    { title: "Paramètres", path: "/farmer/profile", icon: <Settings size={20} /> },
   ];
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+  const name = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : 'Jean Dupont';
+    
+  const email = user?.email || 'jean.dupont@fermelocale.fr';
 
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         order.customer.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter ? order.status === statusFilter : true;
-    
-    return matchesSearch && matchesStatus;
-  });
-  
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    // Mettre à jour l'état des commandes
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
-    
-    // Afficher la notification toast
-    toast({
-      title: "Statut mis à jour",
-      description: `La commande ${orderId} est maintenant "${newStatus}"`,
-      variant: "success"
-    });
-    
-    // Notification en temps réel
-    showNotification({
-      type: 'order',
-      title: 'Commande mise à jour',
-      description: `La commande ${orderId} est maintenant "${newStatus}"`,
-      action: () => {
-        setSelectedOrder(orderId);
-        setShowDeliveryDialog(true);
-      }
-    });
-    
-    // Afficher la notification de mise à jour de statut
-    setStatusUpdateNotification({
-      orderId,
-      status: newStatus
-    });
-
-    // Cacher la notification après 5 secondes
-    setTimeout(() => {
-      setStatusUpdateNotification(null);
-    }, 5000);
-  };
-  
-  const handleViewOrder = (orderId: string) => {
-    setSelectedOrder(orderId);
-    setShowDeliveryDialog(true);
-  };
-  
-  const handleNewOrder = () => {
-    const orderId = `CMD-2023-${Math.floor(Math.random() * 1000)}`;
-    
-    // Ajouter une nouvelle commande
-    const newOrder: Order = {
-      id: orderId,
-      customer: "Nouveau Client",
-      date: new Date().toLocaleDateString('fr-FR'),
-      total: Math.floor(Math.random() * 50000),
-      items: Math.floor(Math.random() * 5) + 1,
-      status: "Nouvelle",
-      paid: Math.random() > 0.5
-    };
-    
-    setOrders(prevOrders => [newOrder, ...prevOrders]);
-    
-    showNotification({
-      type: 'order',
-      title: 'Nouvelle commande reçue',
-      description: `Vous avez reçu une nouvelle commande : ${orderId}`,
-      action: () => {
-        setSelectedOrder(orderId);
-        setShowDeliveryDialog(true);
-      }
-    });
-    
-    // Notification dans la page
-    showInlineNotification({
-      type: 'order',
-      title: 'Nouvelle commande reçue',
-      description: `Vous avez reçu une nouvelle commande : ${orderId}`
-    }, notificationsContainerRef);
-  };
-  
-  const handleNewMessage = () => {
-    showNotification({
-      type: 'message',
-      title: 'Nouveau message',
-      description: `Vous avez reçu un nouveau message de Martin Pasquier`,
-      action: () => console.log('Viewing message')
-    });
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case "Livrée":
-        return <CheckCircle2 className="w-3 h-3 mr-1" />;
-      case "En préparation":
-        return <Clock className="w-3 h-3 mr-1" />;
-      case "En livraison":
-        return <TruckIcon className="w-3 h-3 mr-1" />;
-      default:
-        return null;
+  // Données d'exemple pour les commandes
+  const orders = [
+    {
+      id: "CMD-001",
+      customer: "Marie Dubois",
+      date: "12 Mai 2023",
+      total: 45.50,
+      items: 4,
+      status: "Confirmée"
+    },
+    {
+      id: "CMD-002",
+      customer: "Pierre Martin",
+      date: "10 Mai 2023",
+      total: 32.20,
+      items: 3,
+      status: "Livrée"
+    },
+    {
+      id: "CMD-003",
+      customer: "Sophie Lefebvre",
+      date: "8 Mai 2023",
+      total: 27.80,
+      items: 2,
+      status: "En préparation"
+    },
+    {
+      id: "CMD-004",
+      customer: "Lucas Bernard",
+      date: "5 Mai 2023",
+      total: 58.90,
+      items: 5,
+      status: "Livrée"
     }
-  };
-
-  const getStatusClass = (status: string) => {
-    switch(status) {
-      case "Livrée":
-        return "bg-green-100 text-green-800";
-      case "En livraison":
-        return "bg-blue-100 text-blue-800";
-      case "En préparation":
-        return "bg-yellow-100 text-yellow-800";
-      case "Nouvelle":
-        return "bg-purple-100 text-purple-800";
-      case "Annulée":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  ];
 
   return (
-    <DeliveryProvider>
-      <DashboardLayout
-        name="Sophie Dubois"
-        email="sophie.d@email.com"
-        avatar={
-          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop" alt="Sophie Dubois" />
-        }
-        menuItems={menuItems}
-      >
-        <div className="space-y-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <h1 className="text-3xl font-bold">Commandes</h1>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  type="text"
-                  placeholder="Rechercher une commande..."
-                  className="pl-8 pr-4"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-              </div>
-              <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? null : value)}>
-                <SelectTrigger className="w-[180px]">
-                  <div className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    {statusFilter || "Tous les statuts"}
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="Nouvelle">Nouvelle</SelectItem>
-                  <SelectItem value="En préparation">En préparation</SelectItem>
-                  <SelectItem value="En livraison">En livraison</SelectItem>
-                  <SelectItem value="Livrée">Livrée</SelectItem>
-                  <SelectItem value="Annulée">Annulée</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <div ref={notificationsContainerRef}></div>
-          
-          {/* Notification de mise à jour de statut */}
-          {statusUpdateNotification && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4 relative">
-              <div className="flex items-center">
-                <div className="shrink-0">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-green-800">Commande mise à jour</h3>
-                  <div className="mt-1 text-sm text-green-700">
-                    La commande {statusUpdateNotification.orderId} est maintenant "{statusUpdateNotification.status}"
-                  </div>
-                </div>
-              </div>
-              <button 
-                className="absolute top-2 right-2 text-green-600 hover:text-green-800"
-                onClick={() => setStatusUpdateNotification(null)}
-              >
-                &times;
-              </button>
-            </div>
-          )}
-          
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Button onClick={handleNewOrder} className="bg-green-600 hover:bg-green-700">
-              <Bell className="mr-2 h-4 w-4" />
-              Simuler nouvelle commande
-            </Button>
-            <Button onClick={handleNewMessage} variant="outline">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Simuler nouveau message
-            </Button>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des commandes</CardTitle>
-              <CardDescription>
-                Suivez et gérez les commandes de vos clients
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Commande <ArrowUpDown className="inline h-4 w-4 ml-1" /></TableHead>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Montant</TableHead>
-                    <TableHead>Articles</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Paiement</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredOrders.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={8} className="h-24 text-center">
-                        Aucune commande trouvée
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.id}</TableCell>
-                        <TableCell>{order.customer}</TableCell>
-                        <TableCell>{order.date}</TableCell>
-                        <TableCell>{order.total.toLocaleString()} FCFA</TableCell>
-                        <TableCell>{order.items}</TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${getStatusClass(order.status)}`}>
-                            {getStatusIcon(order.status)}
-                            {order.status}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          {order.paid ? (
-                            <span className="text-green-600 font-medium">Payée</span>
-                          ) : (
-                            <span className="text-red-600 font-medium">Non payée</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="inline-flex items-center gap-1"
-                            onClick={() => handleViewOrder(order.id)}
-                          >
-                            <Eye size={16} />
-                            <span className="hidden sm:inline">Détails</span>
-                          </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                className="inline-flex items-center gap-1 ml-2"
-                                disabled={order.status === "Annulée" || order.status === "Livrée"}
-                              >
-                                Statut
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Changer le statut</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "En préparation")}>
-                                En préparation
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "En livraison")}>
-                                En livraison
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "Livrée")}>
-                                Livrée
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleStatusChange(order.id, "Annulée")} className="text-red-600">
-                                Annuler
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Nouvelles commandes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-purple-600">
-                  {orders.filter(o => o.status === "Nouvelle").length}
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Commandes en attente de traitement
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">En préparation</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-yellow-600">
-                  {orders.filter(o => o.status === "En préparation").length}
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Commandes en cours de préparation
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Chiffre d'affaires</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-agrimarket-green">
-                  {orders
-                    .filter(o => o.status !== "Annulée")
-                    .reduce((sum, order) => sum + order.total, 0)
-                    .toLocaleString()} FCFA
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Total des commandes ce mois-ci
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
-          <DialogContent className="sm:max-w-[650px]">
-            <DialogHeader>
-              <DialogTitle>Détails de livraison</DialogTitle>
-              <DialogDescription>
-                Suivi de la commande {selectedOrder}
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedOrder && (
-              <div className="space-y-4 mt-4">
-                <DeliveryTracker orderId={selectedOrder} />
-                
-                <div className="flex flex-wrap gap-2 justify-end">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setShowDeliveryDialog(false);
-                      setShowDeliveryMethodDialog(true);
-                    }}
-                  >
-                    <TruckIcon className="mr-2 h-4 w-4" />
-                    Changer la méthode de livraison
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setShowDeliveryDialog(false);
-                      setShowDeliverySlotDialog(true);
-                    }}
-                  >
-                    <Clock className="mr-2 h-4 w-4" />
-                    Planifier un créneau
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+    <DashboardLayout
+      name={name}
+      email={email}
+      avatar="https://images.unsplash.com/photo-1553787434-dd9eb4ea4d0b?w=150&h=150&fit=crop"
+      menuItems={menuItems}
+    >
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Commandes</h1>
         
-        <Dialog open={showDeliveryMethodDialog} onOpenChange={setShowDeliveryMethodDialog}>
-          <DialogContent className="sm:max-w-[550px]">
-            <DialogHeader>
-              <DialogTitle>Choisir une méthode de livraison</DialogTitle>
-              <DialogDescription>
-                Sélectionnez comment vous souhaitez être livré
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedOrder && (
-              <DeliveryMethodSelector 
-                orderId={selectedOrder} 
-                onSelect={() => {
-                  setShowDeliveryMethodDialog(false);
-                  setShowDeliveryDialog(true);
-                }} 
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-        
-        <Dialog open={showDeliverySlotDialog} onOpenChange={setShowDeliverySlotDialog}>
-          <DialogContent className="sm:max-w-[550px]">
-            <DialogHeader>
-              <DialogTitle>Planifier la livraison</DialogTitle>
-              <DialogDescription>
-                Choisissez un créneau horaire pour votre livraison
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedOrder && (
-              <DeliverySlotSelector 
-                orderId={selectedOrder} 
-                onSelect={() => {
-                  setShowDeliverySlotDialog(false);
-                  setShowDeliveryDialog(true);
-                }} 
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-      </DashboardLayout>
-    </DeliveryProvider>
+        <Card>
+          <CardHeader>
+            <CardTitle>Historique des commandes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <OrdersList orders={orders} />
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardLayout>
   );
 };
 

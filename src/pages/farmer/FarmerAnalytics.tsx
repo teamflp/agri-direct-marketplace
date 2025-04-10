@@ -1,101 +1,50 @@
 
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { User, ShoppingCart, Users, MessageSquare, FileText, Calendar } from 'lucide-react';
-
-// Components
+import { ShoppingBag, Package, BarChart2, MessageSquare, Settings } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import AnalyticsHeader from './components/AnalyticsHeader';
-import SummaryCards from './components/SummaryCards';
 import AnalyticsCharts from './components/AnalyticsCharts';
+import PopularProducts from './components/PopularProducts';
 import OptimizationTips from './components/OptimizationTips';
 
-// Data
-import { 
-  monthlySalesData, 
-  productSalesData, 
-  customerLocationData, 
-  weekdaySalesData,
-  weeklySalesData,
-  yearlyProductSalesData,
-  yearlyCustomerLocationData,
-  yearlySalesData
-} from './data/analyticsData';
-
 const FarmerAnalytics = () => {
-  const [periodFilter, setPeriodFilter] = useState('month');
+  const { user, profile } = useAuth();
   
   const menuItems = [
-    { title: "Tableau de bord", path: "/farmer-dashboard", icon: <User size={20} /> },
-    { title: "Produits", path: "/farmer-dashboard/products", icon: <ShoppingCart size={20} /> },
-    { title: "Commandes", path: "/farmer-dashboard/orders", icon: <Users size={20} /> },
-    { title: "Messages", path: "/farmer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Analyses", path: "/farmer-dashboard/analytics", icon: <FileText size={20} /> },
-    { title: "Abonnement", path: "/farmer-dashboard/subscription", icon: <Calendar size={20} /> },
+    { title: "Tableau de bord", path: "/farmer", icon: <BarChart2 size={20} /> },
+    { title: "Produits", path: "/farmer/products", icon: <Package size={20} /> },
+    { title: "Commandes", path: "/farmer/orders", icon: <ShoppingBag size={20} /> },
+    { title: "Inventaire", path: "/farmer/inventory", icon: <Package size={20} /> },
+    { title: "Analytics", path: "/farmer/analytics", icon: <BarChart2 size={20} /> },
+    { title: "Messages", path: "/farmer/messages", icon: <MessageSquare size={20} /> },
+    { title: "Paramètres", path: "/farmer/profile", icon: <Settings size={20} /> },
   ];
 
-  // Filter data based on selected period
-  const filteredData = useMemo(() => {
-    switch (periodFilter) {
-      case 'week':
-        return {
-          salesData: weeklySalesData,
-          productData: productSalesData.slice(0, 3), // Fewer products for weekly view
-          locationData: customerLocationData.slice(0, 3), // Fewer locations for weekly view
-          dayData: weekdaySalesData
-        };
-      case 'year':
-        return {
-          salesData: yearlySalesData,
-          productData: yearlyProductSalesData,
-          locationData: yearlyCustomerLocationData,
-          dayData: weekdaySalesData // Same weekday data for yearly view
-        };
-      case 'month':
-      default:
-        return {
-          salesData: monthlySalesData,
-          productData: productSalesData,
-          locationData: customerLocationData,
-          dayData: weekdaySalesData
-        };
-    }
-  }, [periodFilter]);
+  const name = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : 'Jean Dupont';
+    
+  const email = user?.email || 'jean.dupont@fermelocale.fr';
 
   return (
     <DashboardLayout
-      name="Ferme des Quatre Saisons"
-      email="ferme4saisons@email.com"
-      avatar={
-        <div className="bg-agrimarket-green text-white text-xl font-semibold flex items-center justify-center h-full">
-          FQ
-        </div>
-      }
+      name={name}
+      email={email}
+      avatar="https://images.unsplash.com/photo-1553787434-dd9eb4ea4d0b?w=150&h=150&fit=crop"
       menuItems={menuItems}
     >
       <div className="space-y-6">
-        {/* Analytics header with period filter and export button */}
-        <AnalyticsHeader 
-          periodFilter={periodFilter} 
-          setPeriodFilter={setPeriodFilter}
-          monthlySalesData={filteredData.salesData}
-          productSalesData={filteredData.productData}
-          customerLocationData={filteredData.locationData}
-          weekdaySalesData={filteredData.dayData}
-        />
-
-        {/* Summary cards showing key metrics */}
-        <SummaryCards periodFilter={periodFilter} />
-
-        {/* Charts for data visualization */}
-        <AnalyticsCharts 
-          monthlySalesData={filteredData.salesData}
-          productSalesData={filteredData.productData}
-          customerLocationData={filteredData.locationData}
-          weekdaySalesData={filteredData.dayData}
-        />
-
-        {/* Optimization tips based on data analysis */}
-        <OptimizationTips periodFilter={periodFilter} />
+        <h1 className="text-3xl font-bold">Analyses et statistiques</h1>
+        
+        <AnalyticsHeader />
+        
+        <AnalyticsCharts />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PopularProducts />
+          <OptimizationTips />
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -44,6 +44,14 @@ import FAQ from './pages/resources/FAQ';
 import Support from './pages/resources/Support';
 import KnowledgeBase from './pages/resources/KnowledgeBase';
 
+// Import des pages d'agriculteur
+import FarmerProducts from './pages/farmer/FarmerProducts';
+import FarmerOrders from './pages/farmer/FarmerOrders';
+import FarmerInventory from './pages/farmer/FarmerInventory';
+import FarmerAnalytics from './pages/farmer/FarmerAnalytics';
+import FarmerMessages from './pages/farmer/FarmerMessages';
+import FarmerProfile from './pages/farmer/FarmerProfile';
+
 // Import admin pages
 import AdminReports from './pages/admin/AdminReports';
 
@@ -99,6 +107,15 @@ const App = () => {
                     <Route path="/buyer-dashboard/profile" element={<BuyerProfile />} />
                     <Route path="/buyer-dashboard/subscriptions" element={<BuyerSubscriptions />} />
                     
+                    {/* Routes principales pour le tableau de bord agriculteur */}
+                    <Route path="/farmer" element={<FarmerDashboard />} />
+                    <Route path="/farmer/products" element={<FarmerProducts />} />
+                    <Route path="/farmer/orders" element={<FarmerOrders />} />
+                    <Route path="/farmer/inventory" element={<FarmerInventory />} />
+                    <Route path="/farmer/analytics" element={<FarmerAnalytics />} />
+                    <Route path="/farmer/messages" element={<FarmerMessages />} />
+                    <Route path="/farmer/profile" element={<FarmerProfile />} />
+                    
                     {/* Routes pour les autres tableaux de bord */}
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/users" element={<AdminDashboard />} />
@@ -109,7 +126,6 @@ const App = () => {
                     <Route path="/admin/finances" element={<AdminDashboard />} />
                     <Route path="/admin/reports" element={<AdminReports />} />
                     <Route path="/admin/settings" element={<AdminDashboard />} />
-                    <Route path="/farmer/*" element={<FarmerDashboard />} />
                     
                     <Route path="/notifications-demo" element={<NotificationsDemo />} />
                     <Route path="/subscriptions" element={<Subscriptions />} />
