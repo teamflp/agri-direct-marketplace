@@ -41,11 +41,12 @@ const FarmerInventory = () => {
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [products, setProducts] = useState<InventoryProductType[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<InventoryProductType | null>(null);
   
   const {
     showUpdateDialog,
     setShowUpdateDialog,
-    selectedProduct,
+    selectedProduct: hookSelectedProduct,
     lowStockProducts,
     initializeLowStockProducts,
     handleUpdateClick,
