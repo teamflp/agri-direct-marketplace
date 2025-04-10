@@ -21,13 +21,13 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
   if (!isOpen) return null;
 
   return (
-    <div className="md:hidden py-3 mt-2 border-t border-gray-200 bg-white">
+    <div className="md:hidden fixed inset-x-0 top-[60px] z-40 py-3 mt-2 border-t border-gray-200 bg-white shadow-lg max-h-[calc(100vh-60px)] overflow-y-auto">
       <HeaderNavigation
         links={links}
         isMobile={true}
         onClickMobile={onClose}
       />
-      <div className="mt-3 px-2 space-y-2">
+      <div className="mt-3 px-4 space-y-3">
         {user ? (
           <>
             <Link 
@@ -51,10 +51,10 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
             </Button>
           </>
         ) : (
-          <>
+          <div className="flex flex-col space-y-3 px-2">
             <Link 
               to="/login" 
-              className="border-2 border-agrimarket-orange text-agrimarket-orange font-semibold hover:bg-agrimarket-orange/10 p-2 rounded-md flex items-center justify-center w-full"
+              className="border-2 border-agrimarket-orange text-agrimarket-orange font-semibold hover:bg-agrimarket-orange/10 p-3 rounded-md flex items-center justify-center w-full"
               onClick={onClose}
             >
               <LogIn className="h-5 w-5 mr-2" />
@@ -62,13 +62,13 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
             </Link>
             <Link 
               to="/register" 
-              className="bg-agrimarket-orange text-white font-semibold hover:bg-agrimarket-brown shadow-sm p-2 rounded-md flex items-center justify-center w-full"
+              className="bg-agrimarket-orange text-white font-semibold hover:bg-agrimarket-brown shadow-sm p-3 rounded-md flex items-center justify-center w-full"
               onClick={onClose}
             >
               <User className="h-5 w-5 mr-2" />
               Inscription
             </Link>
-          </>
+          </div>
         )}
       </div>
     </div>
