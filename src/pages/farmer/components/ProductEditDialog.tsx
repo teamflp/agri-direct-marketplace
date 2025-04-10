@@ -18,14 +18,14 @@ type ProductEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: ProductType;
-  onSave: (updatedProduct: ProductType) => void;
+  onConfirm: (updatedProduct: ProductType) => void; // Changed from onSave to onConfirm
 };
 
 const ProductEditDialog = ({
   open,
   onOpenChange,
   product,
-  onSave
+  onConfirm
 }: ProductEditDialogProps) => {
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price);
@@ -35,6 +35,7 @@ const ProductEditDialog = ({
   const [organic, setOrganic] = useState(product.organic);
   const [published, setPublished] = useState(product.published);
   const [image, setImage] = useState(product.image);
+  const [description, setDescription] = useState(product.description || '');
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,10 +49,11 @@ const ProductEditDialog = ({
       unit,
       organic,
       published,
-      image
+      image,
+      description
     };
     
-    onSave(updatedProduct);
+    onConfirm(updatedProduct);
   };
   
   return (
@@ -127,6 +129,15 @@ const ProductEditDialog = ({
                 value={image} 
                 onChange={(e) => setImage(e.target.value)} 
                 required 
+              />
+            </div>
+            
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="description">Description</Label>
+              <Input 
+                id="description" 
+                value={description} 
+                onChange={(e) => setDescription(e.target.value)} 
               />
             </div>
           </div>

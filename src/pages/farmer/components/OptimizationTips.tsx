@@ -1,86 +1,73 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Lightbulb, TrendingUp, ShoppingBag, CalendarClock } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Lightbulb, TrendingUp, Users, ShoppingBag } from 'lucide-react';
 
 interface OptimizationTipsProps {
   periodFilter: string;
 }
 
 const OptimizationTips: React.FC<OptimizationTipsProps> = ({ periodFilter }) => {
-  // Different tips based on the period filter
-  const periodTips = {
-    week: [
-      {
-        icon: <TrendingUp className="h-5 w-5 text-agrimarket-green" />,
-        title: "Optimisez les ventes du week-end",
-        description: "Les ventes sont plus importantes le samedi. Proposez des offres spéciales ou des livraisons gratuites pour ces jours."
-      },
-      {
-        icon: <ShoppingBag className="h-5 w-5 text-agrimarket-green" />,
-        title: "Mettez en avant les fraises",
-        description: "Ce produit a connu une forte demande cette semaine. Augmentez son stock et sa visibilité."
-      },
-      {
-        icon: <CalendarClock className="h-5 w-5 text-agrimarket-green" />,
-        title: "Planifiez pour la semaine prochaine",
-        description: "Préparez-vous pour une augmentation des commandes du mercredi au samedi selon les tendances actuelles."
-      }
-    ],
-    month: [
-      {
-        icon: <Lightbulb className="h-5 w-5 text-agrimarket-green" />,
-        title: "Diversifiez votre offre",
-        description: "Les clients qui achètent des tomates bio achètent souvent des herbes aromatiques. Envisagez de créer des packs."
-      },
-      {
-        icon: <TrendingUp className="h-5 w-5 text-agrimarket-green" />,
-        title: "Améliorez le panier moyen",
-        description: "Proposez des remises sur les achats supérieurs à 5000 FCFA pour encourager des paniers plus importants."
-      },
-      {
-        icon: <ShoppingBag className="h-5 w-5 text-agrimarket-green" />,
-        title: "Promotions régionales",
-        description: "La majorité de vos clients viennent de Dakar. Envisagez des offres spéciales de livraison dans cette région."
-      }
-    ],
-    year: [
-      {
-        icon: <CalendarClock className="h-5 w-5 text-agrimarket-green" />,
-        title: "Planifiez selon les saisons",
-        description: "Vos ventes sont plus importantes de juin à septembre. Préparez des stocks plus importants pour cette période."
-      },
-      {
-        icon: <ShoppingBag className="h-5 w-5 text-agrimarket-green" />,
-        title: "Développez de nouveaux produits",
-        description: "Les fraises et tomates représentent 40% de vos ventes annuelles. Investissez dans ces cultures ou des variétés similaires."
-      },
-      {
-        icon: <Lightbulb className="h-5 w-5 text-agrimarket-green" />,
-        title: "Fidélisez vos clients",
-        description: "Implémentez un programme de fidélité pour augmenter le taux de rétention client qui est actuellement de 65%."
-      }
-    ]
+  // Adjust tips based on the period filter
+  const getTipsForPeriod = () => {
+    switch (periodFilter) {
+      case 'week':
+        return [
+          {
+            icon: <TrendingUp className="h-8 w-8 text-orange-500" />,
+            title: "Offre spéciale weekend",
+            description: "Les ventes du weekend représentent 60% de vos revenus. Envisagez une offre promotionnelle pour maximiser cette tendance."
+          },
+          {
+            icon: <ShoppingBag className="h-8 w-8 text-blue-500" />,
+            title: "Rupture de stock imminente",
+            description: "Les fraises et tomates sont très demandées cette semaine. Assurez-vous d'avoir un stock suffisant."
+          }
+        ];
+      case 'year':
+        return [
+          {
+            icon: <Users className="h-8 w-8 text-green-500" />,
+            title: "Fidélisez vos clients",
+            description: "42% de vos revenus proviennent de clients réguliers. Envisagez un programme de fidélité pour la nouvelle année."
+          },
+          {
+            icon: <Lightbulb className="h-8 w-8 text-yellow-500" />,
+            title: "Nouveaux produits saisonniers",
+            description: "Analysez vos tendances annuelles pour planifier de nouveaux produits saisonniers pour l'année prochaine."
+          }
+        ];
+      default: // month
+        return [
+          {
+            icon: <TrendingUp className="h-8 w-8 text-orange-500" />,
+            title: "Optimisez votre tarification",
+            description: "Vos marges sur les produits laitiers sont inférieures de 12% à la moyenne du marché. Envisagez une révision des prix."
+          },
+          {
+            icon: <Lightbulb className="h-8 w-8 text-yellow-500" />,
+            title: "Opportunité marketing",
+            description: "Les ventes de légumes bio ont augmenté de 23% ce mois-ci. Mettez en avant ces produits dans vos communications."
+          }
+        ];
+    }
   };
 
-  const tips = periodTips[periodFilter as keyof typeof periodTips] || periodTips.month;
+  const tips = getTipsForPeriod();
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Conseils d'optimisation</CardTitle>
-        <CardDescription>
-          Basés sur l'analyse de vos données de vente
-        </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-6 sm:grid-cols-1 md:grid-cols-3">
+      <CardContent className="space-y-6">
         {tips.map((tip, index) => (
-          <div key={index} className="flex flex-col space-y-2">
-            <div className="flex items-center space-x-2">
-              {tip.icon}
-              <h3 className="font-medium">{tip.title}</h3>
+          <div key={index} className="flex space-x-4">
+            <div className="mt-1">{tip.icon}</div>
+            <div>
+              <h3 className="text-lg font-semibold">{tip.title}</h3>
+              <p className="text-gray-600">{tip.description}</p>
             </div>
-            <p className="text-sm text-gray-500">{tip.description}</p>
           </div>
         ))}
       </CardContent>

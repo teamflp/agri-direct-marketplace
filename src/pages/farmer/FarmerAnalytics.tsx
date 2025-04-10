@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { ShoppingBag, Package, BarChart2, MessageSquare, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,9 +7,35 @@ import AnalyticsHeader from './components/AnalyticsHeader';
 import AnalyticsCharts from './components/AnalyticsCharts';
 import PopularProducts from './components/PopularProducts';
 import OptimizationTips from './components/OptimizationTips';
+import { 
+  monthlySalesData, 
+  productSalesData, 
+  customerLocationData, 
+  weekdaySalesData, 
+  weeklySalesData, 
+  yearlySalesData, 
+  yearlyProductSalesData, 
+  yearlyCustomerLocationData 
+} from './data/analyticsData';
 
 const FarmerAnalytics = () => {
   const { user, profile } = useAuth();
+  const [periodFilter, setPeriodFilter] = useState('month');
+  
+  // Select data based on period filter
+  const currentMonthlySalesData = periodFilter === 'week' 
+    ? weeklySalesData 
+    : periodFilter === 'year' 
+      ? yearlySalesData 
+      : monthlySalesData;
+  
+  const currentProductSalesData = periodFilter === 'year' 
+    ? yearlyProductSalesData 
+    : productSalesData;
+  
+  const currentCustomerLocationData = periodFilter === 'year' 
+    ? yearlyCustomerLocationData 
+    : customerLocationData;
   
   const menuItems = [
     { title: "Tableau de bord", path: "/farmer", icon: <BarChart2 size={20} /> },
@@ -37,13 +63,25 @@ const FarmerAnalytics = () => {
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Analyses et statistiques</h1>
         
-        <AnalyticsHeader />
+        <AnalyticsHeader 
+          periodFilter={periodFilter} 
+          setPeriodFilter={setPeriodFilter}
+          monthlySalesData={currentMonthlySalesData}
+          productSalesData={currentProductSalesData}
+          customerLocationData={currentCustomerLocationData}
+          weekdaySalesData={weekdaySalesData}
+        />
         
-        <AnalyticsCharts />
+        <AnalyticsCharts 
+          monthlySalesData={currentMonthlySalesData}
+          productSalesData={currentProductSalesData}
+          customerLocationData={currentCustomerLocationData}
+          weekdaySalesData={weekdaySalesData}
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PopularProducts />
-          <OptimizationTips />
+          <OptimizationTips periodFilter={periodFilter} />
         </div>
       </div>
     </DashboardLayout>

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 export type ProductType = {
   id: number;
   name: string;
+  description?: string; // Make description optional
   price: number;
   inventory: number;
   unit: string;
@@ -26,14 +27,14 @@ type ProductDeleteDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: ProductType | null;
-  onConfirmDelete: () => void;
+  onConfirm: () => void; // Changed from onConfirmDelete to onConfirm
 };
 
 const ProductDeleteDialog = ({
   open,
   onOpenChange,
   product,
-  onConfirmDelete
+  onConfirm
 }: ProductDeleteDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -53,7 +54,7 @@ const ProductDeleteDialog = ({
           </Button>
           <Button 
             variant="destructive" 
-            onClick={onConfirmDelete}
+            onClick={onConfirm}
           >
             Supprimer
           </Button>

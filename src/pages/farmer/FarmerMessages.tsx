@@ -19,6 +19,38 @@ const FarmerMessages = () => {
     { title: "Paramètres", path: "/farmer/profile", icon: <Settings size={20} /> },
   ];
 
+  // Mock data for messages
+  const messages = [
+    {
+      id: 1,
+      customer: "Marie Dupont",
+      lastMessage: "Bonjour, je voudrais savoir si vos tomates bio sont disponibles cette semaine?",
+      date: "Aujourd'hui, 10:23",
+      unread: true
+    },
+    {
+      id: 2,
+      customer: "Thomas Martin",
+      lastMessage: "Merci pour votre réponse. Je passerai demain pour récupérer ma commande.",
+      date: "Hier, 16:45",
+      unread: false
+    },
+    {
+      id: 3,
+      customer: "Sophie Leblanc",
+      lastMessage: "Est-ce que vous livrez dans ma région ? Je suis à Bordeaux.",
+      date: "23 mai, 09:12",
+      unread: true
+    },
+    {
+      id: 4,
+      customer: "Pierre Dubois",
+      lastMessage: "Les fraises étaient délicieuses, merci !",
+      date: "20 mai, 14:30",
+      unread: false
+    }
+  ];
+
   const name = profile?.first_name && profile?.last_name 
     ? `${profile.first_name} ${profile.last_name}` 
     : 'Jean Dupont';
@@ -40,7 +72,7 @@ const FarmerMessages = () => {
             <CardTitle>Vos conversations</CardTitle>
           </CardHeader>
           <CardContent>
-            <MessagesList />
+            <MessagesList messages={messages} />
           </CardContent>
         </Card>
       </div>
