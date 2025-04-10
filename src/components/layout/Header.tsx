@@ -72,9 +72,7 @@ const Header = () => {
             <HeaderNavigation links={navLinks} />
             
             {/* Actions à droite - visibles uniquement sur desktop */}
-            <div className="md:block hidden">
-              <HeaderActions />
-            </div>
+            <HeaderActions />
             
             {/* Menu hamburger sur mobile */}
             {isMobile && (

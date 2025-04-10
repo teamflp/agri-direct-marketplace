@@ -17,7 +17,7 @@ const HeaderActions = () => {
   if (!user) {
     return (
       <div className="flex items-center space-x-2">
-        <Button asChild variant="outline" size="sm" className="border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange">
+        <Button asChild variant="outline" size="sm" className="border-2 border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange">
           <Link to="/login">Connexion</Link>
         </Button>
         <Button asChild size="sm" className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white">
