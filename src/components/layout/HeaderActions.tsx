@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Settings, ShoppingBag, Package } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+
 const HeaderActions = () => {
   const {
     user,
@@ -12,22 +14,38 @@ const HeaderActions = () => {
     signOut,
     isLoading
   } = useAuth();
+
   if (isLoading) {
-    return <div className="w-[100px] h-[40px] animate-pulse bg-gray-200 rounded " />;
+    return <div className="w-[100px] h-[40px] animate-pulse bg-gray-200 rounded" />;
   }
+
   if (!user) {
-    return <div className="flex items-center space-x-2">
-        <Button asChild variant="outline" size="sm" className="border-2 border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange">
+    return (
+      <div className="flex items-center space-x-2">
+        <Button 
+          asChild 
+          variant="outline" 
+          size="sm" 
+          className="border-2 border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange font-semibold"
+        >
           <Link to="/login">Connexion</Link>
         </Button>
-        <Button asChild size="sm" className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white">
+        <Button 
+          asChild 
+          size="sm" 
+          className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white font-semibold"
+        >
           <Link to="/register">Inscription</Link>
         </Button>
-      </div>;
+      </div>
+    );
   }
+
   const initials = profile ? `${profile.first_name?.charAt(0) || ''}${profile.last_name?.charAt(0) || ''}` : user.email?.substring(0, 2).toUpperCase() || 'U';
   const userDashboardUrl = profile?.role === 'farmer' ? '/farmer' : profile?.role === 'admin' ? '/admin' : '/buyer';
-  return <DropdownMenu>
+
+  return (
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 border">
@@ -76,6 +94,8 @@ const HeaderActions = () => {
           <span>Déconnexion</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>;
+    </DropdownMenu>
+  );
 };
+
 export default HeaderActions;
