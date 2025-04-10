@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,39 +5,29 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Settings, ShoppingBag, Package } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-
 const HeaderActions = () => {
-  const { user, profile, signOut, isLoading } = useAuth();
-
+  const {
+    user,
+    profile,
+    signOut,
+    isLoading
+  } = useAuth();
   if (isLoading) {
-    return <div className="w-[100px] h-[40px] animate-pulse bg-gray-200 rounded" />;
+    return <div className="w-[100px] h-[40px] animate-pulse bg-gray-200 rounded " />;
   }
-
   if (!user) {
-    return (
-      <div className="flex items-center space-x-2">
+    return <div className="flex items-center space-x-2">
         <Button asChild variant="outline" size="sm" className="border-2 border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange">
           <Link to="/login">Connexion</Link>
         </Button>
         <Button asChild size="sm" className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white">
           <Link to="/register">Inscription</Link>
         </Button>
-      </div>
-    );
+      </div>;
   }
-
-  const initials = profile ? 
-    `${profile.first_name?.charAt(0) || ''}${profile.last_name?.charAt(0) || ''}` : 
-    user.email?.substring(0, 2).toUpperCase() || 'U';
-
-  const userDashboardUrl = profile?.role === 'farmer' 
-    ? '/farmer' 
-    : profile?.role === 'admin' 
-      ? '/admin'
-      : '/buyer';
-
-  return (
-    <DropdownMenu>
+  const initials = profile ? `${profile.first_name?.charAt(0) || ''}${profile.last_name?.charAt(0) || ''}` : user.email?.substring(0, 2).toUpperCase() || 'U';
+  const userDashboardUrl = profile?.role === 'farmer' ? '/farmer' : profile?.role === 'admin' ? '/admin' : '/buyer';
+  return <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 border">
@@ -64,22 +53,18 @@ const HeaderActions = () => {
             <span>Tableau de bord</span>
           </Link>
         </DropdownMenuItem>
-        {profile?.role === 'farmer' && (
-          <DropdownMenuItem asChild>
+        {profile?.role === 'farmer' && <DropdownMenuItem asChild>
             <Link to="/farmer/products" className="cursor-pointer">
               <Package className="mr-2 h-4 w-4" />
               <span>Mes produits</span>
             </Link>
-          </DropdownMenuItem>
-        )}
-        {(profile?.role === 'buyer' || !profile?.role) && (
-          <DropdownMenuItem asChild>
+          </DropdownMenuItem>}
+        {(profile?.role === 'buyer' || !profile?.role) && <DropdownMenuItem asChild>
             <Link to="/buyer/orders" className="cursor-pointer">
               <ShoppingBag className="mr-2 h-4 w-4" />
               <span>Mes commandes</span>
             </Link>
-          </DropdownMenuItem>
-        )}
+          </DropdownMenuItem>}
         <DropdownMenuItem asChild>
           <Link to={`${userDashboardUrl}/profile`} className="cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />
@@ -91,8 +76,6 @@ const HeaderActions = () => {
           <span>Déconnexion</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
-  );
+    </DropdownMenu>;
 };
-
 export default HeaderActions;
