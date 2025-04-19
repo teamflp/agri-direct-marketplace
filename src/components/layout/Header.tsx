@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 import HeaderNavigation from './HeaderNavigation';
-import HeaderActions from './HeaderActions';
+import HeaderAuthActions from './HeaderAuthActions';
 import HeaderMobileMenu from './HeaderMobileMenu';
 import MobileBottomNav from './MobileBottomNav';
 import { t } from '@/services/translation';
@@ -72,7 +72,9 @@ const Header = () => {
             <HeaderNavigation links={navLinks} />
             
             {/* Actions à droite - visibles uniquement sur desktop */}
-            <HeaderActions />
+            <div className="flex items-center">
+              <HeaderAuthActions />
+            </div>
             
             {/* Menu hamburger sur mobile */}
             {isMobile && (
