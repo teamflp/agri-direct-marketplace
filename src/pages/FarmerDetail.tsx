@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -18,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-// Données simulées des agriculteurs (à remplacer par une API réelle)
 import { farmersData } from '@/data/farmersData';
 
 const FarmerDetail = () => {
@@ -28,10 +26,8 @@ const FarmerDetail = () => {
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    // Simulation d'un appel API pour récupérer les détails d'un agriculteur
     setIsLoading(true);
     try {
-      // Trouver l'agriculteur par son ID
       const foundFarmer = farmersData.find(f => f.id === Number(id));
       if (foundFarmer) {
         setFarmer(foundFarmer);
@@ -136,17 +132,23 @@ const FarmerDetail = () => {
             
             {/* Actions rapides */}
             <div className="p-6 flex flex-wrap gap-4 border-b">
-              <Button className="bg-agrimarket-orange hover:bg-agrimarket-brown">
-                <ShoppingBag className="mr-2 h-4 w-4" />
-                Voir les produits
+              <Button className="bg-agrimarket-orange hover:bg-agrimarket-brown" asChild>
+                <Link to={`/farmers/${farmer.id}/products`}>
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Voir les produits
+                </Link>
               </Button>
-              <Button variant="outline">
-                <Calendar className="mr-2 h-4 w-4" />
-                Planifier une visite
+              <Button variant="outline" asChild>
+                <Link to={`/farmers/${farmer.id}/visit`}>
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Planifier une visite
+                </Link>
               </Button>
-              <Button variant="outline">
-                <Mail className="mr-2 h-4 w-4" />
-                Contacter
+              <Button variant="outline" asChild>
+                <Link to={`/farmers/${farmer.id}/contact`}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Contacter
+                </Link>
               </Button>
             </div>
           </div>
@@ -304,7 +306,6 @@ const FarmerDetail = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    {/* Affichage d'avis simulés */}
                     {[...Array(3)].map((_, index) => (
                       <div key={index} className="border-b pb-4 last:border-0">
                         <div className="flex justify-between mb-2">

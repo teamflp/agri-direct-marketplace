@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Farmers from './pages/Farmers';
@@ -61,6 +60,10 @@ import TermsOfService from './pages/legal/TermsOfService';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import LegalNotice from './pages/legal/LegalNotice';
 import Cookies from './pages/legal/Cookies';
+
+import FarmerProductsPage from './pages/farmers/FarmerProductsPage';
+import FarmerVisitPage from './pages/farmers/FarmerVisitPage';
+import FarmerContactPage from './pages/farmers/FarmerContactPage';
 
 const App = () => {
   return (
@@ -146,6 +149,10 @@ const App = () => {
                     <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/legal/legal-notice" element={<LegalNotice />} />
                     <Route path="/legal/cookies" element={<Cookies />} />
+                    
+                    <Route path="/farmers/:id/products" element={<FarmerProductsPage />} />
+                    <Route path="/farmers/:id/visit" element={<FarmerVisitPage />} />
+                    <Route path="/farmers/:id/contact" element={<FarmerContactPage />} />
                     
                     <Route path="*" element={<NotFound />} />
                   </Routes>
