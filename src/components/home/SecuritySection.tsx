@@ -62,7 +62,7 @@ const SecuritySection = () => {
                 Payez facilement avec votre compte MTN Mobile Money.
               </p>
               <div className="mt-3">
-                <Badge variant="success" className="text-xs">Vérification instantanée</Badge>
+                <Badge variant="green" className="text-xs">Vérification instantanée</Badge>
               </div>
             </div>
             
@@ -75,7 +75,7 @@ const SecuritySection = () => {
                 Réglez vos achats rapidement avec Orange Money.
               </p>
               <div className="mt-3">
-                <Badge variant="success" className="text-xs">Confirmation rapide</Badge>
+                <Badge variant="green" className="text-xs">Confirmation rapide</Badge>
               </div>
             </div>
             
@@ -88,7 +88,7 @@ const SecuritySection = () => {
                 Effectuez vos paiements via l'application Move.
               </p>
               <div className="mt-3">
-                <Badge variant="success" className="text-xs">Sans frais supplémentaires</Badge>
+                <Badge variant="green" className="text-xs">Sans frais supplémentaires</Badge>
               </div>
             </div>
             
@@ -101,7 +101,7 @@ const SecuritySection = () => {
                 Payez par carte bancaire via notre partenaire Stripe.
               </p>
               <div className="mt-3">
-                <Badge variant="success" className="text-xs">Protection acheteur</Badge>
+                <Badge variant="green" className="text-xs">Protection acheteur</Badge>
               </div>
             </div>
           </div>
