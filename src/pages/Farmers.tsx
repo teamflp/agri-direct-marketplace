@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -22,6 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+
+// Importation du composant ProductFilters et du type ProductFilters pour typage
+import ProductFilters, { ProductFilters as ProductFiltersType } from '@/components/products/ProductFilters';
 
 // Importation des données des agriculteurs
 import { farmersData } from '@/data/farmersData';
@@ -37,20 +42,44 @@ const farmerCategories = [
   "Viticulteurs"
 ];
 
+// Valeurs initiales des filtres avancés
+const defaultFilters: ProductFiltersType = {
+  search: "",
+  priceRange: [0, 50],
+  categories: [],
+  organic: false,
+  localOnly: false,
+  freeDelivery: false,
+  farmPickup: false,
+  distance: 50,
+};
+
 const Farmers = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [distanceFilter, setDistanceFilter] = useState("");
 
+  const [filtersSheetOpen, setFiltersSheetOpen] = useState(false);
+  const [filters, setFilters] = useState<ProductFiltersType>(defaultFilters);
+
   // Fonction pour la navigation vers le profil de l'agriculteur
   const handleProfileClick = (farmerId: number) => {
     navigate(`/farmers/${farmerId}`);
   };
 
+  // Gestion des filtres avancés
+  const handleOpenFilters = () => setFiltersSheetOpen(true);
+  const handleCloseFilters = () => setFiltersSheetOpen(false);
+  const handleFilterChange = (updatedFilters: ProductFiltersType) => {
+    setFilters(updatedFilters);
+    handleCloseFilters();
+  };
+  const handleResetFilters = () => setFilters(defaultFilters);
+
   // Fonction pour l'action "Plus de filtres"
   const handleMoreFilters = () => {
-    alert("Le panneau de filtres avancés s'ouvrira ici (fonctionnalité à implémenter).");
+    handleOpenFilters();
   };
 
   // Gestion de la pagination
@@ -58,6 +87,19 @@ const Farmers = () => {
     // À ajuster si pagination réelle
     alert(`Aller à la page ${pageNumber} (pagination à implémenter)`);
   };
+
+  // Simulation d'un filtrage "search" visuel (pas relié à la vraie liste pour l'instant)
+  // À adapter selon ton backend/API
+  const filteredFarmers = farmersData.filter((farmer) => {
+    // Recherche textuelle
+    const matchesSearch = searchTerm === "" || farmer.name.toLowerCase().includes(searchTerm.toLowerCase());
+    // Catégorie (hors "Tous les agriculteurs")
+    const matchesCategory = !selectedCategory || selectedCategory === "Tous les agriculteurs" || farmer.category === selectedCategory;
+    // Distance (si sélectionnée et != "all")
+    const matchesDistance = !distanceFilter || distanceFilter === "all" || Number(farmer.distance) <= Number(distanceFilter);
+
+    return matchesSearch && matchesCategory && matchesDistance;
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -110,7 +152,7 @@ const Farmers = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Bouton Plus de filtres actif */}
+                {/* Bouton Plus de filtres ACTIF */}
                 <Button 
                   variant="outline" 
                   className="flex items-center gap-2 cursor-pointer hover:bg-agrimarket-lightGreen"
@@ -123,6 +165,32 @@ const Farmers = () => {
               </div>
             </div>
           </div>
+
+          {/* Panneau latéral (Sheet) des Filtres avancés */}
+          <Sheet open={filtersSheetOpen} onOpenChange={setFiltersSheetOpen}>
+            <SheetContent side="right" className="max-w-md w-full p-0">
+              <SheetHeader className="px-6 pt-6">
+                <SheetTitle>Filtres avancés</SheetTitle>
+              </SheetHeader>
+              <div className="p-6 pb-0">
+                <ProductFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onReset={handleResetFilters}
+                  categories={farmerCategories.filter((c) => c !== "Tous les agriculteurs")}
+                  isOpen={true}
+                  onToggle={handleCloseFilters}
+                  activeFiltersCount={Object.values(filters).filter((v) => {
+                    if (Array.isArray(v)) return v.length > 0;
+                    if (typeof v === 'boolean') return v;
+                    if (typeof v === 'number') return v !== 50;
+                    if (typeof v === 'string') return v.length > 0;
+                    return false;
+                  }).length}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
           
           {/* Carte des agriculteurs (à implémenter avec une véritable API de carte) */}
           <div className="bg-white rounded-lg shadow-sm mb-8 p-4">
@@ -133,7 +201,7 @@ const Farmers = () => {
           
           {/* Liste des agriculteurs */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {farmersData.map((farmer) => (
+            {filteredFarmers.map((farmer) => (
               <Card key={farmer.id} className="overflow-hidden hover:shadow-md transition-shadow">
                 <div className="aspect-video relative overflow-hidden">
                   <img 
