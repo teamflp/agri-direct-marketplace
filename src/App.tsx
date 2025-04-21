@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Farmers from './pages/Farmers';
+import FarmerDetail from './pages/FarmerDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -73,6 +74,7 @@ const App = () => {
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/farmers" element={<Farmers />} />
+                    <Route path="/farmers/:id" element={<FarmerDetail />} />
                     <Route path="/farmers-map" element={<FarmersMap />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />

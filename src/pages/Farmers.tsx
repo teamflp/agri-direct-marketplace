@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -23,81 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Exemple de données des agriculteurs
-const farmersData = [
-  {
-    id: 1,
-    name: "Ferme des Quatre Saisons",
-    location: "Abidjan, Côte d'Ivoire",
-    distance: 5.2,
-    image: "https://images.unsplash.com/photo-1592982573131-03044c94cf46",
-    description: "Nous cultivons des fruits et légumes bio depuis plus de 10 ans. Notre spécialité est la culture maraîchère sans pesticides.",
-    rating: 4.8,
-    reviews: 27,
-    products: ["Tomates", "Aubergines", "Poivrons", "Salades"],
-    isCertified: true,
-  },
-  {
-    id: 2,
-    name: "Les Ruches de Marie",
-    location: "Yamoussoukro, Côte d'Ivoire",
-    distance: 12.5,
-    image: "https://images.unsplash.com/photo-1473973266408-ed4e9f2a8d9b",
-    description: "Apicultrice passionnée produisant différentes variétés de miels et produits dérivés des ruches dans le respect des abeilles.",
-    rating: 4.9,
-    reviews: 43,
-    products: ["Miel d'acacia", "Miel de fleurs", "Propolis", "Cire d'abeille"],
-    isCertified: true,
-  },
-  {
-    id: 3,
-    name: "Chèvrerie du Vallon",
-    location: "Bouaké, Côte d'Ivoire",
-    distance: 8.7,
-    image: "https://images.unsplash.com/photo-1528607929406-7f48298301ef",
-    description: "Élevage de chèvres en pâturage libre et fabrication artisanale de fromages frais, affinés et yaourts.",
-    rating: 4.7,
-    reviews: 19,
-    products: ["Fromage frais", "Fromage affiné", "Yaourt", "Lait"],
-    isCertified: false,
-  },
-  {
-    id: 4,
-    name: "Vergers de l'Ouest",
-    location: "Man, Côte d'Ivoire",
-    distance: 15.3,
-    image: "https://images.unsplash.com/photo-1584300492104-1ede11fdb732",
-    description: "Production de fruits tropicaux variés avec des techniques d'agriculture durable et équitable.",
-    rating: 4.5,
-    reviews: 32,
-    products: ["Mangues", "Ananas", "Papayes", "Bananes"],
-    isCertified: true,
-  },
-  {
-    id: 5,
-    name: "Plantation Café Cacao",
-    location: "Daloa, Côte d'Ivoire",
-    distance: 25.1,
-    image: "https://images.unsplash.com/photo-1599930113854-d6d7fd517ba8",
-    description: "Plantation familiale spécialisée dans la culture de café et cacao de qualité supérieure avec des méthodes traditionnelles.",
-    rating: 4.6,
-    reviews: 51,
-    products: ["Fèves de cacao", "Café vert", "Café torréfié", "Chocolat artisanal"],
-    isCertified: true,
-  },
-  {
-    id: 6,
-    name: "Rizières Durables",
-    location: "Korhogo, Côte d'Ivoire",
-    distance: 18.9,
-    image: "https://images.unsplash.com/photo-1455577380025-4321f1e1dca7",
-    description: "Culture de riz selon des méthodes traditionnelles et durables, avec l'utilisation de techniques d'irrigation efficaces.",
-    rating: 4.4,
-    reviews: 15,
-    products: ["Riz blanc", "Riz rouge", "Riz parfumé", "Riz complet"],
-    isCertified: false,
-  },
-];
+// Importation des données des agriculteurs
+import { farmersData } from '@/data/farmersData';
 
 // Catégories de producteurs
 const farmerCategories = [
@@ -111,22 +38,22 @@ const farmerCategories = [
 ];
 
 const Farmers = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [distanceFilter, setDistanceFilter] = useState("");
 
-  // Fonction simulée pour l'action "Voir le profil"
+  // Fonction pour la navigation vers le profil de l'agriculteur
   const handleProfileClick = (farmerId: number) => {
-    // À relier à la navigation réelle selon votre routing
-    window.location.href = `/farmers/${farmerId}`;
+    navigate(`/farmers/${farmerId}`);
   };
 
-  // Fonction simulée pour l'action "Plus de filtres"
+  // Fonction pour l'action "Plus de filtres"
   const handleMoreFilters = () => {
     alert("Le panneau de filtres avancés s'ouvrira ici (fonctionnalité à implémenter).");
   };
 
-  // Gestion de la pagination fictive
+  // Gestion de la pagination
   const goToPage = (pageNumber: number) => {
     // À ajuster si pagination réelle
     alert(`Aller à la page ${pageNumber} (pagination à implémenter)`);
@@ -302,4 +229,3 @@ const Farmers = () => {
 };
 
 export default Farmers;
-
