@@ -115,6 +115,23 @@ const Farmers = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [distanceFilter, setDistanceFilter] = useState("");
 
+  // Fonction simulée pour l'action "Voir le profil"
+  const handleProfileClick = (farmerId: number) => {
+    // À relier à la navigation réelle selon votre routing
+    window.location.href = `/farmers/${farmerId}`;
+  };
+
+  // Fonction simulée pour l'action "Plus de filtres"
+  const handleMoreFilters = () => {
+    alert("Le panneau de filtres avancés s'ouvrira ici (fonctionnalité à implémenter).");
+  };
+
+  // Gestion de la pagination fictive
+  const goToPage = (pageNumber: number) => {
+    // À ajuster si pagination réelle
+    alert(`Aller à la page ${pageNumber} (pagination à implémenter)`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -166,7 +183,13 @@ const Farmers = () => {
                   </SelectContent>
                 </Select>
                 
-                <Button variant="outline" className="flex items-center gap-2">
+                {/* Bouton Plus de filtres actif */}
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2 cursor-pointer hover:bg-agrimarket-lightGreen"
+                  type="button"
+                  onClick={handleMoreFilters}
+                >
                   <Filter className="w-4 h-4" />
                   Plus de filtres
                 </Button>
@@ -231,8 +254,10 @@ const Farmers = () => {
                     </div>
                   </div>
                   
+                  {/* Bouton Voir le profil ACTIF */}
                   <Button 
-                    className="w-full bg-agrimarket-orange hover:bg-orange-600 text-white" 
+                    className="w-full bg-agrimarket-orange hover:bg-agrimarket-brown text-white font-semibold cursor-pointer"
+                    onClick={() => handleProfileClick(farmer.id)}
                   >
                     Voir le profil
                   </Button>
@@ -241,19 +266,29 @@ const Farmers = () => {
             ))}
           </div>
           
-          {/* Pagination */}
+          {/* Pagination active */}
           <div className="mt-8 flex justify-center">
             <div className="flex gap-2">
               <Button variant="outline" disabled>
                 Précédent
               </Button>
-              <Button variant="outline" className="bg-agrimarket-orange text-white border-agrimarket-orange">
+              <Button 
+                variant="outline" 
+                className="bg-agrimarket-orange text-white border-agrimarket-orange"
+                onClick={() => goToPage(1)}
+              >
                 1
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={() => goToPage(2)}
+              >
                 2
               </Button>
-              <Button variant="outline">
+              <Button 
+                variant="outline"
+                onClick={() => goToPage(2)}
+              >
                 Suivant
               </Button>
             </div>
@@ -267,3 +302,4 @@ const Farmers = () => {
 };
 
 export default Farmers;
+
