@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layout/Header';
@@ -93,8 +92,13 @@ const Farmers = () => {
   const filteredFarmers = farmersData.filter((farmer) => {
     // Recherche textuelle
     const matchesSearch = searchTerm === "" || farmer.name.toLowerCase().includes(searchTerm.toLowerCase());
+    
     // Catégorie (hors "Tous les agriculteurs")
-    const matchesCategory = !selectedCategory || selectedCategory === "Tous les agriculteurs" || farmer.category === selectedCategory;
+    // Modifié pour vérifier dans les produits de l'agriculteur au lieu de "category"
+    const matchesCategory = !selectedCategory || 
+                            selectedCategory === "Tous les agriculteurs" || 
+                            farmer.products.some(product => product === selectedCategory);
+    
     // Distance (si sélectionnée et != "all")
     const matchesDistance = !distanceFilter || distanceFilter === "all" || Number(farmer.distance) <= Number(distanceFilter);
 
