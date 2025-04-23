@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Farmers from './pages/Farmers';
@@ -151,6 +152,10 @@ const App = () => {
                       <Route path="/legal/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/legal/legal-notice" element={<LegalNotice />} />
                       <Route path="/legal/cookies" element={<Cookies />} />
+                      
+                      {/* Ajout des routes raccourcies pour faciliter l'accès */}
+                      <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/privacy" element={<PrivacyPolicy />} />
                       
                       <Route path="/farmers/:id/products" element={<FarmerProductsPage />} />
                       <Route path="/farmers/:id/visit" element={<FarmerVisitPage />} />
