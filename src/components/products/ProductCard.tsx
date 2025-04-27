@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +39,7 @@ const ProductCard = ({
   organic = false,
   freeDelivery = false,
   farmPickup = false,
-  className = "" 
+  className = ""
 }: ProductCardProps) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -50,18 +51,6 @@ const ProductCard = ({
       return;
     }
     navigate(`/product/${id}`);
-  };
-  
-  const increaseQuantity = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setQuantity(prev => prev + 1);
-  };
-
-  const decreaseQuantity = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (quantity > 1) {
-      setQuantity(prev => prev - 1);
-    }
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -90,27 +79,27 @@ const ProductCard = ({
       className={`overflow-hidden transition-shadow duration-300 hover:shadow-md cursor-pointer ${className}`}
       onClick={handleCardClick}
     >
-      <div className={`relative ${className.includes("flex") ? "w-1/3" : "aspect-square"}`}>
+      <div className="relative h-48">
         <img 
           src={image} 
           alt={name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute top-2 right-2 flex flex-col gap-1">
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
           {organic && (
-            <Badge variant="secondary" className="bg-green-600 hover:bg-green-700">
+            <Badge className="bg-agrimarket-green text-white hover:bg-agrimarket-darkGreen">
               <Leaf className="h-3 w-3 mr-1" />
               Bio
             </Badge>
           )}
           {freeDelivery && (
-            <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600">
+            <Badge className="bg-blue-500 hover:bg-blue-600 text-white">
               <Truck className="h-3 w-3 mr-1" />
               Livraison
             </Badge>
           )}
           {farmPickup && (
-            <Badge variant="secondary" className="bg-purple-500 hover:bg-purple-600">
+            <Badge className="bg-purple-500 hover:bg-purple-600 text-white">
               <Store className="h-3 w-3 mr-1" />
               À la ferme
             </Badge>
@@ -118,55 +107,59 @@ const ProductCard = ({
         </div>
       </div>
       
-      <CardContent className={`p-4 ${className.includes("flex") ? "w-2/3" : ""}`}>
-        <div className="mb-1 flex items-center justify-between">
-          <div className="flex items-center text-sm text-gray-500">
-            <span className="hover:text-agrimarket-green transition-colors">
+      <CardContent className="p-4">
+        <div className="mb-2">
+          <div className="flex items-center justify-between mb-1">
+            <div className="text-sm text-gray-600 hover:text-agrimarket-green transition-colors flex items-center">
               {farmerName}
-            </span>
-            {distance && (
-              <div className="flex items-center ml-2 text-xs text-agrimarket-green">
-                <MapPin className="w-3 h-3 mr-0.5" />
-                {distance} km
-              </div>
-            )}
+              {distance && (
+                <span className="flex items-center ml-2 text-xs text-agrimarket-green">
+                  <MapPin className="w-3 h-3 mr-0.5" />
+                  {distance} km
+                </span>
+              )}
+            </div>
+            <div className="flex items-center">
+              <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+              <span className="ml-1 text-sm font-medium">{rating}</span>
+              {reviews > 0 && (
+                <span className="text-xs text-gray-500 ml-1">({reviews})</span>
+              )}
+            </div>
           </div>
-          <div className="flex items-center">
-            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-            <span className="ml-1 text-xs font-medium">{rating}</span>
-            {reviews > 0 && (
-              <span className="text-xs text-gray-500 ml-1">({reviews})</span>
-            )}
-          </div>
-        </div>
-        
-        <h3 className="font-medium text-lg mb-2 line-clamp-2 hover:text-agrimarket-green transition-colors">
-          {name}
-        </h3>
-        
-        <div className="flex items-center justify-between mb-4">
-          <div className="font-bold text-lg text-agrimarket-orange">
+          
+          <h3 className="font-medium text-lg mb-2 line-clamp-2 hover:text-agrimarket-green transition-colors">
+            {name}
+          </h3>
+          
+          <div className="text-xl font-bold text-agrimarket-orange mb-4">
             {price.toFixed(2)} €
-            <span className="text-xs text-gray-500 font-normal ml-1">/ {unit}</span>
+            <span className="text-sm text-gray-500 font-normal ml-1">/ {unit}</span>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between border rounded-md p-1">
+        <div className="flex gap-2">
+          <div className="flex items-center border rounded-md">
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
-              onClick={decreaseQuantity}
+              className="h-9 w-9 rounded-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (quantity > 1) setQuantity(prev => prev - 1);
+              }}
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="font-medium text-sm">{quantity}</span>
+            <span className="w-12 text-center font-medium">{quantity}</span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
-              onClick={increaseQuantity}
+              className="h-9 w-9 rounded-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                setQuantity(prev => prev + 1);
+              }}
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -174,9 +167,9 @@ const ProductCard = ({
 
           <Button
             onClick={handleAddToCart}
-            className="w-full bg-agrimarket-green hover:bg-agrimarket-darkGreen"
+            className="flex-1 bg-agrimarket-green hover:bg-agrimarket-darkGreen"
           >
-            Ajouter au panier
+            Ajouter
           </Button>
         </div>
       </CardContent>
