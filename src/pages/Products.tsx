@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -21,12 +20,11 @@ import {
 import ProductFilters, { ProductFilters as FiltersType } from '@/components/products/ProductFilters';
 import ActiveFilters from '@/components/products/ActiveFilters';
 
-// Exemple de données de produits amélioré avec plus d'attributs
 const productsData = [
   {
     id: 1,
     name: "Panier de légumes bio",
-    image: "https://images.unsplash.com/photo-1518495973542-4542c06a5843",
+    image: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=800&h=600&fit=crop",
     price: 24.90,
     unit: "panier",
     rating: 4.8,
@@ -42,7 +40,7 @@ const productsData = [
   {
     id: 2,
     name: "Miel de fleurs sauvages",
-    image: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
+    image: "https://images.unsplash.com/photo-1587049633312-d628ae50a8ae?w=800&h=600&fit=crop",
     price: 8.50,
     unit: "pot 500g",
     rating: 4.9,
@@ -58,7 +56,7 @@ const productsData = [
   {
     id: 3,
     name: "Fromage de chèvre frais",
-    image: "https://images.unsplash.com/photo-1493962853295-0fd70327578a",
+    image: "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=800&h=600&fit=crop",
     price: 4.20,
     unit: "pièce",
     rating: 4.7,
@@ -74,7 +72,7 @@ const productsData = [
   {
     id: 4,
     name: "Œufs fermiers",
-    image: "https://images.unsplash.com/photo-1465379944081-7f47de8d74ac",
+    image: "https://images.unsplash.com/photo-1518492104633-130d0cc84637?w=800&h=600&fit=crop",
     price: 3.60,
     unit: "boîte de 6",
     rating: 4.6,
@@ -90,7 +88,7 @@ const productsData = [
   {
     id: 5,
     name: "Pommes Golden",
-    image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07",
+    image: "https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=800&h=600&fit=crop",
     price: 2.80,
     unit: "kg",
     rating: 4.5,
@@ -106,7 +104,7 @@ const productsData = [
   {
     id: 6,
     name: "Jus de pomme artisanal",
-    image: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
+    image: "https://images.unsplash.com/photo-1576673442511-7e39b6545c87?w=800&h=600&fit=crop",
     price: 3.50,
     unit: "bouteille 1L",
     rating: 4.4,
@@ -122,7 +120,7 @@ const productsData = [
   {
     id: 7,
     name: "Viande de bœuf (assortiment)",
-    image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9",
+    image: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=800&h=600&fit=crop",
     price: 18.90,
     unit: "kg",
     rating: 4.7,
@@ -138,7 +136,7 @@ const productsData = [
   {
     id: 8,
     name: "Pain au levain",
-    image: "https://images.unsplash.com/photo-1509440159596-0249088772ff",
+    image: "https://images.unsplash.com/photo-1555951015-6da899b5c2cd?w=800&h=600&fit=crop",
     price: 4.50,
     unit: "pièce",
     rating: 4.9,
@@ -153,7 +151,6 @@ const productsData = [
   },
 ];
 
-// Catégories de produits
 const categories = [
   "Tous les produits",
   "Fruits & Légumes",
@@ -168,7 +165,6 @@ const categories = [
   "Fromages"
 ];
 
-// Options de tri
 const sortOptions = [
   { label: "Pertinence", value: "relevance" },
   { label: "Prix croissant", value: "price-asc" },
@@ -178,7 +174,6 @@ const sortOptions = [
 ];
 
 const Products = () => {
-  // État des filtres
   const [filters, setFilters] = useState<FiltersType>({
     search: "",
     priceRange: [0, 50],
@@ -190,14 +185,12 @@ const Products = () => {
     distance: 50
   });
   
-  // État des produits filtrés
   const [filteredProducts, setFilteredProducts] = useState(productsData);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState("relevance");
   const [searchInput, setSearchInput] = useState("");
   
-  // Comptage des filtres actifs
   const getActiveFiltersCount = () => {
     let count = 0;
     if (filters.search) count++;
@@ -211,12 +204,10 @@ const Products = () => {
     return count;
   };
 
-  // Mise à jour des filtres
   const updateFilters = (newFilters: FiltersType) => {
     setFilters(newFilters);
   };
   
-  // Suppression d'un filtre spécifique
   const removeFilter = (key: keyof FiltersType, value?: string) => {
     if (key === 'categories' && value) {
       setFilters({
@@ -247,7 +238,6 @@ const Products = () => {
     }
   };
   
-  // Réinitialisation de tous les filtres
   const resetAllFilters = () => {
     setFilters({
       search: "",
@@ -262,7 +252,6 @@ const Products = () => {
     setSearchInput('');
   };
   
-  // Gestion de la recherche
   const handleSearch = () => {
     setFilters({
       ...filters,
@@ -270,16 +259,13 @@ const Products = () => {
     });
   };
 
-  // Ouverture/fermeture du panneau de filtres
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
   };
   
-  // Effet de filtrage et tri des produits
   useEffect(() => {
     let result = [...productsData];
     
-    // Filtrage par recherche
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       result = result.filter(product => 
@@ -288,45 +274,37 @@ const Products = () => {
       );
     }
     
-    // Filtrage par catégories
     if (filters.categories.length > 0) {
       result = result.filter(product => 
         product.categories.some(cat => filters.categories.includes(cat))
       );
     }
     
-    // Filtrage par prix
     result = result.filter(product => 
       product.price >= filters.priceRange[0] && 
       product.price <= filters.priceRange[1]
     );
     
-    // Filtrage bio
     if (filters.organic) {
       result = result.filter(product => product.organic);
     }
     
-    // Filtrage producteurs locaux
     if (filters.localOnly) {
       result = result.filter(product => (product.distance || 0) <= 30);
     }
     
-    // Filtrage par distance
     if (filters.distance < 50) {
       result = result.filter(product => (product.distance || 0) <= filters.distance);
     }
     
-    // Filtrage livraison gratuite
     if (filters.freeDelivery) {
       result = result.filter(product => product.freeDelivery);
     }
     
-    // Filtrage retrait à la ferme
     if (filters.farmPickup) {
       result = result.filter(product => product.farmPickup);
     }
     
-    // Tri des résultats
     switch (sortBy) {
       case 'price-asc':
         result.sort((a, b) => a.price - b.price);
@@ -340,7 +318,6 @@ const Products = () => {
       case 'distance-asc':
         result.sort((a, b) => (a.distance || 100) - (b.distance || 100));
         break;
-      // Par défaut, on garde l'ordre original
     }
     
     setFilteredProducts(result);
@@ -350,14 +327,13 @@ const Products = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-grow pt-16 bg-gray-50"> {/* Pour compenser le header fixe */}
+      <main className="flex-grow pt-16 bg-gray-50">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Catalogue de produits</h1>
             <p className="text-gray-600">Découvrez des produits frais directement des agriculteurs</p>
           </div>
           
-          {/* Barre de recherche et filtres */}
           <div className="bg-white p-4 rounded-lg shadow-sm mb-8">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
@@ -428,7 +404,6 @@ const Products = () => {
           </div>
           
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Filtres latéraux sur grand écran */}
             <div className="lg:w-1/4 hidden lg:block">
               <div className="sticky top-20">
                 <ProductFilters 
@@ -443,9 +418,7 @@ const Products = () => {
               </div>
             </div>
             
-            {/* Contenu principal */}
             <div className="lg:w-3/4">
-              {/* Filtres mobiles */}
               <div className="lg:hidden mb-4">
                 <ProductFilters 
                   filters={filters}
@@ -458,21 +431,18 @@ const Products = () => {
                 />
               </div>
               
-              {/* Filtres actifs */}
               <ActiveFilters 
                 filters={filters} 
                 onRemoveFilter={removeFilter} 
                 onResetAll={resetAllFilters} 
               />
               
-              {/* Résultats de recherche */}
               <div className="mb-4">
                 <p className="text-gray-600">
                   {filteredProducts.length} produit{filteredProducts.length !== 1 ? 's' : ''} trouvé{filteredProducts.length !== 1 ? 's' : ''}
                 </p>
               </div>
               
-              {/* Liste des produits */}
               {filteredProducts.length === 0 ? (
                 <div className="bg-white p-8 rounded-lg shadow-sm text-center">
                   <h3 className="text-lg font-medium mb-2">Aucun produit ne correspond à vos critères</h3>
