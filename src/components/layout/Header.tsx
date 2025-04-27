@@ -8,6 +8,7 @@ import HeaderAuthActions from './HeaderAuthActions';
 import HeaderMobileMenu from './HeaderMobileMenu';
 import MobileBottomNav from './MobileBottomNav';
 import { t } from '@/services/translation';
+import { MiniCart } from '@/components/cart/MiniCart';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -72,7 +73,11 @@ const Header = () => {
             <HeaderNavigation links={navLinks} />
             
             {/* Actions à droite - visibles uniquement sur desktop */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-3">
+              {/* Mini panier */}
+              <MiniCart />
+              
+              {/* Boutons de connexion/inscription */}
               <HeaderAuthActions />
             </div>
             
