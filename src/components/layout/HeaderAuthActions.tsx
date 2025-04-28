@@ -19,17 +19,16 @@ const HeaderAuthActions = () => {
       <div className="flex items-center space-x-2">
         <Button 
           asChild 
-          variant="orange" 
+          variant="outline" 
           size="sm" 
-          className="border-2 border-agrimarket-orange bg-transparent text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange font-semibold"
+          className="border-2 border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange font-semibold"
         >
           <Link to="/login">Connexion</Link>
         </Button>
         <Button 
           asChild 
-          variant="orange"
           size="sm" 
-          className="font-semibold"
+          className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white font-semibold"
         >
           <Link to="/register">Inscription</Link>
         </Button>
