@@ -9,6 +9,9 @@ import HeaderMobileMenu from './HeaderMobileMenu';
 import MobileBottomNav from './MobileBottomNav';
 import { t } from '@/services/translation';
 import { MiniCart } from '@/components/cart/MiniCart';
+import { Tractor } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,6 +19,7 @@ const Header = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const isMobile = useIsMobile();
+  const { profile } = useAuth();
 
   // Navigation links
   const navLinks = [
@@ -51,6 +55,9 @@ const Header = () => {
     setShowCart(!showCart);
   };
 
+  // Determine if the user is a farmer and show the appropriate link
+  const dashboardLink = profile?.role === 'farmer' ? '/farmer' : '/buyer';
+
   return (
     <>
       <header 
@@ -74,6 +81,20 @@ const Header = () => {
             
             {/* Actions à droite - visibles uniquement sur desktop */}
             <div className="flex items-center gap-3">
+              {/* Bouton Espace agriculteur */}
+              {!isMobile && (
+                <Button 
+                  asChild 
+                  variant="outline" 
+                  className="border-2 border-agrimarket-brown text-agrimarket-brown hover:bg-agrimarket-brown/10 flex items-center gap-2"
+                >
+                  <Link to="/farmer">
+                    <Tractor className="h-4 w-4" />
+                    <span>Espace agriculteur</span>
+                  </Link>
+                </Button>
+              )}
+              
               {/* Mini panier */}
               <MiniCart />
               

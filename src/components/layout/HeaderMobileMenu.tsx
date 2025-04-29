@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogIn } from 'lucide-react';
+import { User, LogIn, Tractor } from 'lucide-react';
 import HeaderNavigation from './HeaderNavigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ interface HeaderMobileMenuProps {
 }
 
 const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   
   if (!isOpen) return null;
 
@@ -28,6 +28,15 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
         onClickMobile={onClose}
       />
       <div className="mt-3 px-4 space-y-3">
+        <Link 
+          to="/farmer" 
+          className="bg-white border-2 border-agrimarket-brown text-agrimarket-brown font-semibold hover:bg-agrimarket-brown/10 p-3 rounded-md flex items-center justify-center w-full"
+          onClick={onClose}
+        >
+          <Tractor className="h-5 w-5 mr-2" />
+          Espace agriculteur
+        </Link>
+
         {user ? (
           <>
             <Link 
