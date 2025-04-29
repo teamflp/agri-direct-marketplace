@@ -5,8 +5,15 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Lock, ShoppingBag, Users, Lightbulb, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MemberOnlyAdvice = () => {
+  const { user, profile } = useAuth();
+  
+  // Détermine l'URL de redirection pour le bouton Espace agriculteur
+  const farmerButtonUrl = user ? (profile?.role === 'farmer' ? '/farmer' : '/login') : '/login';
+  const consumerButtonUrl = user ? '/buyer' : '/login';
+  
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -30,7 +37,7 @@ const MemberOnlyAdvice = () => {
             </Alert>
             <div className="flex justify-center mt-6">
               <Button asChild variant="outline" className="border-amber-500 text-amber-600 hover:bg-amber-50">
-                <Link to="/login">Se connecter</Link>
+                <Link to={consumerButtonUrl}>Se connecter</Link>
               </Button>
             </div>
           </CardContent>
@@ -56,7 +63,7 @@ const MemberOnlyAdvice = () => {
             </Alert>
             <div className="flex justify-center mt-6">
               <Button asChild variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                <Link to="/farmer-dashboard">Espace agriculteur</Link>
+                <Link to={farmerButtonUrl}>Espace agriculteur</Link>
               </Button>
             </div>
           </CardContent>
