@@ -9,8 +9,6 @@ import HeaderMobileMenu from './HeaderMobileMenu';
 import MobileBottomNav from './MobileBottomNav';
 import { t } from '@/services/translation';
 import { MiniCart } from '@/components/cart/MiniCart';
-import { Tractor } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
@@ -81,20 +79,6 @@ const Header = () => {
             
             {/* Actions à droite - visibles uniquement sur desktop */}
             <div className="flex items-center gap-3">
-              {/* Bouton Espace agriculteur */}
-              {!isMobile && (
-                <Button 
-                  asChild 
-                  variant="outline" 
-                  className="border-2 border-agrimarket-brown text-agrimarket-brown hover:bg-agrimarket-brown/10 flex items-center gap-2"
-                >
-                  <Link to="/farmer">
-                    <Tractor className="h-4 w-4" />
-                    <span>Espace agriculteur</span>
-                  </Link>
-                </Button>
-              )}
-              
               {/* Mini panier */}
               <MiniCart />
               
