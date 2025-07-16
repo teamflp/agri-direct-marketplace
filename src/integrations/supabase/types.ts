@@ -277,6 +277,41 @@ export type Database = {
           },
         ]
       }
+      cart_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string
+          quantity: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: string
+          quantity?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          quantity?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           id: string
@@ -613,6 +648,53 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_tracking: {
+        Row: {
+          created_at: string | null
+          delivery_person: string | null
+          estimated_delivery: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          order_id: string
+          status: string
+          tracking_number: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_person?: string | null
+          estimated_delivery?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          order_id: string
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_person?: string | null
+          estimated_delivery?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          order_id?: string
+          status?: string
+          tracking_number?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_tracking_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       df_clients: {
         Row: {
           address: string | null
@@ -916,6 +998,247 @@ export type Database = {
           question?: string
         }
         Relationships: []
+      }
+      farmer_analytics: {
+        Row: {
+          avg_order_value: number | null
+          created_at: string | null
+          date: string
+          farmer_id: string
+          id: string
+          new_customers: number | null
+          products_sold: number | null
+          revenue: number | null
+          total_orders: number | null
+          total_sales: number | null
+        }
+        Insert: {
+          avg_order_value?: number | null
+          created_at?: string | null
+          date?: string
+          farmer_id: string
+          id?: string
+          new_customers?: number | null
+          products_sold?: number | null
+          revenue?: number | null
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Update: {
+          avg_order_value?: number | null
+          created_at?: string | null
+          date?: string
+          farmer_id?: string
+          id?: string
+          new_customers?: number | null
+          products_sold?: number | null
+          revenue?: number | null
+          total_orders?: number | null
+          total_sales?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "farmer_analytics_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "farmers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      farmer_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          read: boolean | null
+          recipient_id: string
+          sender_id: string
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          recipient_id: string
+          sender_id: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          recipient_id?: string
+          sender_id?: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      farmer_subscriptions: {
+        Row: {
+          auto_renew: boolean | null
+          billing_cycle: string
+          created_at: string | null
+          end_date: string | null
+          farmer_id: string | null
+          features: Json | null
+          id: string
+          next_billing_date: string | null
+          plan_type: string
+          price: number
+          start_date: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          billing_cycle?: string
+          created_at?: string | null
+          end_date?: string | null
+          farmer_id?: string | null
+          features?: Json | null
+          id?: string
+          next_billing_date?: string | null
+          plan_type?: string
+          price: number
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          auto_renew?: boolean | null
+          billing_cycle?: string
+          created_at?: string | null
+          end_date?: string | null
+          farmer_id?: string | null
+          features?: Json | null
+          id?: string
+          next_billing_date?: string | null
+          plan_type?: string
+          price?: number
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "farmer_subscriptions_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "farmers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      farmers: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          delivery_zones: string[] | null
+          description: string | null
+          distance: number | null
+          farm_name: string | null
+          id: string
+          is_certified: boolean | null
+          latitude: number | null
+          location: string
+          longitude: number | null
+          name: string
+          phone: string | null
+          rating: number | null
+          reviews_count: number | null
+          updated_at: string | null
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          delivery_zones?: string[] | null
+          description?: string | null
+          distance?: number | null
+          farm_name?: string | null
+          id?: string
+          is_certified?: boolean | null
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          updated_at?: string | null
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          delivery_zones?: string[] | null
+          description?: string | null
+          distance?: number | null
+          farm_name?: string | null
+          id?: string
+          is_certified?: boolean | null
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string | null
+          farmer_id: string | null
+          id: string
+          product_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          farmer_id?: string | null
+          id?: string
+          product_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          farmer_id?: string | null
+          id?: string
+          product_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "farmers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       friendships: {
         Row: {
@@ -1611,23 +1934,47 @@ export type Database = {
         Row: {
           buyer_id: string | null
           created_at: string | null
+          delivery_address: string | null
+          delivery_date: string | null
+          delivery_method: string | null
+          farmer_id: string | null
           id: string
+          notes: string | null
+          payment_method: string | null
+          payment_status: string | null
           status: string
           total: number
+          updated_at: string | null
         }
         Insert: {
           buyer_id?: string | null
           created_at?: string | null
+          delivery_address?: string | null
+          delivery_date?: string | null
+          delivery_method?: string | null
+          farmer_id?: string | null
           id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
           status: string
           total: number
+          updated_at?: string | null
         }
         Update: {
           buyer_id?: string | null
           created_at?: string | null
+          delivery_address?: string | null
+          delivery_date?: string | null
+          delivery_method?: string | null
+          farmer_id?: string | null
           id?: string
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
           status?: string
           total?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -1635,6 +1982,13 @@ export type Database = {
             columns: ["buyer_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "farmers"
             referencedColumns: ["id"]
           },
         ]
@@ -2042,34 +2396,70 @@ export type Database = {
       }
       products: {
         Row: {
+          available_from: string | null
+          available_to: string | null
           category_id: string | null
           created_at: string | null
           description: string | null
+          farm_pickup: boolean | null
           farmer_id: string | null
+          free_delivery: boolean | null
           id: string
+          image_url: string | null
+          is_organic: boolean | null
+          is_seasonal: boolean | null
           name: string
           price: number
           quantity: number
+          rating: number | null
+          reviews_count: number | null
+          stock: number | null
+          tags: string[] | null
+          unit: string | null
         }
         Insert: {
+          available_from?: string | null
+          available_to?: string | null
           category_id?: string | null
           created_at?: string | null
           description?: string | null
+          farm_pickup?: boolean | null
           farmer_id?: string | null
+          free_delivery?: boolean | null
           id?: string
+          image_url?: string | null
+          is_organic?: boolean | null
+          is_seasonal?: boolean | null
           name: string
           price: number
           quantity: number
+          rating?: number | null
+          reviews_count?: number | null
+          stock?: number | null
+          tags?: string[] | null
+          unit?: string | null
         }
         Update: {
+          available_from?: string | null
+          available_to?: string | null
           category_id?: string | null
           created_at?: string | null
           description?: string | null
+          farm_pickup?: boolean | null
           farmer_id?: string | null
+          free_delivery?: boolean | null
           id?: string
+          image_url?: string | null
+          is_organic?: boolean | null
+          is_seasonal?: boolean | null
           name?: string
           price?: number
           quantity?: number
+          rating?: number | null
+          reviews_count?: number | null
+          stock?: number | null
+          tags?: string[] | null
+          unit?: string | null
         }
         Relationships: [
           {
@@ -2196,6 +2586,60 @@ export type Database = {
           },
           {
             foreignKeyName: "ratings_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          farmer_id: string | null
+          helpful_count: number | null
+          id: string
+          not_helpful_count: number | null
+          product_id: string | null
+          rating: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          farmer_id?: string | null
+          helpful_count?: number | null
+          id?: string
+          not_helpful_count?: number | null
+          product_id?: string | null
+          rating: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          farmer_id?: string | null
+          helpful_count?: number | null
+          id?: string
+          not_helpful_count?: number | null
+          product_id?: string | null
+          rating?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_farmer_id_fkey"
+            columns: ["farmer_id"]
+            isOneToOne: false
+            referencedRelation: "farmers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
