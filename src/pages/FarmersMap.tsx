@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -254,7 +253,6 @@ const FarmersMap = () => {
                   rating={4.5}
                   reviewsCount={0}
                   isCertified={farmer.isCertified}
-                  onClick={() => handleFarmerSelect(farmer)}
                 />
               ))}
             </div>
