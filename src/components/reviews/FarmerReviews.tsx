@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StarRating } from './StarRating';
 import { ReviewsList } from './ReviewsList';
 import { AddReviewForm } from './AddReviewForm';
-import { adaptLocalReviewToDb } from './ReviewsAdapter';
+import { Review as DbReview } from '@/hooks/useReviews';
 
 interface FarmerReviewsProps {
   farmerId: number;
@@ -25,8 +25,8 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
   const localReviews = getFarmerReviews(farmerId);
   const averageRating = getAverageFarmerRating(farmerId);
 
-  // Convert local reviews to the format expected by ReviewsList
-  const adaptedReviews = localReviews.map(review => ({
+  // Convert local reviews to the format expected by ReviewsList (DbReview format)
+  const adaptedReviews: DbReview[] = localReviews.map(review => ({
     id: review.id.toString(),
     user_id: review.userId.toString(),
     farmer_id: review.farmerId?.toString(),
