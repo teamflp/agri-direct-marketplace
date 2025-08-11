@@ -179,11 +179,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (profileData && !profileError) {
           if (profileData.role === 'farmer') {
-            navigate('/farmer/*');
+            navigate('/farmer');
           } else if (profileData.role === 'admin') {
-            navigate('/admin/*');
+            navigate('/admin');
           } else {
-            navigate('/buyer/*');
+            navigate('/buyer');
           }
         } else {
           navigate('/');

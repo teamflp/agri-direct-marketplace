@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, FileText, Heart, MessageSquare, Users, User, Download, Eye, Search } from 'lucide-react';
+import { Download, Eye, Search } from 'lucide-react';
 import { 
   Table,
   TableBody,
@@ -16,6 +16,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import InvoiceDownloader from '@/components/buyer/InvoiceDownloader';
+import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Mock data for invoices
 const invoices = [
@@ -65,16 +67,15 @@ const BuyerInvoices = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredInvoices, setFilteredInvoices] = useState(invoices);
+  const { user, profile } = useAuth();
   
-  const menuItems = [
-    { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
-    { title: "Mon profil", path: "/buyer-dashboard/profile", icon: <User size={20} /> },
-    { title: "Mes commandes", path: "/buyer-dashboard/orders", icon: <ShoppingCart size={20} /> },
-    { title: "Mes favoris", path: "/buyer-dashboard/favorites", icon: <Heart size={20} /> },
-    { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
-    { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
-  ];
+  const menuItems = getBuyerDashboardMenuItems();
+  
+  const name = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : 'Martin Pasquier';
+    
+  const email = user?.email || 'martin.p@email.com';
   
   const handleDownloadAllInvoices = () => {
     toast({
@@ -110,11 +111,11 @@ const BuyerInvoices = () => {
 
   return (
     <DashboardLayout
-      name="Martin Pasquier"
-      email="martin.p@email.com"
+      name={name}
+      email={email}
       avatar={
         <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
-          MP
+          {profile?.first_name?.charAt(0) || 'M'}{profile?.last_name?.charAt(0) || 'P'}
         </div>
       }
       menuItems={menuItems}

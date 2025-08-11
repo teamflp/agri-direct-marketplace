@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -11,6 +12,7 @@ import { useSocial } from '@/contexts/SocialContext';
 import { useMessages } from '@/contexts/MessageContext';
 import FavoriteFarmerButton from '@/components/social/FavoriteFarmerButton';
 import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 const farmers = [
   {
@@ -88,8 +90,15 @@ const BuyerFarmers = () => {
   const navigate = useNavigate();
   const { isFarmerFavorite, addFavoriteFarmer, removeFavoriteFarmer, favoriteFarmers } = useSocial();
   const { messageState, setActiveConversation } = useMessages();
+  const { user, profile } = useAuth();
   
   const menuItems = getBuyerDashboardMenuItems();
+  
+  const name = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : 'Martin Pasquier';
+    
+  const email = user?.email || 'martin.p@email.com';
   
   const handleFollowFarmer = (farmer) => {
     const isFavorite = isFarmerFavorite(farmer.id);
@@ -122,7 +131,7 @@ const BuyerFarmers = () => {
     if (conversation) {
       // Ouvrir la conversation existante
       setActiveConversation(conversation.id);
-      navigate('/buyer-dashboard/messages');
+      navigate('/buyer/messages');
     } else {
       // Informer l'utilisateur qu'une nouvelle conversation serait créée dans une vraie application
       toast({
@@ -133,12 +142,12 @@ const BuyerFarmers = () => {
       
       // Dans une vraie application, créer une nouvelle conversation puis naviguer
       // Pour cette démo, on navigue simplement vers la messagerie
-      navigate('/buyer-dashboard/messages');
+      navigate('/buyer/messages');
     }
   };
   
   const navigateToFarmerProfile = (farmerId) => {
-    navigate(`/farmers/${farmerId}`);
+    navigate(`/farmer/${farmerId}`);
   };
 
   const renderFarmerCard = (farmer) => (
@@ -163,7 +172,7 @@ const BuyerFarmers = () => {
       <CardContent className="pt-12 pb-4">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
           <div>
-            <Link to={`/farmers/${farmer.id}`} className="hover:underline">
+            <Link to={`/farmer/${farmer.id}`} className="hover:underline">
               <h3 className="font-bold text-lg">{farmer.farm}</h3>
             </Link>
             <p className="text-sm text-gray-600">{farmer.name}</p>
@@ -205,11 +214,11 @@ const BuyerFarmers = () => {
 
   return (
     <DashboardLayout
-      name="Martin Pasquier"
-      email="martin.p@email.com"
+      name={name}
+      email={email}
       avatar={
         <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
-          MP
+          {profile?.first_name?.charAt(0) || 'M'}{profile?.last_name?.charAt(0) || 'P'}
         </div>
       }
       menuItems={menuItems}

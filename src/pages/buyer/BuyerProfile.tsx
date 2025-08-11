@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { User, Mail, MapPin, Phone, CreditCard, Lock, Bell, Settings, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BuyerProfile = () => {
   const { toast } = useToast();
@@ -18,6 +19,15 @@ const BuyerProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, profile } = useAuth();
+
+  const dashboardMenuItems = getBuyerDashboardMenuItems();
+  
+  const name = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : 'Jean Dupont';
+    
+  const email = user?.email || 'jean.dupont@example.com';
 
   const handleSaveProfile = () => {
     setIsEditing(false);
@@ -55,50 +65,14 @@ const BuyerProfile = () => {
     }
   };
 
-  const dashboardMenuItems = [
-    {
-      title: "Tableau de bord",
-      path: "/buyer-dashboard",
-      icon: <User className="h-5 w-5" />,
-    },
-    {
-      title: "Mon profil",
-      path: "/buyer-dashboard/profile",
-      icon: <Settings className="h-5 w-5" />,
-    },
-    {
-      title: "Mes commandes",
-      path: "/buyer-dashboard/orders",
-      icon: <CreditCard className="h-5 w-5" />,
-    },
-    {
-      title: "Mes favoris",
-      path: "/buyer-dashboard/favorites",
-      icon: <Bell className="h-5 w-5" />,
-    },
-    {
-      title: "Ma messagerie",
-      path: "/buyer-dashboard/messages",
-      icon: <Mail className="h-5 w-5" />,
-    },
-    {
-      title: "Mes agriculteurs",
-      path: "/buyer-dashboard/farmers",
-      icon: <User className="h-5 w-5" />,
-    },
-    {
-      title: "Mes factures",
-      path: "/buyer-dashboard/invoices",
-      icon: <CreditCard className="h-5 w-5" />,
-    },
-  ];
-
   return (
     <DashboardLayout
-      name="Jean Dupont"
-      email="jean.dupont@example.com"
+      name={name}
+      email={email}
       avatar={
-        <AvatarFallback>JD</AvatarFallback>
+        <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
+          {profile?.first_name?.charAt(0) || 'J'}{profile?.last_name?.charAt(0) || 'D'}
+        </div>
       }
       menuItems={dashboardMenuItems}
     >

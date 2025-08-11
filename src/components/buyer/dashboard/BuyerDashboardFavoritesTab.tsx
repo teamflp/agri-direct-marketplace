@@ -73,7 +73,7 @@ const BuyerDashboardFavoritesTab = () => {
       </CardContent>
       <CardFooter className="justify-center">
         <Button variant="outline" asChild>
-          <Link to="/buyer-dashboard/favorites">
+          <Link to="/buyer/favorites">
             Voir tous les favoris
           </Link>
         </Button>

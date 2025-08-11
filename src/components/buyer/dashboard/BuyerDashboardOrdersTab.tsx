@@ -73,7 +73,7 @@ const BuyerDashboardOrdersTab = () => {
                       className="text-agrimarket-orange border-agrimarket-orange hover:bg-agrimarket-orange hover:text-white"
                       asChild
                     >
-                      <Link to={`/buyer-dashboard/orders`}>
+                      <Link to={`/buyer/orders`}>
                         Détails
                       </Link>
                     </Button>
@@ -86,7 +86,7 @@ const BuyerDashboardOrdersTab = () => {
       </CardContent>
       <CardFooter className="justify-center">
         <Button variant="outline" asChild>
-          <Link to="/buyer-dashboard/orders">
+          <Link to="/buyer/orders">
             Voir toutes les commandes
           </Link>
         </Button>

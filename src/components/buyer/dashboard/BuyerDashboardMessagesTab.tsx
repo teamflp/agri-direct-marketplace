@@ -48,7 +48,7 @@ const BuyerDashboardMessagesTab = () => {
                     <p className="mt-2">{message.lastMessage}</p>
                   </div>
                   <Button className="bg-agrimarket-orange hover:bg-orange-600" asChild>
-                    <Link to="/buyer-dashboard/messages">
+                    <Link to="/buyer/messages">
                       Répondre
                     </Link>
                   </Button>
@@ -60,7 +60,7 @@ const BuyerDashboardMessagesTab = () => {
       </CardContent>
       <CardFooter className="justify-center">
         <Button variant="outline" asChild>
-          <Link to="/buyer-dashboard/messages">
+          <Link to="/buyer/messages">
             Voir tous les messages
           </Link>
         </Button>

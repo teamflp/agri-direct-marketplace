@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,18 +12,26 @@ import { useMessages } from '@/contexts/MessageContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 const BuyerMessages = () => {
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
   const { messageState, setActiveConversation, sendMessage } = useMessages();
   const { conversations, activeConversationId } = messageState;
+  const { user, profile } = useAuth();
   
   const selectedConversation = activeConversationId 
     ? conversations.find(c => c.id === activeConversationId) 
     : null;
   
   const menuItems = getBuyerDashboardMenuItems();
+  
+  const name = profile?.first_name && profile?.last_name 
+    ? `${profile.first_name} ${profile.last_name}` 
+    : 'Martin Pasquier';
+    
+  const email = user?.email || 'martin.p@email.com';
   
   const formatMessageDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -60,11 +69,11 @@ const BuyerMessages = () => {
 
   return (
     <DashboardLayout
-      name="Martin Pasquier"
-      email="martin.p@email.com"
+      name={name}
+      email={email}
       avatar={
         <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
-          MP
+          {profile?.first_name?.charAt(0) || 'M'}{profile?.last_name?.charAt(0) || 'P'}
         </div>
       }
       menuItems={menuItems}

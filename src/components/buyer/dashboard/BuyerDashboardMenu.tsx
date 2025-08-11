@@ -2,7 +2,7 @@
 import { Heart, User, ShoppingCart, MessageSquare, Users, FileText, CreditCard, Home } from 'lucide-react';
 
 export const getBuyerDashboardMenuItems = () => [
-  { title: "Tableau de bord", path: "/buyer/dashboard", icon: <Home size={20} /> },
+  { title: "Tableau de bord", path: "/buyer", icon: <Home size={20} /> },
   { title: "Mes commandes", path: "/buyer/orders", icon: <ShoppingCart size={20} /> },
   { title: "Mes favoris", path: "/buyer/favorites", icon: <Heart size={20} /> },
   { title: "Messagerie", path: "/buyer/messages", icon: <MessageSquare size={20} /> },
