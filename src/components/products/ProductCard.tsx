@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, MapPin, Truck, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { AddToCartButton } from './AddToCartButton';
-import { ProductSocialActions } from './ProductSocialActions';
+import AddToCartButton from './AddToCartButton';
+import ProductSocialActions from './ProductSocialActions';
 import { ReviewSummary } from '@/components/reviews/ReviewSummary';
 import { useUnifiedReviews } from '@/hooks/useUnifiedReviews';
 
@@ -54,8 +54,14 @@ const ProductCard = ({
             />
           </Link>
           <ProductSocialActions 
-            productId={id} 
-            farmerId={farmerId}
+            productId={parseInt(id)}
+            productName={name}
+            productImage={image}
+            farmerId={parseInt(farmerId)}
+            farmerName={farmerName}
+            farmName={`Ferme de ${farmerName}`}
+            farmerProductCount={5}
+            farmerRating={4.5}
             className="absolute top-2 right-2"
           />
           {organic && (
@@ -118,7 +124,13 @@ const ProductCard = ({
 
       <CardFooter className="p-4 pt-0">
         <AddToCartButton 
-          productId={id}
+          productId={parseInt(id)}
+          productName={name}
+          productPrice={price}
+          productImage={image}
+          productUnit={unit}
+          farmerName={farmerName}
+          farmerId={parseInt(farmerId)}
           className="w-full"
         />
       </CardFooter>

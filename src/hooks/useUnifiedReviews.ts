@@ -49,7 +49,26 @@ export const useUnifiedReviews = () => {
       const { data, error } = await query;
       
       if (error) throw error;
-      setReviews(data || []);
+      
+      // Transform the data to match our interface
+      const transformedData: UnifiedReview[] = (data || []).map((item: any) => ({
+        id: item.id,
+        user_id: item.user_id,
+        product_id: item.product_id,
+        farmer_id: item.farmer_id,
+        rating: item.rating,
+        comment: item.comment,
+        helpful_count: item.helpful_count || 0,
+        not_helpful_count: item.not_helpful_count || 0,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        user: item.user ? {
+          id: item.user.id,
+          email: item.user.email
+        } : undefined
+      }));
+      
+      setReviews(transformedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
       console.error('Error fetching reviews:', err);
@@ -88,15 +107,32 @@ export const useUnifiedReviews = () => {
       
       if (error) throw error;
       
-      // Add to local state
-      setReviews(prev => [data, ...prev]);
+      // Transform and add to local state
+      const transformedReview: UnifiedReview = {
+        id: data.id,
+        user_id: data.user_id,
+        product_id: data.product_id,
+        farmer_id: data.farmer_id,
+        rating: data.rating,
+        comment: data.comment,
+        helpful_count: data.helpful_count || 0,
+        not_helpful_count: data.not_helpful_count || 0,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        user: data.user ? {
+          id: data.user.id,
+          email: data.user.email
+        } : undefined
+      };
+      
+      setReviews(prev => [transformedReview, ...prev]);
       
       toast({
         title: "Avis ajouté",
         description: "Merci d'avoir partagé votre avis!",
       });
       
-      return data;
+      return transformedReview;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la création';
       setError(errorMessage);
