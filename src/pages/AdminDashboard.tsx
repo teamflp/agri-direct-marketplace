@@ -1,140 +1,155 @@
 
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-
-// Import the components
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import React from 'react';
+import DashboardLayout from '@/components/layout/DashboardLayout';
+import { adminMenuItems } from '@/components/layout/dashboardNavigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import StatCard from '@/components/dashboard/StatCard';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { Users, ShieldAlert, DollarSign, TrendingUp, UserPlus, FileText } from 'lucide-react';
 import AdminStatisticsCards from '@/components/admin/AdminStatisticsCards';
-import AdminUsersTab from '@/components/admin/AdminUsersTab';
-import AdminFarmersTab from '@/components/admin/AdminFarmersTab';
-import AdminMessagesTab from '@/components/admin/AdminMessagesTab';
-import AdminDisputesTab from '@/components/admin/AdminDisputesTab';
-import AdminSubscriptionsTab from '@/components/admin/AdminSubscriptionsTab';
-import AdminResourcesTab from '@/components/admin/AdminResourcesTab';
-
-// Import the statistics data
 import { adminStatistics } from '@/components/admin/data/adminData';
 
 const AdminDashboard = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const path = location.pathname;
-  
-  // Determine active tab based on URL path
-  const getActiveTab = () => {
-    if (path.includes('/admin/farmers')) return 'farmers';
-    if (path.includes('/admin/messages')) return 'messages';
-    if (path.includes('/admin/disputes')) return 'disputes';
-    if (path.includes('/admin/subscriptions')) return 'subscriptions';
-    if (path.includes('/admin/resources')) return 'resources';
-    if (path.includes('/admin/users')) return 'users';
-    if (path === '/admin') return 'dashboard';
-    return 'dashboard'; // Default tab
-  };
-  
-  const [activeTab, setActiveTab] = useState(getActiveTab());
-  
-  // Update active tab when URL changes
-  useEffect(() => {
-    setActiveTab(getActiveTab());
-  }, [path]);
-  
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    if (value === 'dashboard') {
-      navigate('/admin');
-    } else {
-      navigate(`/admin/${value}`);
+  const stats = [
+    {
+      title: "Nouvelles inscriptions",
+      value: "47",
+      description: "Cette semaine",
+      icon: UserPlus,
+      trend: { value: 12, isPositive: true, label: "vs semaine dernière" }
+    },
+    {
+      title: "Litiges en attente",
+      value: "3",
+      description: "Nécessitent une attention",
+      icon: ShieldAlert,
+      variant: 'warning' as const
+    },
+    {
+      title: "Revenus mensuels",
+      value: "€15,420",
+      description: "Commissions et abonnements",
+      icon: DollarSign,
+      trend: { value: 8, isPositive: true, label: "vs mois dernier" }
+    },
+    {
+      title: "Taux de croissance",
+      value: "23%",
+      description: "Nouveaux utilisateurs actifs",
+      icon: TrendingUp,
+      variant: 'success' as const
     }
+  ];
+
+  const handleExportData = () => {
+    console.log('Export des données...');
   };
-  
+
+  const handleGenerateReport = () => {
+    console.log('Génération du rapport...');
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main className="flex-grow pt-16 bg-gray-50 pb-10">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Sidebar */}
-            <div className="w-full md:w-1/4">
-              <AdminSidebar />
-            </div>
-            
-            {/* Main content */}
-            <div className="w-full md:w-3/4">
-              <h1 className="text-3xl font-bold mb-6">Tableau de bord admin</h1>
-              
-              {/* Statistics Cards */}
-              <AdminStatisticsCards statistics={adminStatistics} />
-              
-              <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange} className="mb-8">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                  <TabsTrigger value="users">Utilisateurs</TabsTrigger>
-                  <TabsTrigger value="farmers">Agriculteurs</TabsTrigger>
-                  <TabsTrigger value="messages">Messages</TabsTrigger>
-                  <TabsTrigger value="disputes">Litiges</TabsTrigger>
-                  <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
-                  <TabsTrigger value="resources">Ressources</TabsTrigger>
-                </TabsList>
-                
-                {/* Dashboard Tab (This is new to show the dashboard view) */}
-                <TabsContent value="dashboard">
-                  <Card>
-                    <div className="p-6">
-                      <h2 className="text-xl font-semibold mb-4">Bienvenue dans votre tableau de bord administrateur</h2>
-                      <p className="text-gray-600 mb-4">
-                        Ici, vous pouvez gérer tous les aspects de la plateforme AgriMarket. 
-                        Utilisez les onglets ci-dessus ou le menu latéral pour naviguer entre les différentes sections.
-                      </p>
-                      <p className="text-gray-600">
-                        Consultez les statistiques en haut pour avoir un aperçu rapide de l'état de la plateforme.
-                      </p>
-                    </div>
-                  </Card>
-                </TabsContent>
-                
-                {/* Users Tab */}
-                <TabsContent value="users">
-                  <AdminUsersTab />
-                </TabsContent>
-                
-                {/* Farmers Tab */}
-                <TabsContent value="farmers">
-                  <AdminFarmersTab />
-                </TabsContent>
-                
-                {/* Messages Tab */}
-                <TabsContent value="messages">
-                  <AdminMessagesTab />
-                </TabsContent>
-                
-                {/* Disputes Tab */}
-                <TabsContent value="disputes">
-                  <AdminDisputesTab />
-                </TabsContent>
-                
-                {/* Subscriptions Tab */}
-                <TabsContent value="subscriptions">
-                  <AdminSubscriptionsTab />
-                </TabsContent>
-                
-                {/* Resources Tab */}
-                <TabsContent value="resources">
-                  <AdminResourcesTab />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
+    <DashboardLayout
+      name="Admin AgriMarket"
+      email="admin@agrimarket.com"
+      avatar={
+        <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
+          AM
         </div>
-      </main>
-      
-      <Footer />
-    </div>
+      }
+      menuItems={adminMenuItems}
+    >
+      <div className="space-y-8">
+        <DashboardHeader
+          title="Tableau de bord administrateur"
+          subtitle="Vue d'ensemble de la plateforme AgriMarket"
+          userName="Admin"
+          actions={[
+            {
+              label: "Exporter les données",
+              onClick: handleExportData,
+              icon: <FileText className="h-4 w-4" />,
+              variant: 'outline'
+            },
+            {
+              label: "Générer un rapport",
+              onClick: handleGenerateReport,
+              icon: <TrendingUp className="h-4 w-4" />,
+              variant: 'default'
+            }
+          ]}
+        />
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => (
+            <StatCard key={index} {...stat} />
+          ))}
+        </div>
+
+        {/* Original Statistics Cards */}
+        <AdminStatisticsCards statistics={adminStatistics} />
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Activités récentes</CardTitle>
+              <CardDescription>Dernières actions sur la plateforme</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Users className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium">Nouvel agriculteur inscrit</p>
+                    <p className="text-sm text-gray-600">Ferme du Soleil - il y a 2h</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <ShieldAlert className="h-5 w-5 text-yellow-600" />
+                  <div>
+                    <p className="font-medium">Nouveau litige signalé</p>
+                    <p className="text-sm text-gray-600">Commande #CMD-2024-001 - il y a 4h</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <div>
+                    <p className="font-medium">Paiement reçu</p>
+                    <p className="text-sm text-gray-600">Abonnement Premium - il y a 6h</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Actions rapides</CardTitle>
+              <CardDescription>Tâches administratives courantes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <button className="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                  <div className="font-medium text-blue-900">Modérer les nouveaux produits</div>
+                  <div className="text-sm text-blue-700">12 produits en attente</div>
+                </button>
+                <button className="w-full p-3 text-left bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors">
+                  <div className="font-medium text-yellow-900">Traiter les litiges</div>
+                  <div className="text-sm text-yellow-700">3 litiges à résoudre</div>
+                </button>
+                <button className="w-full p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                  <div className="font-medium text-green-900">Approuver les agriculteurs</div>
+                  <div className="text-sm text-green-700">5 demandes en cours</div>
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
