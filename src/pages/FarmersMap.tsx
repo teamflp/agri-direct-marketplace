@@ -246,14 +246,14 @@ const FarmersMap = () => {
               {mockFarmers.map((farmer) => (
                 <FarmerCard
                   key={farmer.id}
-                  id={farmer.id}
+                  id={farmer.id.toString()}
                   name={farmer.name}
-                  image={farmer.image}
+                  farmName={farmer.farmName}
                   location={farmer.location.lat.toFixed(4) + ', ' + farmer.location.lng.toFixed(4)}
                   distance={farmer.distance}
                   rating={4.5}
-                  productsCount={farmer.products.length}
-                  specialties={farmer.categories}
+                  reviewsCount={0}
+                  isCertified={farmer.isCertified}
                   onClick={() => handleFarmerSelect(farmer)}
                 />
               ))}
