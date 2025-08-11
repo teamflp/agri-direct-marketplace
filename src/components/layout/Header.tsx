@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -11,6 +10,7 @@ import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { t } from '@/services/translation';
 import { MiniCart } from '@/components/cart/MiniCart';
 import { useAuth } from '@/contexts/AuthContext';
+import { navigationLinks } from './navLinks';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,15 +20,11 @@ const Header = () => {
   const isMobile = useIsMobile();
   const { profile } = useAuth();
 
-  // Navigation links
-  const navLinks = [
-    { path: '/', label: t('header.home') },
-    { path: '/products', label: t('header.products') },
-    { path: '/farmers', label: t('header.farmers') },
-    { path: '/seasonal-calendar', label: t('header.seasonal') },
-    { path: '/subscriptions', label: t('header.subscriptions') },
-    { path: '/contact', label: t('header.contact') },
-  ];
+  // Navigation links with translated labels
+  const navLinks = navigationLinks.map(link => ({
+    path: link.path,
+    label: t(link.translationKey)
+  }));
 
   // Détection du défilement pour appliquer les effets visuels
   useEffect(() => {
