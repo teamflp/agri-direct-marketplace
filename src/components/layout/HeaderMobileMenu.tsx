@@ -40,10 +40,15 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
               to="/buyer/profile" 
               className={getProfileLinkClassName}
               onClick={onClose}
-              aria-current={({ isActive }) => isActive ? 'page' : undefined}
             >
-              <User className="h-5 w-5 mr-2" />
-              Mon profil
+              {({ isActive }) => (
+                <>
+                  <User className="h-5 w-5 mr-2" />
+                  <span aria-current={isActive ? 'page' : undefined}>
+                    Mon profil
+                  </span>
+                </>
+              )}
             </NavLink>
             <Button 
               variant="ghost"
@@ -69,10 +74,15 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
                 }`
               }
               onClick={onClose}
-              aria-current={({ isActive }) => isActive ? 'page' : undefined}
             >
-              <LogIn className="h-5 w-5 mr-2" />
-              Connexion
+              {({ isActive }) => (
+                <>
+                  <LogIn className="h-5 w-5 mr-2" />
+                  <span aria-current={isActive ? 'page' : undefined}>
+                    Connexion
+                  </span>
+                </>
+              )}
             </NavLink>
             <NavLink 
               to="/register" 
@@ -84,10 +94,15 @@ const HeaderMobileMenu = ({ isOpen, links, onClose }: HeaderMobileMenuProps) => 
                 }`
               }
               onClick={onClose}
-              aria-current={({ isActive }) => isActive ? 'page' : undefined}
             >
-              <User className="h-5 w-5 mr-2" />
-              Inscription
+              {({ isActive }) => (
+                <>
+                  <User className="h-5 w-5 mr-2" />
+                  <span aria-current={isActive ? 'page' : undefined}>
+                    Inscription
+                  </span>
+                </>
+              )}
             </NavLink>
           </div>
         )}

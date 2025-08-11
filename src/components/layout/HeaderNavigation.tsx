@@ -28,9 +28,12 @@ const HeaderNavigation = ({ links, isMobile = false, onClickMobile }: HeaderNavi
             end={link.path === '/'}
             className={getNavLinkClassName}
             onClick={onClickMobile}
-            aria-current={({ isActive }) => isActive ? 'page' : undefined}
           >
-            {link.label}
+            {({ isActive }) => (
+              <span aria-current={isActive ? 'page' : undefined}>
+                {link.label}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -45,9 +48,12 @@ const HeaderNavigation = ({ links, isMobile = false, onClickMobile }: HeaderNavi
           to={link.path} 
           end={link.path === '/'}
           className={getNavLinkClassName}
-          aria-current={({ isActive }) => isActive ? 'page' : undefined}
         >
-          {link.label}
+          {({ isActive }) => (
+            <span aria-current={isActive ? 'page' : undefined}>
+              {link.label}
+            </span>
+          )}
         </NavLink>
       ))}
     </nav>
