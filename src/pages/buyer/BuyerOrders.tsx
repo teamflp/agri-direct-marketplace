@@ -7,9 +7,13 @@ import { useOrders } from '@/hooks/useOrders';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Eye, Package, Truck, CheckCircle } from 'lucide-react';
+import BuyerOrderDetailsDialog from '@/components/orders/BuyerOrderDetailsDialog';
 
 const BuyerOrders = () => {
   const { orders, loading } = useOrders();
+
+  const [detailsOpen, setDetailsOpen] = React.useState(false);
+  const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -120,7 +124,7 @@ const BuyerOrders = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-gray-600">Total</p>
-                    <p className="font-semibold">{order.total.toFixed(2)} €</p>
+                    <p className="font-semibold">{order.total.toFixed ? order.total.toFixed(2) : order.total} €</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Articles</p>
@@ -152,7 +156,7 @@ const BuyerOrders = () => {
                         <div key={item.id} className="flex justify-between items-center text-sm">
                           <span>{item.product?.name} x{item.quantity}</span>
                           <span className="font-medium">
-                            {(item.unit_price * item.quantity).toFixed(2)} €
+                            {((item.unit_price || 0) * item.quantity).toFixed(2)} €
                           </span>
                         </div>
                       ))}
@@ -173,7 +177,14 @@ const BuyerOrders = () => {
                       </p>
                     )}
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedOrderId(order.id);
+                      setDetailsOpen(true);
+                    }}
+                  >
                     <Eye className="h-4 w-4 mr-2" />
                     Voir détails
                   </Button>
@@ -183,6 +194,14 @@ const BuyerOrders = () => {
           ))}
         </div>
       )}
+
+      <BuyerOrderDetailsDialog
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        orderId={selectedOrderId}
+        orderNumber={selectedOrderId ? selectedOrderId.slice(0, 8) : undefined}
+        currentStatus={orders.find(o => o.id === selectedOrderId)?.status}
+      />
     </div>
   );
 };

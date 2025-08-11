@@ -38,6 +38,17 @@ export interface OrderItem {
   };
 }
 
+// New: type for status history entries
+export interface OrderStatusHistory {
+  id: string;
+  order_id: string;
+  old_status: string | null;
+  new_status: string;
+  changed_by: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
 export const useOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +167,7 @@ export const useOrders = () => {
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.unit_price
+        // NOTE: We intentionally avoid inserting total_price to stay compatible with existing schema
       }));
 
       const { error: itemsError } = await supabase
@@ -171,21 +183,26 @@ export const useOrders = () => {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, status: string) => {
-    try {
-      const { data, error } = await supabase
+  // Updated: use Supabase RPC to update status and log history
+  const updateOrderStatus = async (orderId: string, status: string, notes?: string) => {
+    // Prefer RPC to ensure status history is recorded server-side
+    const { data, error } = await supabase.rpc('update_order_status', {
+      order_id: orderId,
+      new_status: status,
+      notes: notes ?? null
+    });
+    if (error) {
+      // Fallback: direct update if RPC unavailable
+      const { error: directError } = await supabase
         .from('orders')
         .update({ status })
-        .eq('id', orderId)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      await fetchOrders();
-      return data;
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erreur lors de la mise à jour');
+        .eq('id', orderId);
+      if (directError) {
+        throw directError;
+      }
     }
+    await fetchOrders();
+    return true;
   };
 
   const updatePaymentStatus = async (orderId: string, paymentStatus: string) => {
@@ -205,6 +222,17 @@ export const useOrders = () => {
     }
   };
 
+  // New: fetch status history for an order (timeline)
+  const getOrderStatusHistory = async (orderId: string) => {
+    const { data, error } = await supabase
+      .from('order_status_history')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    return (data || []) as OrderStatusHistory[];
+  };
+
   useEffect(() => {
     fetchOrders();
   }, [user]);
@@ -217,6 +245,7 @@ export const useOrders = () => {
     getOrderById,
     createOrder,
     updateOrderStatus,
-    updatePaymentStatus
+    updatePaymentStatus,
+    getOrderStatusHistory, // expose new method
   };
 };
