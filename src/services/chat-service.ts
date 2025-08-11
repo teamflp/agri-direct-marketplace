@@ -106,10 +106,7 @@ class ChatService {
 
     // Validation
     this.validateMessage(latestMessage.content);
-    const conversationHistory = messages.slice(0, -1).map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
+    const conversationHistory = messages.slice(0, -1); // Keep full ChatMessage objects
     this.validateConversationHistory(conversationHistory);
 
     let lastError: any;
@@ -126,10 +123,14 @@ class ChatService {
           historyLength: conversationHistory.length
         });
 
+        // Send simplified format to Edge Function (role/content only)
         const { data, error } = await supabase.functions.invoke('agrimarket-chat', {
           body: { 
             message: latestMessage.content,
-            conversation_history: conversationHistory 
+            conversation_history: conversationHistory.map(msg => ({
+              role: msg.role,
+              content: msg.content
+            }))
           }
         });
 
