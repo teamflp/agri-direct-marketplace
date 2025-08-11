@@ -1,79 +1,100 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Star } from 'lucide-react';
+import { ReviewSummary } from '@/components/reviews/ReviewSummary';
+import { useUnifiedReviews } from '@/hooks/useUnifiedReviews';
+import { MapPin, Phone, Award, MessageCircle } from 'lucide-react';
 
 interface FarmerCardProps {
-  id: number;
+  id: string;
   name: string;
-  image: string;
+  farmName?: string;
   location: string;
-  distance: number;
+  distance?: number;
+  phone?: string;
+  description?: string;
+  isCertified: boolean;
   rating: number;
-  productsCount: number;
-  specialties: string[];
-  onClick: () => void;
+  reviewsCount: number;
 }
 
-const FarmerCard = ({
+const FarmerCard: React.FC<FarmerCardProps> = ({
   id,
   name,
-  image,
+  farmName,
   location,
   distance,
+  phone,
+  description,
+  isCertified,
   rating,
-  productsCount,
-  specialties,
-  onClick
-}: FarmerCardProps) => {
+  reviewsCount
+}) => {
+  const { getFarmerReviews } = useUnifiedReviews();
+  const farmerReviews = getFarmerReviews(id);
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={onClick}>
-      <div className="aspect-video relative overflow-hidden">
-        <img 
-          src={image} 
-          alt={name} 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-          <h3 className="font-bold text-lg text-white">{name}</h3>
+    <Card className="h-full hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-agrimarket-green rounded-full flex items-center justify-center text-white font-bold">
+              {name.charAt(0)}
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">{name}</h3>
+              {farmName && (
+                <p className="text-sm text-gray-600">{farmName}</p>
+              )}
+            </div>
+          </div>
+          {isCertified && (
+            <Badge className="bg-green-100 text-green-800">
+              <Award className="h-3 w-3 mr-1" />
+              Bio
+            </Badge>
+          )}
         </div>
-      </div>
+        
+        <ReviewSummary reviews={farmerReviews} size="sm" />
+      </CardHeader>
       
-      <CardContent className="p-4">
-        <div className="flex justify-between items-center mb-3">
-          <div className="flex items-center text-gray-500 text-sm">
-            <MapPin className="w-4 h-4 mr-1" />
-            <span>{distance} km</span>
-          </div>
-          <div className="flex items-center">
-            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-            <span className="ml-1 text-sm font-medium">{rating}</span>
-          </div>
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <MapPin className="h-4 w-4" />
+          <span>{location}</span>
+          {distance && (
+            <span className="ml-auto">({distance} km)</span>
+          )}
         </div>
         
-        <p className="text-gray-600 text-sm mb-3">
-          {productsCount} produits disponibles
-        </p>
-        
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-1">
-            {specialties.map((specialty, index) => (
-              <span 
-                key={index} 
-                className="text-xs bg-agrimarket-lightGreen text-agrimarket-green rounded-full px-2 py-1"
-              >
-                {specialty}
-              </span>
-            ))}
+        {phone && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Phone className="h-4 w-4" />
+            <span>{phone}</span>
           </div>
-        </div>
+        )}
         
-        <Button 
-          className="w-full bg-agrimarket-orange hover:bg-orange-600 text-white"
-        >
-          Voir le profil
-        </Button>
+        {description && (
+          <p className="text-sm text-gray-700 line-clamp-3">
+            {description}
+          </p>
+        )}
+        
+        <div className="flex gap-2 pt-4">
+          <Button variant="outline" size="sm" className="flex-1">
+            <MessageCircle className="h-4 w-4 mr-1" />
+            Contact
+          </Button>
+          <Link to={`/farmers/${id}`} className="flex-1">
+            <Button size="sm" className="w-full">
+              Voir plus
+            </Button>
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
