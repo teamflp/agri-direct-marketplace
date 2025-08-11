@@ -7,10 +7,10 @@ import { StarRating } from './StarRating';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { Review } from '@/hooks/useReviews';
+import { UnifiedReview } from '@/hooks/useUnifiedReviews';
 
 interface ReviewsListProps {
-  reviews: Review[];
+  reviews: UnifiedReview[];
   onMarkHelpful: (id: string) => void;
   onMarkNotHelpful: (id: string) => void;
 }

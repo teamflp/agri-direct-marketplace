@@ -1,56 +1,77 @@
 
 import React from 'react';
-import { useReviews } from '@/contexts/ReviewContext';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StarRating } from './StarRating';
 import { ReviewsList } from './ReviewsList';
 import { AddReviewForm } from './AddReviewForm';
-import { Review as DbReview } from '@/hooks/useReviews';
+import { useUnifiedReviews } from '@/hooks/useUnifiedReviews';
 
 interface FarmerReviewsProps {
-  farmerId: number;
+  farmerId: string;
   farmerName: string;
 }
 
 export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
   const { 
-    getFarmerReviews, 
-    addFarmerReview, 
-    markReviewHelpful, 
-    markReviewNotHelpful,
-    getAverageFarmerRating
-  } = useReviews();
-  
-  const localReviews = getFarmerReviews(farmerId);
-  const averageRating = getAverageFarmerRating(farmerId);
+    loading, 
+    error, 
+    createReview, 
+    markHelpful,
+    fetchReviews,
+    getFarmerReviews,
+    calculateAverageRating
+  } = useUnifiedReviews();
 
-  // Convert local reviews to the format expected by ReviewsList (DbReview format)
-  const adaptedReviews: DbReview[] = localReviews.map(review => ({
-    id: review.id.toString(),
-    user_id: review.userId.toString(),
-    farmer_id: review.farmerId?.toString(),
-    rating: review.rating,
-    comment: review.text,
-    helpful_count: review.helpful,
-    not_helpful_count: review.notHelpful,
-    created_at: review.date,
-    updated_at: review.date,
-    user: {
-      id: review.userId.toString(),
-      email: `${review.userName}@example.com`
+  // Fetch reviews for this farmer on component mount
+  React.useEffect(() => {
+    fetchReviews(undefined, farmerId);
+  }, [farmerId]);
+
+  const farmerReviews = getFarmerReviews(farmerId);
+  const averageRating = calculateAverageRating(farmerReviews);
+
+  const handleAddReview = async (rating: number, text: string) => {
+    try {
+      await createReview({
+        farmer_id: farmerId,
+        rating,
+        comment: text
+      });
+    } catch (error) {
+      console.error('Failed to add review:', error);
     }
-  }));
-
-  const handleMarkHelpful = (id: string) => {
-    const numericId = parseInt(id);
-    markReviewHelpful(numericId, undefined, farmerId);
   };
 
-  const handleMarkNotHelpful = (id: string) => {
-    const numericId = parseInt(id);
-    markReviewNotHelpful(numericId, undefined, farmerId);
+  const handleMarkHelpful = async (reviewId: string) => {
+    await markHelpful(reviewId, true);
   };
+
+  const handleMarkNotHelpful = async (reviewId: string) => {
+    await markHelpful(reviewId, false);
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center">Chargement des avis...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-red-500">
+            Erreur lors du chargement des avis: {error}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -60,7 +81,7 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
           <div className="flex items-center space-x-2">
             <StarRating rating={averageRating} />
             <span>
-              {averageRating.toFixed(1)} ({localReviews.length} avis)
+              {averageRating.toFixed(1)} ({farmerReviews.length} avis)
             </span>
           </div>
         </CardTitle>
@@ -74,7 +95,7 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
           
           <TabsContent value="all-reviews" className="mt-6">
             <ReviewsList 
-              reviews={adaptedReviews} 
+              reviews={farmerReviews}
               onMarkHelpful={handleMarkHelpful} 
               onMarkNotHelpful={handleMarkNotHelpful}
             />
@@ -82,7 +103,7 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
           
           <TabsContent value="add-review" className="mt-6">
             <AddReviewForm 
-              onSubmit={(rating, text) => addFarmerReview(farmerId, rating, text)}
+              onSubmit={handleAddReview}
               title={`Ajouter un avis pour ${farmerName}`}
             />
           </TabsContent>

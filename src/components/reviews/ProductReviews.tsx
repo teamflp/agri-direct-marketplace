@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { useReviews } from '@/hooks/useReviews';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StarRating } from './StarRating';
 import { ReviewsList } from './ReviewsList';
 import { AddReviewForm } from './AddReviewForm';
+import { useUnifiedReviews } from '@/hooks/useUnifiedReviews';
 
 interface ProductReviewsProps {
   productId: string;
@@ -19,21 +19,19 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
     error, 
     createReview, 
     markHelpful,
-    fetchReviews
-  } = useReviews();
+    fetchReviews,
+    getProductReviews,
+    calculateAverageRating
+  } = useUnifiedReviews();
 
   // Fetch reviews for this product on component mount
   React.useEffect(() => {
     fetchReviews(productId);
-  }, [productId, fetchReviews]);
+  }, [productId]);
 
   // Filter reviews for this product
-  const productReviews = reviews.filter(review => review.product_id === productId);
-
-  // Calculate average rating
-  const averageRating = productReviews.length > 0 
-    ? productReviews.reduce((sum, review) => sum + review.rating, 0) / productReviews.length 
-    : 0;
+  const productReviews = getProductReviews(productId);
+  const averageRating = calculateAverageRating(productReviews);
 
   const handleAddReview = async (rating: number, text: string) => {
     try {
@@ -42,31 +40,17 @@ export function ProductReviews({ productId, productName }: ProductReviewsProps) 
         rating,
         comment: text
       });
-      // Refresh reviews after adding
-      fetchReviews(productId);
     } catch (error) {
       console.error('Failed to add review:', error);
     }
   };
 
   const handleMarkHelpful = async (reviewId: string) => {
-    try {
-      await markHelpful(reviewId, true);
-      // Refresh reviews after marking helpful
-      fetchReviews(productId);
-    } catch (error) {
-      console.error('Failed to mark review as helpful:', error);
-    }
+    await markHelpful(reviewId, true);
   };
 
   const handleMarkNotHelpful = async (reviewId: string) => {
-    try {
-      await markHelpful(reviewId, false);
-      // Refresh reviews after marking not helpful
-      fetchReviews(productId);
-    } catch (error) {
-      console.error('Failed to mark review as not helpful:', error);
-    }
+    await markHelpful(reviewId, false);
   };
 
   if (loading) {
