@@ -1,259 +1,189 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Check, ShoppingCart, FileText, Heart, MessageSquare, Users, User, TruckIcon, Clock, CalendarClock } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useNotifications } from '@/components/ui/notifications';
-import { DeliveryTracker } from '@/components/delivery/DeliveryTracker';
-import { DeliveryMethodSelector } from '@/components/delivery/DeliveryMethodSelector';
-import { DeliverySlotSelector } from '@/components/delivery/DeliverySlotSelector';
-import { DeliveryProvider } from '@/contexts/DeliveryContext';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger,
-  DialogFooter 
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const orders = [
-  {
-    id: "ORD-2023-001",
-    date: "27/07/2023",
-    total: 49800,
-    items: 4,
-    status: "Livré",
-    farmer: "Ferme des Quatre Saisons"
-  },
-  {
-    id: "ORD-2023-002",
-    date: "15/08/2023",
-    total: 21300,
-    items: 2,
-    status: "En préparation",
-    farmer: "Les Ruches de Marie"
-  },
-  {
-    id: "ORD-2023-003",
-    date: "05/09/2023",
-    total: 84500,
-    items: 7,
-    status: "En livraison",
-    farmer: "Chèvrerie du Vallon"
-  },
-  {
-    id: "ORD-2023-004",
-    date: "18/09/2023",
-    total: 32400,
-    items: 3,
-    status: "En préparation",
-    farmer: "Potager du Village"
-  },
-  {
-    id: "ORD-2023-005",
-    date: "29/09/2023",
-    total: 12700,
-    items: 1,
-    status: "Livré",
-    farmer: "Ferme des Collines"
-  }
-];
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useOrders } from '@/hooks/useOrders';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Eye, Package, Truck, CheckCircle } from 'lucide-react';
 
 const BuyerOrders = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { showNotification } = useNotifications();
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
-  const [showDeliveryDialog, setShowDeliveryDialog] = useState(false);
-  const [showDeliveryMethodDialog, setShowDeliveryMethodDialog] = useState(false);
-  const [showDeliverySlotDialog, setShowDeliverySlotDialog] = useState(false);
-  
-  const menuItems = [
-    { title: "Tableau de bord", path: "/buyer-dashboard", icon: <User size={20} /> },
-    { title: "Mes commandes", path: "/buyer-dashboard/orders", icon: <ShoppingCart size={20} /> },
-    { title: "Mes favoris", path: "/buyer-dashboard/favorites", icon: <Heart size={20} /> },
-    { title: "Messagerie", path: "/buyer-dashboard/messages", icon: <MessageSquare size={20} /> },
-    { title: "Mes agriculteurs", path: "/buyer-dashboard/farmers", icon: <Users size={20} /> },
-    { title: "Factures", path: "/buyer-dashboard/invoices", icon: <FileText size={20} /> },
-  ];
-  
-  const handleOrderDetails = (orderId: string) => {
-    setSelectedOrder(orderId);
-    setShowDeliveryDialog(true);
+  const { orders, loading } = useOrders();
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800';
+      case 'preparing':
+        return 'bg-orange-100 text-orange-800';
+      case 'shipped':
+        return 'bg-purple-100 text-purple-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
-  
-  const handleReorderItems = (orderId: string) => {
-    toast({
-      title: "Commander à nouveau",
-      description: `Les articles de la commande ${orderId} ont été ajoutés au panier`,
-      variant: "success"
-    });
-    
-    showNotification({
-      type: 'product',
-      title: 'Produits ajoutés au panier',
-      description: `Les articles de la commande ${orderId} ont été ajoutés au panier`,
-    });
-    
-    // Dans une application réelle, redirigez vers le panier avec les produits ajoutés
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Package className="h-4 w-4" />;
+      case 'confirmed':
+      case 'preparing':
+        return <Package className="h-4 w-4" />;
+      case 'shipped':
+        return <Truck className="h-4 w-4" />;
+      case 'delivered':
+        return <CheckCircle className="h-4 w-4" />;
+      default:
+        return <Package className="h-4 w-4" />;
+    }
   };
-  
-  const simulateDeliveryUpdate = () => {
-    if (!selectedOrder) return;
-    
-    showNotification({
-      type: 'delivery',
-      title: 'Mise à jour de livraison',
-      description: `Votre commande ${selectedOrder} est en cours de livraison et sera livrée aujourd'hui`,
-      action: () => setShowDeliveryDialog(true)
-    });
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'En attente';
+      case 'confirmed':
+        return 'Confirmée';
+      case 'preparing':
+        return 'En préparation';
+      case 'shipped':
+        return 'Expédiée';
+      case 'delivered':
+        return 'Livrée';
+      case 'cancelled':
+        return 'Annulée';
+      default:
+        return status;
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <DeliveryProvider>
-      <DashboardLayout
-        name="Martin Pasquier"
-        email="martin.p@email.com"
-        avatar={
-          <div className="bg-agrimarket-orange text-white text-xl font-semibold flex items-center justify-center h-full">
-            MP
-          </div>
-        }
-        menuItems={menuItems}
-      >
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">Mes commandes</h1>
-            <Button onClick={() => navigate('/products')}>
-              Découvrir plus de produits
-            </Button>
-          </div>
-          
-          {selectedOrder && (
-            <Button onClick={simulateDeliveryUpdate} variant="outline" className="mb-4">
-              <TruckIcon className="mr-2 h-4 w-4" />
-              Simuler une mise à jour de livraison
-            </Button>
-          )}
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Mes Commandes</h1>
+        <p className="text-gray-600 mt-2">Suivez l'état de vos commandes et consultez l'historique</p>
+      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Historique des commandes</CardTitle>
-              <CardDescription>
-                Consultez et suivez vos commandes récentes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {orders.map((order) => (
-                  <Card key={order.id} className="border hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div>
-                          <p className="font-medium">{order.id}</p>
-                          <p className="text-sm text-gray-500">{order.date}</p>
-                          <p className="text-sm">Agriculteur: {order.farmer}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold">{order.total.toLocaleString()} FCFA</p>
-                          <p className="text-sm">{order.items} articles</p>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-                            order.status === "Livré" 
-                              ? "bg-green-100 text-green-800" 
-                              : order.status === "En livraison"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}>
-                            {order.status === "Livré" && <Check className="w-3 h-3 mr-1" />}
-                            {order.status}
+      {orders.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Aucune commande</h3>
+            <p className="text-gray-600 mb-4">Vous n'avez pas encore passé de commande</p>
+            <Button onClick={() => window.location.href = '/products'}>
+              Découvrir les produits
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {orders.map((order) => (
+            <Card key={order.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg">
+                      Commande #{order.id.slice(0, 8)}
+                    </CardTitle>
+                    <CardDescription>
+                      Passée {formatDistanceToNow(new Date(order.created_at), { 
+                        addSuffix: true, 
+                        locale: fr 
+                      })}
+                    </CardDescription>
+                  </div>
+                  <Badge className={getStatusColor(order.status)}>
+                    <div className="flex items-center gap-1">
+                      {getStatusIcon(order.status)}
+                      {getStatusLabel(order.status)}
+                    </div>
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Total</p>
+                    <p className="font-semibold">{order.total.toFixed(2)} €</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Articles</p>
+                    <p className="font-semibold">{order.order_items?.length || 0} produit(s)</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Livraison</p>
+                    <p className="font-semibold capitalize">{order.delivery_method}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Paiement</p>
+                    <p className="font-semibold capitalize">{order.payment_status}</p>
+                  </div>
+                </div>
+
+                {order.farmer && (
+                  <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-600">Agriculteur</p>
+                    <p className="font-medium">{order.farmer.name}</p>
+                    <p className="text-sm text-gray-500">{order.farmer.location}</p>
+                  </div>
+                )}
+
+                {order.order_items && order.order_items.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600 mb-2">Produits commandés</p>
+                    <div className="space-y-2">
+                      {order.order_items.slice(0, 3).map((item) => (
+                        <div key={item.id} className="flex justify-between items-center text-sm">
+                          <span>{item.product?.name} x{item.quantity}</span>
+                          <span className="font-medium">
+                            {(item.unit_price * item.quantity).toFixed(2)} €
                           </span>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <Button 
-                            variant="outline" 
-                            className="text-agrimarket-orange border-agrimarket-orange hover:bg-agrimarket-orange hover:text-white"
-                            onClick={() => handleOrderDetails(order.id)}
-                          >
-                            <TruckIcon className="mr-2 h-4 w-4" />
-                            Suivi
-                          </Button>
-                          {order.status === "Livré" && (
-                            <Button 
-                              variant="outline"
-                              onClick={() => handleReorderItems(order.id)}
-                            >
-                              Commander à nouveau
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="justify-center">
-              <p className="text-gray-500">
-                {orders.length} commandes au total
-              </p>
-            </CardFooter>
-          </Card>
+                      ))}
+                      {order.order_items.length > 3 && (
+                        <p className="text-sm text-gray-500">
+                          +{order.order_items.length - 3} autre(s) produit(s)
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <div>
+                    {order.delivery_date && (
+                      <p className="text-sm text-gray-600">
+                        Livraison prévue le {new Date(order.delivery_date).toLocaleDateString('fr-FR')}
+                      </p>
+                    )}
+                  </div>
+                  <Button variant="outline" size="sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Voir détails
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-        
-        <Dialog open={showDeliveryDialog} onOpenChange={setShowDeliveryDialog}>
-          <DialogContent className="sm:max-w-[650px]">
-            <DialogHeader>
-              <DialogTitle>Suivi de commande</DialogTitle>
-              <DialogDescription>
-                Détails et statut de votre commande {selectedOrder}
-              </DialogDescription>
-            </DialogHeader>
-            
-            {selectedOrder && (
-              <Tabs defaultValue="tracking" className="mt-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="tracking">
-                    <TruckIcon className="mr-2 h-4 w-4" />
-                    Suivi
-                  </TabsTrigger>
-                  <TabsTrigger value="method">
-                    <Clock className="mr-2 h-4 w-4" />
-                    Méthode
-                  </TabsTrigger>
-                  <TabsTrigger value="schedule">
-                    <CalendarClock className="mr-2 h-4 w-4" />
-                    Planifier
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="tracking" className="pt-4">
-                  <DeliveryTracker orderId={selectedOrder} />
-                </TabsContent>
-                
-                <TabsContent value="method" className="pt-4">
-                  <DeliveryMethodSelector 
-                    orderId={selectedOrder} 
-                    onSelect={() => {}} 
-                  />
-                </TabsContent>
-                
-                <TabsContent value="schedule" className="pt-4">
-                  <DeliverySlotSelector 
-                    orderId={selectedOrder} 
-                    onSelect={() => {}} 
-                  />
-                </TabsContent>
-              </Tabs>
-            )}
-          </DialogContent>
-        </Dialog>
-      </DashboardLayout>
-    </DeliveryProvider>
+      )}
+    </div>
   );
 };
 

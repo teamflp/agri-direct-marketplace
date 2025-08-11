@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
@@ -10,25 +10,40 @@ import { ShoppingCart, ArrowLeft, Trash2, Plus, Minus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 const Cart = () => {
-  const { items, totalItems, totalPrice, updateQuantity, removeItem, clearCart } = useCart();
+  const { cartItems, loading, getTotalPrice, getTotalItems, updateQuantity, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
   
   // Group items by farmer
-  const groupedByFarmer = items.reduce((acc, item) => {
-    const farmerId = item.farmerId || 0;
+  const groupedByFarmer = cartItems.reduce((acc, item) => {
+    const farmerId = item.product?.farmer?.name || 'Agriculteur inconnu';
     if (!acc[farmerId]) {
       acc[farmerId] = {
-        farmerName: item.farmerName || 'Unknown Farmer',
-        farmerId: farmerId,
+        farmerName: farmerId,
         items: []
       };
     }
     acc[farmerId].items.push(item);
     return acc;
-  }, {} as Record<number, { farmerName: string; farmerId: number; items: typeof items }>);
+  }, {} as Record<string, { farmerName: string; items: typeof cartItems }>);
   
   // Convert to array for rendering
   const farmerGroups = Object.values(groupedByFarmer);
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-24 bg-gray-50 pb-10">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-agrimarket-green"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -48,7 +63,7 @@ const Cart = () => {
             <h1 className="text-3xl font-bold text-gray-800">Mon Panier</h1>
           </div>
           
-          {items.length === 0 ? (
+          {cartItems.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-8 text-center">
               <div className="mb-4 flex justify-center">
                 <ShoppingCart className="h-16 w-16 text-gray-300" />
@@ -67,7 +82,7 @@ const Cart = () => {
               <div className="lg:col-span-2 space-y-6">
                 <div className="bg-white rounded-lg shadow-sm p-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-medium text-gray-800">Articles ({totalItems})</h2>
+                    <h2 className="text-xl font-medium text-gray-800">Articles ({getTotalItems()})</h2>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -81,7 +96,7 @@ const Cart = () => {
                   
                   <div className="space-y-6">
                     {farmerGroups.map((group) => (
-                      <div key={group.farmerId} className="border rounded-lg overflow-hidden shadow-sm">
+                      <div key={group.farmerName} className="border rounded-lg overflow-hidden shadow-sm">
                         <div className="bg-gray-50 p-4">
                           <h3 className="font-medium text-gray-700">{group.farmerName}</h3>
                         </div>
@@ -92,14 +107,14 @@ const Cart = () => {
                               <div className="flex items-center flex-grow">
                                 <div className="h-20 w-20 rounded-md overflow-hidden">
                                   <img 
-                                    src={item.image} 
-                                    alt={item.name} 
+                                    src={item.product?.image_url || '/placeholder.svg'} 
+                                    alt={item.product?.name || 'Produit'} 
                                     className="h-full w-full object-cover"
                                   />
                                 </div>
                                 <div className="ml-4">
-                                  <h4 className="font-medium text-gray-800">{item.name}</h4>
-                                  <p className="text-sm text-gray-500">{item.price.toFixed(2)} € / {item.unit}</p>
+                                  <h4 className="font-medium text-gray-800">{item.product?.name}</h4>
+                                  <p className="text-sm text-gray-500">{(item.product?.price || 0).toFixed(2)} € / {item.product?.unit}</p>
                                 </div>
                               </div>
                               
@@ -126,12 +141,12 @@ const Cart = () => {
                                 </div>
                                 
                                 <div className="ml-6 text-right">
-                                  <p className="font-bold text-gray-800">{(item.price * item.quantity).toFixed(2)} €</p>
+                                  <p className="font-bold text-gray-800">{((item.product?.price || 0) * item.quantity).toFixed(2)} €</p>
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
                                     className="text-red-500 hover:text-red-700 p-0 h-auto"
-                                    onClick={() => removeItem(item.id)}
+                                    onClick={() => removeFromCart(item.id)}
                                   >
                                     <Trash2 className="h-4 w-4" />
                                     <span className="sr-only">Supprimer</span>
@@ -154,7 +169,7 @@ const Cart = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Sous-total</span>
-                      <span className="text-gray-800">{totalPrice.toFixed(2)} €</span>
+                      <span className="text-gray-800">{getTotalPrice().toFixed(2)} €</span>
                     </div>
                     
                     <div className="flex justify-between items-center text-gray-600">
@@ -181,7 +196,7 @@ const Cart = () => {
                     
                     <div className="flex justify-between font-bold">
                       <span className="text-gray-800">Total (TTC)</span>
-                      <span className="text-agrimarket-green">{totalPrice.toFixed(2)} €</span>
+                      <span className="text-agrimarket-green">{getTotalPrice().toFixed(2)} €</span>
                     </div>
                     
                     <Button 
