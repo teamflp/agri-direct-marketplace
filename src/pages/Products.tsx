@@ -27,6 +27,11 @@ const Products = () => {
   // Available categories (could be fetched from API)
   const categories = ['Légumes', 'Fruits', 'Produits laitiers', 'Viande', 'Épicerie'];
 
+  // Update filters when search term changes
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, search: searchTerm }));
+  }, [searchTerm]);
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -49,6 +54,10 @@ const Products = () => {
 
   const handleFilterChange = (newFilters: ProductFiltersType) => {
     setFilters(newFilters);
+    // Update search term if it changed in filters
+    if (newFilters.search !== searchTerm) {
+      setSearchTerm(newFilters.search);
+    }
   };
 
   const clearFilters = () => {
@@ -68,6 +77,7 @@ const Products = () => {
   const removeFilter = (filterKey: string) => {
     if (filterKey === 'search') {
       setSearchTerm('');
+      setFilters(prev => ({ ...prev, search: '' }));
     } else if (filterKey === 'priceRange') {
       setFilters(prev => ({ ...prev, priceRange: [0, 100] }));
     } else if (filterKey === 'distance') {
@@ -91,9 +101,10 @@ const Products = () => {
       return count + (range[0] !== 0 || range[1] !== 100 ? 1 : 0);
     }
     if (key === 'distance') return count + (value !== 50 ? 1 : 0);
+    if (key === 'search') return count + (value ? 1 : 0);
     if (typeof value === 'boolean') return count + (value ? 1 : 0);
     return count;
-  }, 0) + (searchTerm ? 1 : 0);
+  }, 0);
 
   if (loading) {
     return (
@@ -158,7 +169,6 @@ const Products = () => {
           
           <ActiveFilters
             filters={filters}
-            searchTerm={searchTerm}
             onRemoveFilter={removeFilter}
             onClearAll={clearFilters}
           />
@@ -174,7 +184,7 @@ const Products = () => {
               {filteredProducts.map((product) => (
                 <ProductCard 
                   key={product.id}
-                  id={parseInt(product.id)}
+                  id={product.id}
                   name={product.name}
                   image={product.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43'}
                   price={product.price}
@@ -182,7 +192,7 @@ const Products = () => {
                   rating={product.rating}
                   reviews={product.reviews_count}
                   farmerName={product.farmer?.name || 'Producteur'}
-                  farmerId={parseInt(product.farmer?.id || '1')}
+                  farmerId={product.farmer?.id || '1'}
                   distance={product.farmer?.distance}
                   organic={product.is_organic}
                   freeDelivery={product.free_delivery}

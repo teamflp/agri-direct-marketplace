@@ -8,7 +8,7 @@ export interface CartItem {
   quantity: number;
   image?: string;
   farmerName?: string;
-  farmerId?: number;
+  farmerId?: string | number;
   unit?: string;
 }
 

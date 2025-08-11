@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 
 type ProductCardProps = {
-  id: number;
+  id: string;
   name: string;
   image: string;
   price: number;
@@ -17,7 +17,7 @@ type ProductCardProps = {
   rating: number;
   reviews?: number;
   farmerName: string;
-  farmerId: number;
+  farmerId: string;
   distance?: number;
   organic?: boolean;
   freeDelivery?: boolean;
@@ -56,13 +56,13 @@ const ProductCard = ({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart({
-      id: id.toString(),
+      id: id,
       name,
       price,
       quantity,
       image,
       farmerName,
-      farmerId: farmerId.toString(),
+      farmerId: farmerId,
       unit
     });
     
