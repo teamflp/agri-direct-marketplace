@@ -10,6 +10,7 @@ import { ReviewProvider } from "@/contexts/reviews";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { SocialProvider } from "@/contexts/SocialContext";
 import { MessageProvider } from "@/contexts/MessageContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -44,42 +45,44 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <CartProvider>
-            <ReviewProvider>
-              <NotificationProvider>
-                <SocialProvider>
-                  <MessageProvider>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/products" element={<Products />} />
-                      <Route path="/product/:id" element={<ProductDetail />} />
-                      <Route path="/farmers" element={<Farmers />} />
-                      <Route path="/farmer/:id" element={<FarmerDetail />} />
-                      <Route path="/cart" element={<Cart />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
-                      <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
-                      <Route path="/chat" element={<Chat />} />
-                      <Route path="/notifications-demo" element={<NotificationsDemo />} />
-                      <Route path="/email-verification" element={<EmailVerification />} />
-                      <Route path="/forgot-password" element={<ForgotPassword />} />
-                      <Route path="/reset-password" element={<ResetPassword />} />
-                      <Route path="/subscriptions" element={<SubscriptionsPage />} />
-                      <Route path="/terms" element={<TermsOfService />} />
-                      <Route path="/privacy" element={<PrivacyPolicy />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/faq" element={<FAQ />} />
-                      <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </MessageProvider>
-                </SocialProvider>
-              </NotificationProvider>
-            </ReviewProvider>
-          </CartProvider>
+          <SubscriptionProvider>
+            <CartProvider>
+              <ReviewProvider>
+                <NotificationProvider>
+                  <SocialProvider>
+                    <MessageProvider>
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/farmers" element={<Farmers />} />
+                        <Route path="/farmer/:id" element={<FarmerDetail />} />
+                        <Route path="/cart" element={<Cart />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
+                        <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
+                        <Route path="/chat" element={<Chat />} />
+                        <Route path="/notifications-demo" element={<NotificationsDemo />} />
+                        <Route path="/email-verification" element={<EmailVerification />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                        <Route path="/terms" element={<TermsOfService />} />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </MessageProvider>
+                  </SocialProvider>
+                </NotificationProvider>
+              </ReviewProvider>
+            </CartProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
