@@ -12,14 +12,42 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversation_history = [] } = await req.json()
+    const body = await req.json()
+    console.log("Received request body:", body)
     
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openAIApiKey) {
+      console.error('OpenAI API key not configured')
       return new Response(
         JSON.stringify({ error: 'OpenAI API key not configured' }),
         { 
           status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    // Handle both new format { message, conversation_history } and old format { messages }
+    let messages = []
+    let userMessage = ''
+    
+    if (body.message && body.conversation_history !== undefined) {
+      // New format
+      userMessage = body.message
+      messages = [
+        ...body.conversation_history,
+        { role: 'user', content: userMessage }
+      ]
+    } else if (body.messages) {
+      // Old format (backward compatibility)
+      messages = body.messages
+      userMessage = messages[messages.length - 1]?.content || ''
+    } else {
+      console.error('Invalid request format:', body)
+      return new Response(
+        JSON.stringify({ error: 'Invalid request format. Expected { message, conversation_history } or { messages }' }),
+        { 
+          status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
@@ -37,11 +65,12 @@ Tes domaines d'expertise incluent :
 
 Réponds de manière concise, pratique et bienveillante. Encourage toujours l'achat local et les pratiques durables.`
 
-    const messages = [
+    const fullMessages = [
       { role: 'system', content: systemPrompt },
-      ...conversation_history,
-      { role: 'user', content: message }
+      ...messages
     ]
+
+    console.log("Sending to OpenAI:", { messageCount: fullMessages.length, userMessage })
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -51,7 +80,7 @@ Réponds de manière concise, pratique et bienveillante. Encourage toujours l'ac
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        messages: messages,
+        messages: fullMessages,
         max_tokens: 500,
         temperature: 0.7,
       }),
@@ -72,13 +101,14 @@ Réponds de manière concise, pratique et bienveillante. Encourage toujours l'ac
     const data = await response.json()
     const aiMessage = data.choices[0].message.content
 
+    console.log("OpenAI response received, length:", aiMessage?.length)
+
+    // Return both formats for compatibility
     return new Response(
       JSON.stringify({ 
-        message: aiMessage,
-        conversation_history: [...conversation_history, 
-          { role: 'user', content: message },
-          { role: 'assistant', content: aiMessage }
-        ]
+        message: aiMessage,  // New format
+        reply: aiMessage,    // Old format (backward compatibility)
+        conversation_history: [...messages, { role: 'assistant', content: aiMessage }]
       }),
       { 
         status: 200, 

@@ -46,11 +46,32 @@ export const useChatMessages = () => {
       setMessages(prev => [...prev, botReply]);
     } catch (error) {
       console.error("Erreur lors de l'envoi du message:", error);
-      toast({
-        variant: "destructive",
-        title: "Erreur de communication",
-        description: "Impossible de recevoir une réponse. Veuillez réessayer.",
-      });
+      
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+      
+      // Provide specific error messages
+      if (errorMessage.includes('Clé API OpenAI')) {
+        toast({
+          variant: "destructive",
+          title: "Configuration requise",
+          description: "La clé API OpenAI n'est pas configurée. Utilisez le bouton 'Config IA' pour la configurer.",
+          duration: 6000,
+        });
+      } else if (errorMessage.includes('OpenAI API key') || errorMessage.includes('OPENAI_API_KEY')) {
+        toast({
+          variant: "destructive",
+          title: "Clé API manquante",
+          description: "Veuillez configurer votre clé API OpenAI dans les paramètres Supabase.",
+          duration: 6000,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erreur de communication",
+          description: "Impossible de recevoir une réponse. Veuillez réessayer.",
+          duration: 4000,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
