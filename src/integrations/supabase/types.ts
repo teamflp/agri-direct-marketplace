@@ -648,6 +648,60 @@ export type Database = {
         }
         Relationships: []
       }
+      data_deletion_requests: {
+        Row: {
+          admin_notes: string | null
+          email: string | null
+          id: string
+          metadata: Json
+          processed_at: string | null
+          processed_by: string | null
+          reason: string | null
+          requested_at: string
+          status: Database["public"]["Enums"]["deletion_status"]
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          email?: string | null
+          id?: string
+          metadata?: Json
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: Database["public"]["Enums"]["deletion_status"]
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          email?: string | null
+          id?: string
+          metadata?: Json
+          processed_at?: string | null
+          processed_by?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: Database["public"]["Enums"]["deletion_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_deletion_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "strk_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_deletion_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "strk_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_tracking: {
         Row: {
           created_at: string | null
@@ -975,6 +1029,33 @@ export type Database = {
           pronunciation?: string | null
           word?: string
           word_length?: number
+        }
+        Relationships: []
+      }
+      edge_rate_limits: {
+        Row: {
+          count: number
+          id: string
+          key: string
+          route: string
+          window_sec: number
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          id?: string
+          key: string
+          route: string
+          window_sec: number
+          window_start: string
+        }
+        Update: {
+          count?: number
+          id?: string
+          key?: string
+          route?: string
+          window_sec?: number
+          window_start?: string
         }
         Relationships: []
       }
@@ -2014,6 +2095,68 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_limits: {
+        Row: {
+          enforcement: string
+          feature: string
+          id: string
+          limit_per_day: number | null
+          limit_per_month: number | null
+          plan_id: string
+        }
+        Insert: {
+          enforcement?: string
+          feature: string
+          id?: string
+          limit_per_day?: number | null
+          limit_per_month?: number | null
+          plan_id: string
+        }
+        Update: {
+          enforcement?: string
+          feature?: string
+          id?: string
+          limit_per_day?: number | null
+          limit_per_month?: number | null
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_limits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_usage: {
+        Row: {
+          feature: string
+          id: string
+          period_end: string
+          period_start: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          feature: string
+          id?: string
+          period_end: string
+          period_start: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          feature?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_achievements: {
         Row: {
           achievement_id: string
@@ -2394,6 +2537,42 @@ export type Database = {
           },
         ]
       }
+      processed_webhook_events: {
+        Row: {
+          error: string | null
+          event_id: string
+          id: string
+          idempotency_key: string | null
+          payload: Json
+          processed_at: string | null
+          received_at: string
+          source: string
+          status: string
+        }
+        Insert: {
+          error?: string | null
+          event_id: string
+          id?: string
+          idempotency_key?: string | null
+          payload?: Json
+          processed_at?: string | null
+          received_at?: string
+          source: string
+          status?: string
+        }
+        Update: {
+          error?: string | null
+          event_id?: string
+          id?: string
+          idempotency_key?: string | null
+          payload?: Json
+          processed_at?: string | null
+          received_at?: string
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           available_from: string | null
@@ -2547,6 +2726,1443 @@ export type Database = {
             columns: ["puzzle_id"]
             isOneToOne: false
             referencedRelation: "daily_puzzles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_alerts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          level: string
+          resident_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level: string
+          resident_id?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level?: string
+          resident_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_alerts_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "pz_residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_audit_logs: {
+        Row: {
+          action: string
+          actor_user_id: string
+          created_at: string
+          description: string | null
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          target_id: string | null
+          target_table: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          created_at?: string
+          description?: string | null
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          target_id?: string | null
+          target_table?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          created_at?: string
+          description?: string | null
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          target_id?: string | null
+          target_table?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      pz_daily_care_logs: {
+        Row: {
+          care_date: string
+          care_description: string
+          care_time: string
+          care_type: string
+          created_at: string
+          id: string
+          notes: string | null
+          org_id: string
+          resident_id: string
+          staff_id: string
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+          validation_notes: string | null
+          validation_status: string | null
+        }
+        Insert: {
+          care_date: string
+          care_description: string
+          care_time: string
+          care_type: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          org_id: string
+          resident_id: string
+          staff_id: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+          validation_status?: string | null
+        }
+        Update: {
+          care_date?: string
+          care_description?: string
+          care_time?: string
+          care_type?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          resident_id?: string
+          staff_id?: string
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+          validation_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_daily_care_logs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "pz_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_daily_care_logs_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "pz_residents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_daily_care_logs_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_daily_care_logs_validated_by_fkey"
+            columns: ["validated_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_exports: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          export_type: string
+          file_name: string
+          file_path: string | null
+          id: string
+          parameters: Json | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          export_type: string
+          file_name: string
+          file_path?: string | null
+          id?: string
+          parameters?: Json | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          export_type?: string
+          file_name?: string
+          file_path?: string | null
+          id?: string
+          parameters?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
+      pz_floors: {
+        Row: {
+          created_at: string
+          description: string | null
+          floor_number: number
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          floor_number: number
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          floor_number?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pz_leave_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          leave_id: string
+          mime_type: string | null
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          leave_id: string
+          mime_type?: string | null
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          leave_id?: string
+          mime_type?: string | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_leave_attachments_leave_id_fkey"
+            columns: ["leave_id"]
+            isOneToOne: false
+            referencedRelation: "pz_leaves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_leave_balances: {
+        Row: {
+          allocated_days: number
+          carried_over_days: number
+          created_at: string
+          id: string
+          leave_type: string
+          remaining_days: number | null
+          staff_id: string
+          updated_at: string
+          used_days: number
+          year: number
+        }
+        Insert: {
+          allocated_days?: number
+          carried_over_days?: number
+          created_at?: string
+          id?: string
+          leave_type: string
+          remaining_days?: number | null
+          staff_id: string
+          updated_at?: string
+          used_days?: number
+          year: number
+        }
+        Update: {
+          allocated_days?: number
+          carried_over_days?: number
+          created_at?: string
+          id?: string
+          leave_type?: string
+          remaining_days?: number | null
+          staff_id?: string
+          updated_at?: string
+          used_days?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_leave_balances_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_leave_comments: {
+        Row: {
+          author_user_id: string
+          content: string
+          created_at: string
+          id: string
+          leave_id: string
+        }
+        Insert: {
+          author_user_id: string
+          content: string
+          created_at?: string
+          id?: string
+          leave_id: string
+        }
+        Update: {
+          author_user_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          leave_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_leave_comments_leave_id_fkey"
+            columns: ["leave_id"]
+            isOneToOne: false
+            referencedRelation: "pz_leaves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_leave_status_logs: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          id: string
+          leave_id: string
+          new_status: string | null
+          note: string | null
+          old_status: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          leave_id: string
+          new_status?: string | null
+          note?: string | null
+          old_status?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          leave_id?: string
+          new_status?: string | null
+          note?: string | null
+          old_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_leave_status_logs_leave_id_fkey"
+            columns: ["leave_id"]
+            isOneToOne: false
+            referencedRelation: "pz_leaves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_leaves: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          approver1_at: string | null
+          approver1_comment: string | null
+          approver1_decision_at: string | null
+          approver1_user_id: string | null
+          approver2_at: string | null
+          approver2_comment: string | null
+          approver2_decision_at: string | null
+          approver2_user_id: string | null
+          created_at: string
+          days_count: number
+          decision_comment: string | null
+          end_date: string
+          id: string
+          leave_type: string
+          notes: string | null
+          reason: string | null
+          replacement_staff_id: string | null
+          staff_id: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          approver1_at?: string | null
+          approver1_comment?: string | null
+          approver1_decision_at?: string | null
+          approver1_user_id?: string | null
+          approver2_at?: string | null
+          approver2_comment?: string | null
+          approver2_decision_at?: string | null
+          approver2_user_id?: string | null
+          created_at?: string
+          days_count: number
+          decision_comment?: string | null
+          end_date: string
+          id?: string
+          leave_type: string
+          notes?: string | null
+          reason?: string | null
+          replacement_staff_id?: string | null
+          staff_id: string
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          approver1_at?: string | null
+          approver1_comment?: string | null
+          approver1_decision_at?: string | null
+          approver1_user_id?: string | null
+          approver2_at?: string | null
+          approver2_comment?: string | null
+          approver2_decision_at?: string | null
+          approver2_user_id?: string | null
+          created_at?: string
+          days_count?: number
+          decision_comment?: string | null
+          end_date?: string
+          id?: string
+          leave_type?: string
+          notes?: string | null
+          reason?: string | null
+          replacement_staff_id?: string | null
+          staff_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_leaves_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_leaves_replacement_staff_id_fkey"
+            columns: ["replacement_staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_leaves_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_medical_records: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          doctor_name: string | null
+          id: string
+          is_active: boolean
+          medical_data: Json | null
+          next_review_date: string | null
+          priority: string
+          record_type: string
+          resident_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          doctor_name?: string | null
+          id?: string
+          is_active?: boolean
+          medical_data?: Json | null
+          next_review_date?: string | null
+          priority?: string
+          record_type: string
+          resident_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          doctor_name?: string | null
+          id?: string
+          is_active?: boolean
+          medical_data?: Json | null
+          next_review_date?: string | null
+          priority?: string
+          record_type?: string
+          resident_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_medical_records_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_medical_records_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "pz_residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          org_id: string
+          read_at: string | null
+          recipient_id: string
+          recipient_staff_id: string | null
+          sender_id: string
+          sender_staff_id: string | null
+          subject: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          org_id: string
+          read_at?: string | null
+          recipient_id: string
+          recipient_staff_id?: string | null
+          sender_id: string
+          sender_staff_id?: string | null
+          subject: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          org_id?: string
+          read_at?: string | null
+          recipient_id?: string
+          recipient_staff_id?: string | null
+          sender_id?: string
+          sender_staff_id?: string | null
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_messages_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "pz_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_messages_recipient_staff_id_fkey"
+            columns: ["recipient_staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_messages_sender_staff_id_fkey"
+            columns: ["sender_staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_notification_preferences: {
+        Row: {
+          categories: Json
+          created_at: string
+          email_enabled: boolean
+          in_app_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categories?: Json
+          created_at?: string
+          email_enabled?: boolean
+          in_app_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categories?: Json
+          created_at?: string
+          email_enabled?: boolean
+          in_app_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pz_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          expires_at: string | null
+          id: string
+          is_read: boolean
+          message: string
+          priority: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean
+          message: string
+          priority?: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          priority?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pz_org_members: {
+        Row: {
+          created_at: string
+          org_id: string
+          role: Database["public"]["Enums"]["pz_org_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          org_id: string
+          role?: Database["public"]["Enums"]["pz_org_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          org_id?: string
+          role?: Database["public"]["Enums"]["pz_org_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_org_members_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "pz_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_org_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "pz_user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_organizations: {
+        Row: {
+          address: Json
+          contact_email: string | null
+          created_at: string
+          id: string
+          legal_name: string | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          siret: string | null
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          address?: Json
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          legal_name?: string | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          siret?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: Json
+          contact_email?: string | null
+          created_at?: string
+          id?: string
+          legal_name?: string | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          siret?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pz_resident_history: {
+        Row: {
+          change_date: string
+          change_description: Json
+          change_type: string
+          changed_by: string
+          created_at: string
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+          resident_id: string
+        }
+        Insert: {
+          change_date?: string
+          change_description?: Json
+          change_type: string
+          changed_by: string
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          resident_id: string
+        }
+        Update: {
+          change_date?: string
+          change_description?: Json
+          change_type?: string
+          changed_by?: string
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          resident_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_resident_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_resident_history_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "pz_residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_residents: {
+        Row: {
+          admission_date: string
+          archive_reason: string | null
+          archived: boolean
+          archived_at: string | null
+          archived_by: string | null
+          birth_date: string
+          created_at: string
+          created_by: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relation: string | null
+          first_name: string
+          gender: string
+          id: string
+          last_name: string
+          medical_notes: string | null
+          org_id: string
+          pathologies: string[] | null
+          room_number: string
+          updated_at: string
+        }
+        Insert: {
+          admission_date: string
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
+          archived_by?: string | null
+          birth_date: string
+          created_at?: string
+          created_by?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relation?: string | null
+          first_name: string
+          gender: string
+          id?: string
+          last_name: string
+          medical_notes?: string | null
+          org_id: string
+          pathologies?: string[] | null
+          room_number: string
+          updated_at?: string
+        }
+        Update: {
+          admission_date?: string
+          archive_reason?: string | null
+          archived?: boolean
+          archived_at?: string | null
+          archived_by?: string | null
+          birth_date?: string
+          created_at?: string
+          created_by?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relation?: string | null
+          first_name?: string
+          gender?: string
+          id?: string
+          last_name?: string
+          medical_notes?: string | null
+          org_id?: string
+          pathologies?: string[] | null
+          room_number?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_residents_archived_by_fkey"
+            columns: ["archived_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_residents_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "pz_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_room_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          end_reason: string | null
+          ended_at: string | null
+          id: string
+          notes: string | null
+          resident_id: string
+          room_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          resident_id: string
+          room_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          end_reason?: string | null
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          resident_id?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_room_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_room_assignments_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "pz_residents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_room_assignments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "pz_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_room_features: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_premium: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_premium?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_premium?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      pz_room_features_assignments: {
+        Row: {
+          created_at: string
+          feature_id: string
+          id: string
+          room_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_id: string
+          id?: string
+          room_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_id?: string
+          id?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_room_features_assignments_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "pz_room_features"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_room_features_assignments_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "pz_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_room_rates: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          effective_from: string
+          effective_until: string | null
+          id: string
+          rate_type: string
+          room_type_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          effective_from?: string
+          effective_until?: string | null
+          id?: string
+          rate_type: string
+          room_type_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          effective_from?: string
+          effective_until?: string | null
+          id?: string
+          rate_type?: string
+          room_type_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_room_rates_room_type_id_fkey"
+            columns: ["room_type_id"]
+            isOneToOne: false
+            referencedRelation: "pz_room_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_room_types: {
+        Row: {
+          base_rate: number | null
+          created_at: string
+          default_features: Json | null
+          description: string | null
+          id: string
+          max_capacity: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          base_rate?: number | null
+          created_at?: string
+          default_features?: Json | null
+          description?: string | null
+          id?: string
+          max_capacity?: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          base_rate?: number | null
+          created_at?: string
+          default_features?: Json | null
+          description?: string | null
+          id?: string
+          max_capacity?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pz_rooms: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          features: Json | null
+          floor: number | null
+          floor_id: string | null
+          id: string
+          notes: string | null
+          occupancy_count: number
+          org_id: string
+          resident_id: string | null
+          room_number: string
+          room_type_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          features?: Json | null
+          floor?: number | null
+          floor_id?: string | null
+          id?: string
+          notes?: string | null
+          occupancy_count?: number
+          org_id: string
+          resident_id?: string | null
+          room_number: string
+          room_type_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          features?: Json | null
+          floor?: number | null
+          floor_id?: string | null
+          id?: string
+          notes?: string | null
+          occupancy_count?: number
+          org_id?: string
+          resident_id?: string | null
+          room_number?: string
+          room_type_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_rooms_floor_id_fkey"
+            columns: ["floor_id"]
+            isOneToOne: false
+            referencedRelation: "pz_floors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_rooms_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "pz_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_rooms_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "pz_residents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_rooms_room_type_id_fkey"
+            columns: ["room_type_id"]
+            isOneToOne: false
+            referencedRelation: "pz_room_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_rtp_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          hours_requested: number
+          id: string
+          justification: string | null
+          reason: string
+          request_date: string
+          staff_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          hours_requested: number
+          id?: string
+          justification?: string | null
+          reason: string
+          request_date: string
+          staff_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          hours_requested?: number
+          id?: string
+          justification?: string | null
+          reason?: string
+          request_date?: string
+          staff_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_rtp_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pz_rtp_requests_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_staff: {
+        Row: {
+          contract_type: Database["public"]["Enums"]["contract_type"] | null
+          created_at: string
+          email: string | null
+          end_date: string | null
+          first_name: string
+          hire_date: string
+          id: string
+          is_active: boolean
+          last_name: string
+          org_id: string
+          phone: string | null
+          position: string
+          role: Database["public"]["Enums"]["staff_role"]
+          specialty: string | null
+          start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          contract_type?: Database["public"]["Enums"]["contract_type"] | null
+          created_at?: string
+          email?: string | null
+          end_date?: string | null
+          first_name: string
+          hire_date: string
+          id?: string
+          is_active?: boolean
+          last_name: string
+          org_id: string
+          phone?: string | null
+          position: string
+          role?: Database["public"]["Enums"]["staff_role"]
+          specialty?: string | null
+          start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contract_type?: Database["public"]["Enums"]["contract_type"] | null
+          created_at?: string
+          email?: string | null
+          end_date?: string | null
+          first_name?: string
+          hire_date?: string
+          id?: string
+          is_active?: boolean
+          last_name?: string
+          org_id?: string
+          phone?: string | null
+          position?: string
+          role?: Database["public"]["Enums"]["staff_role"]
+          specialty?: string | null
+          start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_staff_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "pz_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_staff_contracts: {
+        Row: {
+          contract_file_url: string | null
+          contract_type: string
+          created_at: string
+          end_date: string | null
+          hours_per_week: number | null
+          id: string
+          is_current: boolean
+          notes: string | null
+          salary: number | null
+          staff_id: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          contract_file_url?: string | null
+          contract_type: string
+          created_at?: string
+          end_date?: string | null
+          hours_per_week?: number | null
+          id?: string
+          is_current?: boolean
+          notes?: string | null
+          salary?: number | null
+          staff_id: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          contract_file_url?: string | null
+          contract_type?: string
+          created_at?: string
+          end_date?: string | null
+          hours_per_week?: number | null
+          id?: string
+          is_current?: boolean
+          notes?: string | null
+          salary?: number | null
+          staff_id?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_staff_contracts_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_staff_plannings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          date: string
+          id: string
+          notes: string | null
+          shift_type: string
+          staff_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: string
+          notes?: string | null
+          shift_type: string
+          staff_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: string
+          notes?: string | null
+          shift_type?: string
+          staff_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_staff_plannings_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pz_user_profiles: {
+        Row: {
+          created_at: string
+          current_org_id: string | null
+          first_name: string
+          id: string
+          last_name: string
+          notification_settings: Json | null
+          role: string
+          staff_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_org_id?: string | null
+          first_name: string
+          id: string
+          last_name: string
+          notification_settings?: Json | null
+          role?: string
+          staff_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_org_id?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          notification_settings?: Json | null
+          role?: string
+          staff_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pz_user_profiles_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "pz_staff"
             referencedColumns: ["id"]
           },
         ]
@@ -4742,6 +6358,33 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_webhook_events: {
+        Row: {
+          event_id: string
+          last_error: string | null
+          processed_at: string | null
+          received_at: string
+          status: string
+          type: string
+        }
+        Insert: {
+          event_id: string
+          last_error?: string | null
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+          type: string
+        }
+        Update: {
+          event_id?: string
+          last_error?: string | null
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
       strk_absences: {
         Row: {
           course_id: string | null
@@ -5000,30 +6643,51 @@ export type Database = {
         }
         Relationships: []
       }
-      strk_class_students: {
+      strk_audit_logs: {
         Row: {
-          class_id: string
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          after_data: Json | null
+          before_data: Json | null
           created_at: string
-          enrollment_date: string
+          details: Json
+          entity: string
+          entity_id: string | null
           id: string
-          is_active: boolean
-          student_id: string
+          institution_id: string | null
+          ip: unknown | null
+          user_agent: string | null
         }
         Insert: {
-          class_id: string
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
           created_at?: string
-          enrollment_date?: string
+          details?: Json
+          entity: string
+          entity_id?: string | null
           id?: string
-          is_active?: boolean
-          student_id: string
+          institution_id?: string | null
+          ip?: unknown | null
+          user_agent?: string | null
         }
         Update: {
-          class_id?: string
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          after_data?: Json | null
+          before_data?: Json | null
           created_at?: string
-          enrollment_date?: string
+          details?: Json
+          entity?: string
+          entity_id?: string | null
           id?: string
-          is_active?: boolean
-          student_id?: string
+          institution_id?: string | null
+          ip?: unknown | null
+          user_agent?: string | null
         }
         Relationships: []
       }
@@ -5820,6 +7484,7 @@ export type Database = {
           phone_number: string | null
           profile_image: string | null
           role: Database["public"]["Enums"]["strk_user_role"]
+          status: Database["public"]["Enums"]["strk_profile_status"]
           updated_at: string | null
         }
         Insert: {
@@ -5832,6 +7497,7 @@ export type Database = {
           phone_number?: string | null
           profile_image?: string | null
           role?: Database["public"]["Enums"]["strk_user_role"]
+          status?: Database["public"]["Enums"]["strk_profile_status"]
           updated_at?: string | null
         }
         Update: {
@@ -5844,6 +7510,7 @@ export type Database = {
           phone_number?: string | null
           profile_image?: string | null
           role?: Database["public"]["Enums"]["strk_user_role"]
+          status?: Database["public"]["Enums"]["strk_profile_status"]
           updated_at?: string | null
         }
         Relationships: [
@@ -6022,11 +7689,112 @@ export type Database = {
         }
         Relationships: []
       }
+      strk_signature_evidence: {
+        Row: {
+          created_at: string
+          document_hash: string
+          id: string
+          metadata: Json
+          raw_signature_data: string | null
+          signature_id: string
+          signer_email: string | null
+          signer_ip: unknown | null
+          signer_user_agent: string | null
+          signer_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_hash: string
+          id?: string
+          metadata?: Json
+          raw_signature_data?: string | null
+          signature_id: string
+          signer_email?: string | null
+          signer_ip?: unknown | null
+          signer_user_agent?: string | null
+          signer_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_hash?: string
+          id?: string
+          metadata?: Json
+          raw_signature_data?: string | null
+          signature_id?: string
+          signer_email?: string | null
+          signer_ip?: unknown | null
+          signer_user_agent?: string | null
+          signer_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strk_signature_evidence_signature_id_fkey"
+            columns: ["signature_id"]
+            isOneToOne: false
+            referencedRelation: "strk_signatures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strk_signature_links: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          last_ip: unknown | null
+          last_user_agent: string | null
+          max_attempts: number
+          signature_id: string
+          status: Database["public"]["Enums"]["signature_link_status"]
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          last_ip?: unknown | null
+          last_user_agent?: string | null
+          max_attempts?: number
+          signature_id: string
+          status?: Database["public"]["Enums"]["signature_link_status"]
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          last_ip?: unknown | null
+          last_user_agent?: string | null
+          max_attempts?: number
+          signature_id?: string
+          status?: Database["public"]["Enums"]["signature_link_status"]
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strk_signature_links_signature_id_fkey"
+            columns: ["signature_id"]
+            isOneToOne: false
+            referencedRelation: "strk_signatures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       strk_signatures: {
         Row: {
           completed_at: string | null
           created_at: string | null
           date: string
+          document_hash: string | null
           expires_at: string | null
           id: string
           institution_id: string
@@ -6045,6 +7813,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           date: string
+          document_hash?: string | null
           expires_at?: string | null
           id?: string
           institution_id: string
@@ -6063,6 +7832,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           date?: string
+          document_hash?: string | null
           expires_at?: string | null
           id?: string
           institution_id?: string
@@ -6111,21 +7881,33 @@ export type Database = {
       strk_student_classes: {
         Row: {
           class_id: string
+          created_at: string
           enrolled_at: string
+          enrollment_date: string
           id: string
+          is_active: boolean
           student_id: string
+          updated_at: string
         }
         Insert: {
           class_id: string
+          created_at?: string
           enrolled_at?: string
+          enrollment_date?: string
           id?: string
+          is_active?: boolean
           student_id: string
+          updated_at?: string
         }
         Update: {
           class_id?: string
+          created_at?: string
           enrolled_at?: string
+          enrollment_date?: string
           id?: string
+          is_active?: boolean
           student_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -6406,6 +8188,7 @@ export type Database = {
       }
       subscription_plans: {
         Row: {
+          billing_cycle: string | null
           created_at: string | null
           features: Json
           id: string
@@ -6424,6 +8207,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          billing_cycle?: string | null
           created_at?: string | null
           features?: Json
           id?: string
@@ -6442,6 +8226,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          billing_cycle?: string | null
           created_at?: string | null
           features?: Json
           id?: string
@@ -6785,6 +8570,53 @@ export type Database = {
         }
         Relationships: []
       }
+      user_sessions: {
+        Row: {
+          created_at: string
+          device: string | null
+          id: string
+          ip: unknown | null
+          is_current: boolean | null
+          last_seen_at: string
+          revoked_at: string | null
+          revoked_reason: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          id?: string
+          ip?: unknown | null
+          is_current?: boolean | null
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          id?: string
+          ip?: unknown | null
+          is_current?: boolean | null
+          last_seen_at?: string
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "strk_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_settings: {
         Row: {
           created_at: string
@@ -6906,9 +8738,75 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      strk_class_students: {
+        Row: {
+          class_id: string | null
+          created_at: string | null
+          enrollment_date: string | null
+          id: string | null
+          is_active: boolean | null
+          student_id: string | null
+        }
+        Insert: {
+          class_id?: string | null
+          created_at?: string | null
+          enrollment_date?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          student_id?: string | null
+        }
+        Update: {
+          class_id?: string | null
+          created_at?: string | null
+          enrollment_date?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strk_student_classes_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "strk_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strk_student_classes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "strk_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      _period_bounds: {
+        Args: { p_kind: string }
+        Returns: {
+          start_at: string
+          end_at: string
+        }[]
+      }
+      _strk_get_class_institution: {
+        Args: { p_class: string }
+        Returns: string
+      }
+      adjust_leave_balance_for_leave: {
+        Args: { p_leave_id: string; p_use_new: boolean; p_sign: number }
+        Returns: undefined
+      }
+      adjust_leave_balance_for_period: {
+        Args: {
+          p_staff: string
+          p_type: string
+          p_start: string
+          p_end: string
+          p_sign: number
+        }
+        Returns: undefined
+      }
       calculate_average_score: {
         Args: { p_user_id: string }
         Returns: number
@@ -6931,9 +8829,57 @@ export type Database = {
         }
         Returns: string
       }
+      create_notification: {
+        Args: {
+          p_user_id: string
+          p_title: string
+          p_message: string
+          p_type?: string
+          p_priority?: string
+          p_data?: Json
+        }
+        Returns: string
+      }
+      current_org_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      current_staff_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_active_message_recipients: {
+        Args: Record<PropertyKey, never> | { include_self?: boolean }
+        Returns: {
+          id: string
+          first_name: string
+          last_name: string
+          email: string
+        }[]
+      }
+      get_active_plan_id: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
+      get_current_strk_institution_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_current_strk_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
-        Returns: Database["public"]["Enums"]["strk_user_role"]
+        Returns: string
+      }
+      get_current_user_role_pz: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_my_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["staff_role"]
       }
       get_profile_by_id: {
         Args: { user_id: string }
@@ -6953,20 +8899,108 @@ export type Database = {
           email: string
         }[]
       }
+      increment_plan_usage: {
+        Args: { p_user_id: string; p_feature: string; p_amount?: number }
+        Returns: boolean
+      }
       is_user_premium: {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      log_audit_event: {
+        Args: {
+          p_event_type: string
+          p_action: string
+          p_target_table: string
+          p_target_id: string
+          p_description?: string
+          p_details?: Json
+        }
+        Returns: string
+      }
+      mark_all_notifications_read: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      reassign_residents_and_apply_room_action: {
+        Args: {
+          p_source_room: string
+          p_assignments: Json
+          p_final_action?: string
+        }
+        Returns: Json
+      }
+      record_rate_limit_hit: {
+        Args: {
+          p_key: string
+          p_route: string
+          p_window_sec: number
+          p_max: number
+        }
+        Returns: boolean
+      }
+      self_upgrade_to_teacher: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      strk_can_manage_students: {
+        Args: { target_institution: string }
+        Returns: boolean
+      }
+      strk_log_audit: {
+        Args: {
+          p_action: string
+          p_entity: string
+          p_entity_id: string
+          p_institution: string
+          p_details?: Json
+        }
+        Returns: undefined
+      }
       update_elo_ratings: {
         Args: { winner_id: string; loser_id: string; is_draw?: boolean }
+        Returns: undefined
+      }
+      update_room_occupancy: {
+        Args: { p_room_number: string }
         Returns: undefined
       }
       update_user_profile: {
         Args: { user_id: string; profile_data: Json }
         Returns: undefined
       }
+      update_user_role: {
+        Args: { p_target_user_id: string; p_new_role: string }
+        Returns: boolean
+      }
+      upsert_leave_balance: {
+        Args: { p_staff: string; p_year: number; p_type: string }
+        Returns: undefined
+      }
+      user_can_access_leave: {
+        Args: { p_leave_id: string }
+        Returns: boolean
+      }
+      user_has_permission: {
+        Args: { permission_name: string }
+        Returns: boolean
+      }
+      validate_role_change: {
+        Args: { target_user_id: string; new_role: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      contract_type: "CDI" | "CDD" | "Interim" | "Stagiaire" | "Vacations"
+      deletion_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "processed"
+        | "canceled"
+      pz_org_role: "admin" | "rh" | "soignant" | "viewer"
+      signature_link_status: "active" | "used" | "expired" | "revoked"
+      staff_role: "admin" | "infirmier" | "aide-soignant"
       strk_absence_type: "absence" | "lateness"
       strk_institution_type:
         | "school"
@@ -6976,6 +9010,7 @@ export type Database = {
         | "training_center"
         | "elementary_school"
         | "private_school"
+      strk_profile_status: "active" | "inactive" | "suspended"
       strk_signature_status: "pending" | "completed" | "expired"
       strk_signature_type: "entry" | "exit" | "document"
       strk_user_role: "admin" | "school_admin" | "teacher" | "student"
@@ -7106,6 +9141,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      contract_type: ["CDI", "CDD", "Interim", "Stagiaire", "Vacations"],
+      deletion_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "processed",
+        "canceled",
+      ],
+      pz_org_role: ["admin", "rh", "soignant", "viewer"],
+      signature_link_status: ["active", "used", "expired", "revoked"],
+      staff_role: ["admin", "infirmier", "aide-soignant"],
       strk_absence_type: ["absence", "lateness"],
       strk_institution_type: [
         "school",
@@ -7116,6 +9162,7 @@ export const Constants = {
         "elementary_school",
         "private_school",
       ],
+      strk_profile_status: ["active", "inactive", "suspended"],
       strk_signature_status: ["pending", "completed", "expired"],
       strk_signature_type: ["entry", "exit", "document"],
       strk_user_role: ["admin", "school_admin", "teacher", "student"],

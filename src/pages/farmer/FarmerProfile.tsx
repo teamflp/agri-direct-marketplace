@@ -19,10 +19,10 @@ const FarmerProfile = () => {
   
   // Form states
   const [formData, setFormData] = useState({
-    firstName: profile?.first_name || 'Jean',
-    lastName: profile?.last_name || 'Dupont',
-    email: user?.email || 'jean.dupont@fermelocale.fr',
-    phone: profile?.phone_number || '+33 6 12 34 56 78',
+    firstName: profile?.first_name || '',
+    lastName: profile?.last_name || '',
+    email: user?.email || '',
+    phone: profile?.phone_number || '',
     farmName: 'Ferme des Quatre Saisons',
     address: '123 Chemin des Agriculteurs',
     city: 'Saint-Martin',
@@ -104,9 +104,9 @@ const FarmerProfile = () => {
 
   const name = profile?.first_name && profile?.last_name 
     ? `${profile.first_name} ${profile.last_name}` 
-    : 'Jean Dupont';
+    : 'Agriculteur';
     
-  const email = user?.email || 'jean.dupont@fermelocale.fr';
+  const email = user?.email || 'agriculteur@agrimarket.fr';
 
   return (
     <DashboardLayout

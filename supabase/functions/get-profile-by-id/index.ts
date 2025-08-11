@@ -1,6 +1,6 @@
 
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,48 +8,61 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
-  
+
   try {
-    // Create a Supabase client with the Auth context of the logged in user
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
     )
 
-    // Get the request data
     const { user_id } = await req.json()
-    
+
     if (!user_id) {
       return new Response(
         JSON.stringify({ error: 'User ID is required' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       )
     }
-    
-    // Use RPC function to get profile
-    const { data, error } = await supabaseClient.rpc('get_profile_by_id', {
-      user_id
-    })
 
-    if (error) throw error
+    const { data: profile, error } = await supabaseClient
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user_id)
+      .single()
+
+    if (error) {
+      console.error('Error fetching profile:', error)
+      return new Response(
+        JSON.stringify({ error: 'Profile not found' }),
+        { 
+          status: 404, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
 
     return new Response(
-      JSON.stringify(data),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      JSON.stringify(profile),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
+
   } catch (error) {
+    console.error('Error in get-profile-by-id function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      JSON.stringify({ error: 'Internal server error' }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
   }
 })
