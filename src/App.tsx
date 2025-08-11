@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,26 +20,20 @@ import Checkout from "./pages/Checkout";
 import BuyerOrders from "./pages/buyer/BuyerOrders";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import BuyerDashboard from "./pages/buyer/BuyerDashboard";
-import FarmerDashboard from "./pages/farmer/FarmerDashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
+import FarmerDashboard from "./pages/FarmerDashboard";
 import Chat from "./pages/Chat";
-import Notifications from "./pages/Notifications";
-import Settings from "./pages/Settings";
-import Error404 from "./pages/Error404";
-import Error500 from "./pages/Error500";
-import ComingSoon from "./pages/ComingSoon";
-import UnderMaintenance from "./pages/UnderMaintenance";
-import AccessDenied from "./pages/AccessDenied";
-import VerifyEmail from "./pages/VerifyEmail";
+import NotificationsDemo from "./pages/NotificationsDemo";
+import EmailVerification from "./pages/EmailVerification";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import Pricing from "./pages/Pricing";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
+import SubscriptionsPage from "./pages/subscriptions/SubscriptionsPage";
+import TermsOfService from "./pages/legal/TermsOfService";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
 import Contact from "./pages/Contact";
-import About from "./pages/About";
-import FAQ from "./pages/FAQ";
+import FAQ from "./pages/resources/FAQ";
+import NotFound from "./pages/NotFound";
+import SeasonalCalendar from "./pages/SeasonalCalendar";
 
 const queryClient = new QueryClient();
 
@@ -65,26 +60,20 @@ const App = () => (
                       <Route path="/buyer-dashboard/orders" element={<BuyerOrders />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/register" element={<Register />} />
-                      <Route path="/profile" element={<Profile />} />
                       <Route path="/buyer-dashboard" element={<BuyerDashboard />} />
                       <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
                       <Route path="/chat" element={<Chat />} />
-                      <Route path="/notifications" element={<Notifications />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/404" element={<Error404 />} />
-                      <Route path="/500" element={<Error500 />} />
-                      <Route path="/coming-soon" element={<ComingSoon />} />
-                      <Route path="/maintenance" element={<UnderMaintenance />} />
-                      <Route path="/access-denied" element={<AccessDenied />} />
-                      <Route path="/verify-email" element={<VerifyEmail />} />
+                      <Route path="/notifications-demo" element={<NotificationsDemo />} />
+                      <Route path="/email-verification" element={<EmailVerification />} />
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
-                      <Route path="/pricing" element={<Pricing />} />
-                      <Route path="/terms" element={<Terms />} />
-                      <Route path="/privacy" element={<Privacy />} />
+                      <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                      <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/contact" element={<Contact />} />
-                      <Route path="/about" element={<About />} />
                       <Route path="/faq" element={<FAQ />} />
+                      <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                   </BrowserRouter>
                 </TooltipProvider>
