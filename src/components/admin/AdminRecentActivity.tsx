@@ -8,7 +8,7 @@ import { ShoppingCart, User, Clock } from 'lucide-react';
 
 interface RecentOrder {
   id: string;
-  total_amount: number;
+  total: number;
   status: string;
   created_at: string;
   buyer_id: string;
@@ -128,7 +128,7 @@ const AdminRecentActivity: React.FC<AdminRecentActivityProps> = ({
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">{order.total_amount?.toLocaleString() || 0} €</div>
+                    <div className="font-medium">{order.total?.toLocaleString() || 0} €</div>
                     <Badge className={getStatusColor(order.status)}>
                       {getStatusLabel(order.status)}
                     </Badge>

@@ -15,7 +15,7 @@ interface AdminAnalytics {
 
 interface RecentOrder {
   id: string;
-  total_amount: number;
+  total: number;
   status: string;
   created_at: string;
   buyer_id: string;
@@ -50,7 +50,7 @@ export const useAdminAnalytics = () => {
       setLoading(true);
       setError(null);
 
-      // Get total users count
+      // Get total users count from user_profiles
       const { count: totalUsers } = await supabase
         .from('user_profiles')
         .select('*', { count: 'exact', head: true });
@@ -65,20 +65,20 @@ export const useAdminAnalytics = () => {
         .from('orders')
         .select('*', { count: 'exact', head: true });
 
-      // Get orders for revenue calculation (this month)
+      // Get orders for revenue calculation (this month) - using 'total' instead of 'total_amount'
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
 
       const { data: monthlyOrders } = await supabase
         .from('orders')
-        .select('total_amount')
+        .select('total')
         .gte('created_at', startOfMonth.toISOString())
         .eq('status', 'completed');
 
-      const monthlyRevenue = monthlyOrders?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0;
+      const monthlyRevenue = monthlyOrders?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
 
-      // Get new users this month
+      // Get new users this month from user_profiles
       const { count: newUsersThisMonth } = await supabase
         .from('user_profiles')
         .select('*', { count: 'exact', head: true })
@@ -99,10 +99,10 @@ export const useAdminAnalytics = () => {
         .select('*', { count: 'exact', head: true })
         .gte('created_at', startOfWeek.toISOString());
 
-      // Get recent orders
+      // Get recent orders - using 'total' instead of 'total_amount'
       const { data: ordersData } = await supabase
         .from('orders')
-        .select('id, total_amount, status, created_at, buyer_id')
+        .select('id, total, status, created_at, buyer_id')
         .order('created_at', { ascending: false })
         .limit(5);
 
