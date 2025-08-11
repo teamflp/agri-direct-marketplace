@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -74,22 +73,21 @@ const Products = () => {
     setSearchTerm('');
   };
 
-  const removeFilter = (filterKey: string) => {
-    if (filterKey === 'search') {
+  const removeFilter = (key: keyof ProductFiltersType, value?: string) => {
+    if (key === 'search') {
       setSearchTerm('');
       setFilters(prev => ({ ...prev, search: '' }));
-    } else if (filterKey === 'priceRange') {
+    } else if (key === 'priceRange') {
       setFilters(prev => ({ ...prev, priceRange: [0, 100] }));
-    } else if (filterKey === 'distance') {
+    } else if (key === 'distance') {
       setFilters(prev => ({ ...prev, distance: 50 }));
-    } else if (filterKey.startsWith('category-')) {
-      const category = filterKey.replace('category-', '');
+    } else if (key === 'categories' && value) {
       setFilters(prev => ({ 
         ...prev, 
-        categories: prev.categories.filter(c => c !== category) 
+        categories: prev.categories.filter(c => c !== value) 
       }));
     } else {
-      setFilters(prev => ({ ...prev, [filterKey]: false }));
+      setFilters(prev => ({ ...prev, [key]: false }));
     }
   };
 
@@ -170,7 +168,7 @@ const Products = () => {
           <ActiveFilters
             filters={filters}
             onRemoveFilter={removeFilter}
-            onClearAll={clearFilters}
+            onResetAll={clearFilters}
           />
         </div>
 
