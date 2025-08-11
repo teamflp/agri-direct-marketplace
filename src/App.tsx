@@ -11,6 +11,10 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { SocialProvider } from "@/contexts/SocialContext";
 import { MessageProvider } from "@/contexts/MessageContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import RoleGuard from "@/components/auth/RoleGuard";
+
+// Pages communes
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -18,12 +22,8 @@ import Farmers from "./pages/Farmers";
 import FarmerDetail from "./pages/FarmerDetail";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
-import BuyerOrders from "./pages/buyer/BuyerOrders";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import BuyerDashboard from "./pages/BuyerDashboard";
-import FarmerDashboard from "./pages/FarmerDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 import Chat from "./pages/Chat";
 import NotificationsDemo from "./pages/NotificationsDemo";
 import EmailVerification from "./pages/EmailVerification";
@@ -37,7 +37,9 @@ import FAQ from "./pages/resources/FAQ";
 import NotFound from "./pages/NotFound";
 import SeasonalCalendar from "./pages/SeasonalCalendar";
 
-// Buyer pages
+// Pages Buyer
+import BuyerDashboard from "./pages/BuyerDashboard";
+import BuyerOrders from "./pages/buyer/BuyerOrders";
 import BuyerProfile from "./pages/buyer/BuyerProfile";
 import BuyerFavorites from "./pages/buyer/BuyerFavorites";
 import BuyerMessages from "./pages/buyer/BuyerMessages";
@@ -45,7 +47,8 @@ import BuyerFarmers from "./pages/buyer/BuyerFarmers";
 import BuyerInvoices from "./pages/buyer/BuyerInvoices";
 import BuyerSubscriptions from "./pages/buyer/BuyerSubscriptions";
 
-// Farmer pages
+// Pages Farmer
+import FarmerDashboard from "./pages/FarmerDashboard";
 import FarmerProducts from "./pages/farmer/FarmerProducts";
 import FarmerOrders from "./pages/farmer/FarmerOrders";
 import FarmerInventory from "./pages/farmer/FarmerInventory";
@@ -56,7 +59,8 @@ import FarmerBlog from "./pages/farmer/FarmerBlog";
 import FarmerSubscription from "./pages/farmer/FarmerSubscription";
 import FarmerInvoices from "./pages/farmer/FarmerInvoices";
 
-// Admin pages
+// Pages Admin
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 const queryClient = new QueryClient();
@@ -75,71 +79,308 @@ const App = () => (
                   <SocialProvider>
                     <MessageProvider>
                       <Routes>
-                        {/* Main routes */}
+                        {/* Routes publiques */}
                         <Route path="/" element={<Index />} />
                         <Route path="/products" element={<Products />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
                         <Route path="/farmers" element={<Farmers />} />
                         <Route path="/farmer/:id" element={<FarmerDetail />} />
-                        <Route path="/cart" element={<Cart />} />
-                        <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/chat" element={<Chat />} />
-                        <Route path="/notifications-demo" element={<NotificationsDemo />} />
-                        <Route path="/email-verification" element={<EmailVerification />} />
-                        <Route path="/forgot-password" element={<ForgotPassword />} />
-                        <Route path="/reset-password" element={<ResetPassword />} />
-                        <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                        <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
                         <Route path="/terms" element={<TermsOfService />} />
                         <Route path="/privacy" element={<PrivacyPolicy />} />
                         <Route path="/contact" element={<Contact />} />
                         <Route path="/faq" element={<FAQ />} />
-                        <Route path="/seasonal-calendar" element={<SeasonalCalendar />} />
 
-                        {/* Primary dashboard routes */}
-                        <Route path="/buyer" element={<BuyerDashboard />} />
-                        <Route path="/farmer" element={<FarmerDashboard />} />
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        
-                        {/* Backward compatibility redirects */}
+                        {/* Routes d'authentification - interdites aux utilisateurs connectés */}
+                        <Route 
+                          path="/login" 
+                          element={
+                            <ProtectedRoute requireAuth={false}>
+                              <Login />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/register" 
+                          element={
+                            <ProtectedRoute requireAuth={false}>
+                              <Register />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/forgot-password" 
+                          element={
+                            <ProtectedRoute requireAuth={false}>
+                              <ForgotPassword />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/reset-password" 
+                          element={
+                            <ProtectedRoute requireAuth={false}>
+                              <ResetPassword />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route path="/email-verification" element={<EmailVerification />} />
+
+                        {/* Routes protégées - requièrent une authentification */}
+                        <Route 
+                          path="/cart" 
+                          element={
+                            <ProtectedRoute>
+                              <Cart />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/checkout" 
+                          element={
+                            <ProtectedRoute>
+                              <Checkout />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/chat" 
+                          element={
+                            <ProtectedRoute>
+                              <Chat />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/subscriptions" 
+                          element={
+                            <ProtectedRoute>
+                              <SubscriptionsPage />
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/notifications-demo" 
+                          element={
+                            <ProtectedRoute>
+                              <NotificationsDemo />
+                            </ProtectedRoute>
+                          } 
+                        />
+
+                        {/* Routes Buyer - protégées par rôle */}
+                        <Route 
+                          path="/buyer" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerDashboard />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/orders" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerOrders />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/profile" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerProfile />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/favorites" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerFavorites />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/messages" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerMessages />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/farmers" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerFarmers />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/invoices" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerInvoices />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/buyer/subscriptions" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['buyer', 'admin']}>
+                                <BuyerSubscriptions />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+
+                        {/* Routes Farmer - protégées par rôle */}
+                        <Route 
+                          path="/farmer" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerDashboard />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/products" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerProducts />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/orders" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerOrders />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/inventory" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerInventory />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/analytics" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerAnalytics />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/invoices" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerInvoices />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/messages" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerMessages />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/profile" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerProfile />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/blog" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerBlog />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/farmer/subscription" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['farmer', 'admin']}>
+                                <FarmerSubscription />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+
+                        {/* Routes Admin - strictement admin */}
+                        <Route 
+                          path="/admin" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['admin']}>
+                                <AdminDashboard />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+                        <Route 
+                          path="/admin/settings" 
+                          element={
+                            <ProtectedRoute>
+                              <RoleGuard allowedRoles={['admin']}>
+                                <AdminSettings />
+                              </RoleGuard>
+                            </ProtectedRoute>
+                          } 
+                        />
+
+                        {/* Redirections pour compatibilité */}
                         <Route path="/buyer-dashboard" element={<Navigate to="/buyer" replace />} />
                         <Route path="/farmer-dashboard" element={<Navigate to="/farmer" replace />} />
-
-                        {/* Buyer routes */}
                         <Route path="/buyer/dashboard" element={<Navigate to="/buyer" replace />} />
-                        <Route path="/buyer/orders" element={<BuyerOrders />} />
-                        <Route path="/buyer/profile" element={<BuyerProfile />} />
-                        <Route path="/buyer/favorites" element={<BuyerFavorites />} />
-                        <Route path="/buyer/messages" element={<BuyerMessages />} />
-                        <Route path="/buyer/farmers" element={<BuyerFarmers />} />
-                        <Route path="/buyer/invoices" element={<BuyerInvoices />} />
-                        <Route path="/buyer/subscriptions" element={<BuyerSubscriptions />} />
+                        <Route path="/buyer-dashboard/*" element={<Navigate to="/buyer" replace />} />
 
-                        {/* Legacy buyer routes - redirect to new paths */}
-                        <Route path="/buyer-dashboard/orders" element={<Navigate to="/buyer/orders" replace />} />
-                        <Route path="/buyer-dashboard/profile" element={<Navigate to="/buyer/profile" replace />} />
-                        <Route path="/buyer-dashboard/favorites" element={<Navigate to="/buyer/favorites" replace />} />
-                        <Route path="/buyer-dashboard/messages" element={<Navigate to="/buyer/messages" replace />} />
-                        <Route path="/buyer-dashboard/farmers" element={<Navigate to="/buyer/farmers" replace />} />
-                        <Route path="/buyer-dashboard/invoices" element={<Navigate to="/buyer/invoices" replace />} />
-                        <Route path="/buyer-dashboard/subscriptions" element={<Navigate to="/buyer/subscriptions" replace />} />
-
-                        {/* Farmer routes */}
-                        <Route path="/farmer/products" element={<FarmerProducts />} />
-                        <Route path="/farmer/orders" element={<FarmerOrders />} />
-                        <Route path="/farmer/inventory" element={<FarmerInventory />} />
-                        <Route path="/farmer/analytics" element={<FarmerAnalytics />} />
-                        <Route path="/farmer/invoices" element={<FarmerInvoices />} />
-                        <Route path="/farmer/messages" element={<FarmerMessages />} />
-                        <Route path="/farmer/profile" element={<FarmerProfile />} />
-                        <Route path="/farmer/blog" element={<FarmerBlog />} />
-                        <Route path="/farmer/subscription" element={<FarmerSubscription />} />
-
-                        {/* Admin routes */}
-                        <Route path="/admin/settings" element={<AdminSettings />} />
-
-                        {/* Catch all - 404 */}
+                        {/* 404 */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </MessageProvider>
