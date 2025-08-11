@@ -142,7 +142,18 @@ const Farmers = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredFarmers.map((farmer) => (
-              <FarmerCard key={farmer.id} farmer={farmer} />
+              <FarmerCard 
+                key={farmer.id}
+                id={parseInt(farmer.id)}
+                name={farmer.name}
+                image="https://images.unsplash.com/photo-1566472814542-3571fb3b9e7a"
+                location={farmer.location}
+                distance={farmer.distance || 0}
+                rating={farmer.rating}
+                productsCount={0}
+                specialties={['Légumes bio', 'Fruits de saison']}
+                onClick={() => console.log('Navigate to farmer', farmer.id)}
+              />
             ))}
           </div>
         )}

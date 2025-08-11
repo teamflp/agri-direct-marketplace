@@ -56,13 +56,13 @@ const ProductCard = ({
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart({
-      id,
+      id: id.toString(),
       name,
       price,
       quantity,
       image,
       farmerName,
-      farmerId,
+      farmerId: farmerId.toString(),
       unit
     });
     

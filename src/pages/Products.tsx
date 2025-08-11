@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ProductCard from '@/components/products/ProductCard';
-import ProductFilters from '@/components/products/ProductFilters';
+import ProductFilters, { ProductFilters as ProductFiltersType } from '@/components/products/ProductFilters';
 import ActiveFilters from '@/components/products/ActiveFilters';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -12,49 +12,55 @@ import { useProducts } from '@/hooks/useProducts';
 const Products = () => {
   const { products, loading, error } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    category: '',
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<ProductFiltersType>({
+    search: '',
     priceRange: [0, 100],
+    categories: [],
     organic: false,
+    localOnly: false,
     freeDelivery: false,
     farmPickup: false,
     distance: 50,
-    rating: 0,
-    inStock: false,
   });
+
+  // Available categories (could be fetched from API)
+  const categories = ['Légumes', 'Fruits', 'Produits laitiers', 'Viande', 'Épicerie'];
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = !filters.category || product.category_id === filters.category;
-    const matchesPrice = product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1];
+    const matchesCategory = filters.categories.length === 0 || 
+                           filters.categories.includes(product.category_id || '');
+    const matchesPrice = product.price >= filters.priceRange[0] && 
+                        product.price <= filters.priceRange[1];
     const matchesOrganic = !filters.organic || product.is_organic;
     const matchesFreeDelivery = !filters.freeDelivery || product.free_delivery;
     const matchesFarmPickup = !filters.farmPickup || product.farm_pickup;
-    const matchesRating = product.rating >= filters.rating;
-    const matchesStock = !filters.inStock || product.stock > 0;
-    const matchesDistance = !product.farmer?.distance || product.farmer.distance <= filters.distance;
+    const matchesDistance = !filters.localOnly || 
+                           !product.farmer?.distance || 
+                           product.farmer.distance <= 30;
 
-    return matchesSearch && matchesCategory && matchesPrice && matchesOrganic && 
-           matchesFreeDelivery && matchesFarmPickup && matchesRating && 
-           matchesStock && matchesDistance;
+    return matchesSearch && matchesCategory && matchesPrice && 
+           matchesOrganic && matchesFreeDelivery && matchesFarmPickup && 
+           matchesDistance;
   });
 
-  const handleFilterChange = (newFilters: typeof filters) => {
+  const handleFilterChange = (newFilters: ProductFiltersType) => {
     setFilters(newFilters);
   };
 
   const clearFilters = () => {
     setFilters({
-      category: '',
+      search: '',
       priceRange: [0, 100],
+      categories: [],
       organic: false,
+      localOnly: false,
       freeDelivery: false,
       farmPickup: false,
       distance: 50,
-      rating: 0,
-      inStock: false,
     });
     setSearchTerm('');
   };
@@ -66,12 +72,28 @@ const Products = () => {
       setFilters(prev => ({ ...prev, priceRange: [0, 100] }));
     } else if (filterKey === 'distance') {
       setFilters(prev => ({ ...prev, distance: 50 }));
-    } else if (filterKey === 'rating') {
-      setFilters(prev => ({ ...prev, rating: 0 }));
+    } else if (filterKey.startsWith('category-')) {
+      const category = filterKey.replace('category-', '');
+      setFilters(prev => ({ 
+        ...prev, 
+        categories: prev.categories.filter(c => c !== category) 
+      }));
     } else {
-      setFilters(prev => ({ ...prev, [filterKey]: filterKey === 'category' ? '' : false }));
+      setFilters(prev => ({ ...prev, [filterKey]: false }));
     }
   };
+
+  // Count active filters
+  const activeFiltersCount = Object.entries(filters).reduce((count, [key, value]) => {
+    if (key === 'categories') return count + (value as string[]).length;
+    if (key === 'priceRange') {
+      const range = value as [number, number];
+      return count + (range[0] !== 0 || range[1] !== 100 ? 1 : 0);
+    }
+    if (key === 'distance') return count + (value !== 50 ? 1 : 0);
+    if (typeof value === 'boolean') return count + (value ? 1 : 0);
+    return count;
+  }, 0) + (searchTerm ? 1 : 0);
 
   if (loading) {
     return (
@@ -124,6 +146,16 @@ const Products = () => {
             />
           </div>
           
+          <ProductFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onReset={clearFilters}
+            categories={categories}
+            isOpen={showFilters}
+            onToggle={() => setShowFilters(!showFilters)}
+            activeFiltersCount={activeFiltersCount}
+          />
+          
           <ActiveFilters
             filters={filters}
             searchTerm={searchTerm}
@@ -132,27 +164,33 @@ const Products = () => {
           />
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="w-full lg:w-1/4">
-            <ProductFilters
-              filters={filters}
-              onFiltersChange={handleFilterChange}
-            />
-          </aside>
-
-          <div className="flex-1">
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-600">Aucun produit trouvé avec ces critères.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="flex-1">
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Aucun produit trouvé avec ces critères.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard 
+                  key={product.id}
+                  id={parseInt(product.id)}
+                  name={product.name}
+                  image={product.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43'}
+                  price={product.price}
+                  unit={product.unit}
+                  rating={product.rating}
+                  reviews={product.reviews_count}
+                  farmerName={product.farmer?.name || 'Producteur'}
+                  farmerId={parseInt(product.farmer?.id || '1')}
+                  distance={product.farmer?.distance}
+                  organic={product.is_organic}
+                  freeDelivery={product.free_delivery}
+                  farmPickup={product.farm_pickup}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
