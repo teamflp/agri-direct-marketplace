@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { StarRating } from './StarRating';
 import { ReviewsList } from './ReviewsList';
 import { AddReviewForm } from './AddReviewForm';
+import { adaptLocalReviewToDb } from './ReviewsAdapter';
 
 interface FarmerReviewsProps {
   farmerId: number;
@@ -21,15 +22,34 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
     getAverageFarmerRating
   } = useReviews();
   
-  const reviews = getFarmerReviews(farmerId);
+  const localReviews = getFarmerReviews(farmerId);
   const averageRating = getAverageFarmerRating(farmerId);
 
-  const handleMarkHelpful = (id: number) => {
-    markReviewHelpful(id, undefined, farmerId);
+  // Convert local reviews to the format expected by ReviewsList
+  const adaptedReviews = localReviews.map(review => ({
+    id: review.id.toString(),
+    user_id: review.userId.toString(),
+    farmer_id: review.farmerId?.toString(),
+    rating: review.rating,
+    comment: review.text,
+    helpful_count: review.helpful,
+    not_helpful_count: review.notHelpful,
+    created_at: review.date,
+    updated_at: review.date,
+    user: {
+      id: review.userId.toString(),
+      email: `${review.userName}@example.com`
+    }
+  }));
+
+  const handleMarkHelpful = (id: string) => {
+    const numericId = parseInt(id);
+    markReviewHelpful(numericId, undefined, farmerId);
   };
 
-  const handleMarkNotHelpful = (id: number) => {
-    markReviewNotHelpful(id, undefined, farmerId);
+  const handleMarkNotHelpful = (id: string) => {
+    const numericId = parseInt(id);
+    markReviewNotHelpful(numericId, undefined, farmerId);
   };
 
   return (
@@ -40,7 +60,7 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
           <div className="flex items-center space-x-2">
             <StarRating rating={averageRating} />
             <span>
-              {averageRating.toFixed(1)} ({reviews.length} avis)
+              {averageRating.toFixed(1)} ({localReviews.length} avis)
             </span>
           </div>
         </CardTitle>
@@ -54,7 +74,7 @@ export function FarmerReviews({ farmerId, farmerName }: FarmerReviewsProps) {
           
           <TabsContent value="all-reviews" className="mt-6">
             <ReviewsList 
-              reviews={reviews} 
+              reviews={adaptedReviews} 
               onMarkHelpful={handleMarkHelpful} 
               onMarkNotHelpful={handleMarkNotHelpful}
             />
