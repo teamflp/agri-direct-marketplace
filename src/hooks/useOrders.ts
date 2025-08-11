@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -185,14 +186,15 @@ export const useOrders = () => {
 
   // Updated: use Supabase RPC to update status and log history
   const updateOrderStatus = async (orderId: string, status: string, notes?: string) => {
-    // Prefer RPC to ensure status history is recorded server-side
-    const { data, error } = await supabase.rpc('update_order_status', {
+    // Utiliser un cast temporaire car le type généré n'inclut pas encore la fonction RPC
+    const { error } = await (supabase as any).rpc('update_order_status', {
       order_id: orderId,
       new_status: status,
       notes: notes ?? null
     });
+
     if (error) {
-      // Fallback: direct update if RPC unavailable
+      // Fallback: direct update si la RPC est indisponible
       const { error: directError } = await supabase
         .from('orders')
         .update({ status })
@@ -224,7 +226,8 @@ export const useOrders = () => {
 
   // New: fetch status history for an order (timeline)
   const getOrderStatusHistory = async (orderId: string) => {
-    const { data, error } = await supabase
+    // Utiliser un cast temporaire car la table peut ne pas être présente dans les types générés
+    const { data, error } = await (supabase as any)
       .from('order_status_history')
       .select('*')
       .eq('order_id', orderId)
