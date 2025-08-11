@@ -15,27 +15,40 @@ const ProtectedRoute = ({
   requireAuth = true, 
   redirectTo = '/login' 
 }: ProtectedRouteProps) => {
-  const { user, session, isLoading } = useAuth();
+  const { user, session, isLoading, profile } = useAuth();
   const location = useLocation();
 
-  // Afficher un loader pendant le chargement de l'authentification
+  console.log('ProtectedRoute - isLoading:', isLoading, 'user:', !!user, 'profile:', !!profile);
+
+  // Show loading spinner with timeout protection
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-agrimarket-orange" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-agrimarket-orange" />
+          <p className="text-gray-600">Chargement...</p>
+        </div>
       </div>
     );
   }
 
   // Si l'authentification est requise mais l'utilisateur n'est pas connecté
   if (requireAuth && (!user || !session)) {
+    console.log('Redirecting to login - no user or session');
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
   // Si l'utilisateur est connecté mais ne devrait pas être sur cette page (ex: page login)
   if (!requireAuth && user && session) {
-    const from = location.state?.from?.pathname || '/';
-    return <Navigate to={from} replace />;
+    console.log('User logged in, redirecting from public page');
+    // Redirect based on profile role if available
+    if (profile?.role === 'farmer') {
+      return <Navigate to="/farmer" replace />;
+    } else if (profile?.role === 'admin') {
+      return <Navigate to="/admin" replace />;
+    } else {
+      return <Navigate to="/buyer" replace />;
+    }
   }
 
   return <>{children}</>;

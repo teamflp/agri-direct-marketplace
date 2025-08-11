@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,6 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Configurer le listener pour les changements d'état d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log('Auth state change:', event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(true);
@@ -65,16 +65,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Vérifier s'il y a une session active
     const initializeAuth = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user) {
-        await fetchUserProfile(currentSession.user.id);
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        console.log('Initial session:', currentSession?.user?.id);
+        
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          await fetchUserProfile(currentSession.user.id);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
     initializeAuth();
@@ -86,21 +91,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      // Explicitly type the response from the RPC function
-      const { data, error } = await supabase.functions.invoke('get-profile-by-id', {
-        body: { user_id: userId }
-      });
+      console.log('Fetching profile for user:', userId);
+      
+      // Fetch profile directly from user_profiles table
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
       if (error) {
-        console.error('Erreur lors du chargement du profil :', error);
-        setProfile(null);
+        console.error('Error fetching profile:', error);
+        // If no profile exists, create a default buyer profile
+        if (error.code === 'PGRST116') {
+          console.log('No profile found, creating default profile');
+          const { data: newProfile, error: createError } = await supabase
+            .from('user_profiles')
+            .insert([
+              {
+                id: userId,
+                role: 'buyer',
+                first_name: '',
+                last_name: '',
+                phone_number: ''
+              }
+            ])
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            setProfile(null);
+          } else {
+            console.log('Created new profile:', newProfile);
+            setProfile(newProfile as UserProfile);
+          }
+        } else {
+          setProfile(null);
+        }
       } else if (data) {
+        console.log('Profile fetched successfully:', data);
         setProfile(data as UserProfile);
       } else {
+        console.log('No profile data returned');
         setProfile(null);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement du profil :', error);
+      console.error('Error in fetchUserProfile:', error);
       setProfile(null);
     }
   };
@@ -135,7 +172,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'success',
       });
 
-      // Rediriger vers la page de vérification d'email
       navigate('/email-verification', { state: { email } });
       return { error: null };
     } catch (error: any) {
@@ -170,26 +206,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'success',
       });
 
-      // Redirect to appropriate page based on role
-      if (data.user) {
-        // Use Edge Function to get profile role
-        const { data: profileData, error: profileError } = await supabase.functions.invoke('get-profile-by-id', {
-          body: { user_id: data.user.id }
-        });
-
-        if (profileData && !profileError) {
-          if (profileData.role === 'farmer') {
-            navigate('/farmer');
-          } else if (profileData.role === 'admin') {
-            navigate('/admin');
-          } else {
-            navigate('/buyer');
-          }
-        } else {
-          navigate('/');
-        }
-      }
-
+      // The profile will be fetched automatically by the auth state change listener
       return { error: null };
     } catch (error: any) {
       toast({
@@ -213,10 +230,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return { error: new Error('Utilisateur non connecté') };
 
     try {
-      // Use Edge Function for updating profile
-      const { error } = await supabase.functions.invoke('update-user-profile', {
-        body: { user_id: user.id, profile_data: data }
-      });
+      const { error } = await supabase
+        .from('user_profiles')
+        .update(data)
+        .eq('id', user.id);
 
       if (error) {
         toast({
