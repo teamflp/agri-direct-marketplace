@@ -20,10 +20,12 @@ const Header = () => {
   const isMobile = useIsMobile();
   const { profile } = useAuth();
 
-  // Navigation links with translated labels
+  // Navigation links with translated labels and icons
   const navLinks = navigationLinks.map(link => ({
     path: link.path,
-    label: t(link.translationKey)
+    label: t(link.translationKey),
+    icon: link.icon,
+    iconOnly: link.iconOnly
   }));
 
   // Détection du défilement pour appliquer les effets visuels
