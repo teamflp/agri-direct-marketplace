@@ -7,6 +7,7 @@ import HeaderNavigation from './HeaderNavigation';
 import HeaderAuthActions from './HeaderAuthActions';
 import HeaderMobileMenu from './HeaderMobileMenu';
 import MobileBottomNav from './MobileBottomNav';
+import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { t } from '@/services/translation';
 import { MiniCart } from '@/components/cart/MiniCart';
 import { useAuth } from '@/contexts/AuthContext';
@@ -79,6 +80,9 @@ const Header = () => {
             
             {/* Actions à droite - visibles uniquement sur desktop */}
             <div className="flex items-center gap-3">
+              {/* Notification Center */}
+              <NotificationCenter />
+              
               {/* Mini panier */}
               <MiniCart />
               
