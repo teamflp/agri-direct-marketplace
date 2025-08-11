@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { fr } from 'date-fns/locale';
 import { Eye, Package, Truck, CheckCircle, X } from 'lucide-react';
 import BuyerOrderDetailsDialog from '@/components/orders/BuyerOrderDetailsDialog';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const BuyerOrders = () => {
   const { orders, loading, updateOrderStatus } = useOrders();
