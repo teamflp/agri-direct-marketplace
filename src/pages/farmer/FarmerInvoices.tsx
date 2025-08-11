@@ -5,6 +5,7 @@ import { farmerMenuItems } from '@/components/layout/dashboardNavigation';
 import { useAuth } from '@/contexts/AuthContext';
 import InvoiceHistory from '@/pages/farmer/components/InvoiceHistory';
 import BillingDetails from '@/pages/farmer/components/BillingDetails';
+import { subscriptionData, invoicesData } from './data/subscriptionData';
 
 const FarmerInvoices = () => {
   const { user, profile } = useAuth();
@@ -27,10 +28,10 @@ const FarmerInvoices = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <InvoiceHistory />
+            <InvoiceHistory invoices={invoicesData} />
           </div>
           <div>
-            <BillingDetails />
+            <BillingDetails subscription={subscriptionData} />
           </div>
         </div>
       </div>
