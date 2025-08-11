@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -6,12 +7,12 @@ import { StarRating } from './StarRating';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { Review } from '@/contexts/reviews/types';
+import { Review } from '@/hooks/useReviews';
 
 interface ReviewsListProps {
   reviews: Review[];
-  onMarkHelpful: (id: number) => void;
-  onMarkNotHelpful: (id: number) => void;
+  onMarkHelpful: (id: string) => void;
+  onMarkNotHelpful: (id: string) => void;
 }
 
 export function ReviewsList({ reviews, onMarkHelpful, onMarkNotHelpful }: ReviewsListProps) {
@@ -33,28 +34,34 @@ export function ReviewsList({ reviews, onMarkHelpful, onMarkNotHelpful }: Review
         <Card key={review.id} className="p-4">
           <div className="flex items-start gap-4">
             <Avatar>
-              {review.userAvatar ? (
-                <img src={review.userAvatar} alt={review.userName} />
+              {review.user?.email ? (
+                <div className="bg-agrimarket-orange text-white flex items-center justify-center h-full">
+                  {review.user.email.charAt(0).toUpperCase()}
+                </div>
               ) : (
                 <div className="bg-agrimarket-orange text-white flex items-center justify-center h-full">
-                  {review.userName.charAt(0)}
+                  ?
                 </div>
               )}
             </Avatar>
             <div className="flex-1">
               <div className="flex justify-between">
                 <div>
-                  <h4 className="font-semibold">{review.userName}</h4>
+                  <h4 className="font-semibold">
+                    {review.user?.email ? review.user.email.split('@')[0] : 'Utilisateur anonyme'}
+                  </h4>
                   <div className="flex items-center gap-2 mt-1">
                     <StarRating rating={review.rating} size={14} />
                     <span className="text-sm text-gray-500">
-                      {formatDate(review.date)}
+                      {formatDate(review.created_at)}
                     </span>
                   </div>
                 </div>
               </div>
               
-              <p className="mt-3 text-gray-700">{review.text}</p>
+              {review.comment && (
+                <p className="mt-3 text-gray-700">{review.comment}</p>
+              )}
               
               <div className="flex items-center mt-4 text-sm text-gray-500">
                 <span>Cet avis vous a-t-il été utile ?</span>
@@ -66,7 +73,7 @@ export function ReviewsList({ reviews, onMarkHelpful, onMarkNotHelpful }: Review
                     onClick={() => onMarkHelpful(review.id)}
                   >
                     <ThumbsUp className="h-4 w-4 mr-1" />
-                    <span>{review.helpful}</span>
+                    <span>{review.helpful_count}</span>
                   </Button>
                   <Button 
                     variant="ghost" 
@@ -75,7 +82,7 @@ export function ReviewsList({ reviews, onMarkHelpful, onMarkNotHelpful }: Review
                     onClick={() => onMarkNotHelpful(review.id)}
                   >
                     <ThumbsDown className="h-4 w-4 mr-1" />
-                    <span>{review.notHelpful}</span>
+                    <span>{review.not_helpful_count}</span>
                   </Button>
                 </div>
               </div>

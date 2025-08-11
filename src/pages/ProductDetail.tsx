@@ -341,7 +341,7 @@ const ProductDetail = () => {
                 </TabsContent>
                 
                 <TabsContent value="reviews" className="py-4">
-                  <ProductReviews productId={product.id} productName={product.name} />
+                  <ProductReviews productId={product.id.toString()} productName={product.name} />
                 </TabsContent>
               </Tabs>
             </div>
