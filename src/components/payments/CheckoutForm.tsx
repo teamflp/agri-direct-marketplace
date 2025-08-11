@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,16 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/hooks/useCart';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CreditCard, Truck, MapPin, Calendar } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export const CheckoutForm = () => {
+  const [searchParams] = useSearchParams();
   const [deliveryMethod, setDeliveryMethod] = useState('delivery');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -23,9 +25,23 @@ export const CheckoutForm = () => {
   const [loading, setLoading] = useState(false);
   
   const { cartItems, getTotalPrice, clearCart } = useCart();
-  const { createOrder } = useOrders();
+  const { createOrder, updatePaymentStatus } = useOrders();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Handle success/cancel from Stripe
+  React.useEffect(() => {
+    const status = searchParams.get('status');
+    const orderId = searchParams.get('order_id');
+
+    if (status === 'success' && orderId) {
+      updatePaymentStatus(orderId, 'paid');
+      toast.success('Paiement réussi ! Votre commande a été confirmée.');
+      navigate('/buyer/orders');
+    } else if (status === 'canceled') {
+      toast.error('Paiement annulé');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,11 +68,41 @@ export const CheckoutForm = () => {
         items: orderItems
       };
 
-      await createOrder(orderData);
-      await clearCart();
+      const order = await createOrder(orderData);
       
-      toast.success('Commande passée avec succès !');
-      navigate('/buyer-dashboard');
+      if (paymentMethod === 'card') {
+        // Create Stripe checkout session
+        const stripeItems = cartItems.map(item => ({
+          name: item.product?.name || 'Produit',
+          description: `${item.quantity} ${item.product?.unit || 'unité(s)'}`,
+          unit_price: item.product?.price || 0,
+          quantity: item.quantity
+        }));
+
+        const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+          body: {
+            amount: getTotalPrice(),
+            currency: 'eur',
+            orderId: order.id,
+            items: stripeItems
+          }
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        if (data?.url) {
+          // Open Stripe checkout in the same tab
+          window.location.href = data.url;
+          return;
+        }
+      } else {
+        // For cash/transfer payments, clear cart and redirect
+        await clearCart();
+        toast.success('Commande passée avec succès !');
+        navigate('/buyer/orders');
+      }
     } catch (error) {
       toast.error('Erreur lors de la commande');
       console.error('Erreur:', error);
@@ -155,7 +201,7 @@ export const CheckoutForm = () => {
               <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="mt-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="card" id="card" />
-                  <Label htmlFor="card">Carte bancaire</Label>
+                  <Label htmlFor="card">Carte bancaire (Stripe)</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="cash" id="cash" />
@@ -169,21 +215,26 @@ export const CheckoutForm = () => {
             </div>
 
             {paymentMethod === 'card' && (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="cardNumber">Numéro de carte</Label>
-                  <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="expiry">Date d'expiration</Label>
-                    <Input id="expiry" placeholder="MM/AA" />
-                  </div>
-                  <div>
-                    <Label htmlFor="cvc">CVC</Label>
-                    <Input id="cvc" placeholder="123" />
-                  </div>
-                </div>
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  Vous serez redirigé vers Stripe pour effectuer le paiement sécurisé.
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'cash' && (
+              <div className="p-4 bg-yellow-50 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  Le paiement sera effectué en espèces lors de la livraison.
+                </p>
+              </div>
+            )}
+
+            {paymentMethod === 'transfer' && (
+              <div className="p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-800">
+                  Vous recevrez les informations bancaires par email après la commande.
+                </p>
               </div>
             )}
           </CardContent>
@@ -221,7 +272,8 @@ export const CheckoutForm = () => {
         size="lg"
         disabled={loading}
       >
-        {loading ? 'Traitement...' : 'Confirmer la commande'}
+        {loading ? 'Traitement...' : 
+         paymentMethod === 'card' ? 'Procéder au paiement' : 'Confirmer la commande'}
       </Button>
     </form>
   );

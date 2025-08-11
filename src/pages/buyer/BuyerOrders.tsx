@@ -6,14 +6,38 @@ import { Badge } from '@/components/ui/badge';
 import { useOrders } from '@/hooks/useOrders';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Eye, Package, Truck, CheckCircle } from 'lucide-react';
+import { Eye, Package, Truck, CheckCircle, X } from 'lucide-react';
 import BuyerOrderDetailsDialog from '@/components/orders/BuyerOrderDetailsDialog';
+import { useToast } from '@/hooks/use-toast';
 
 const BuyerOrders = () => {
-  const { orders, loading } = useOrders();
+  const { orders, loading, updateOrderStatus } = useOrders();
+  const { toast } = useToast();
 
   const [detailsOpen, setDetailsOpen] = React.useState(false);
   const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null);
+
+  // Real-time subscription for orders
+  React.useEffect(() => {
+    const channel = supabase
+      .channel('buyer-orders')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        () => {
+          // Orders will be automatically refetched by useOrders hook
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -23,6 +47,8 @@ const BuyerOrders = () => {
         return 'bg-blue-100 text-blue-800';
       case 'preparing':
         return 'bg-orange-100 text-orange-800';
+      case 'ready':
+        return 'bg-indigo-100 text-indigo-800';
       case 'shipped':
         return 'bg-purple-100 text-purple-800';
       case 'delivered':
@@ -40,6 +66,7 @@ const BuyerOrders = () => {
         return <Package className="h-4 w-4" />;
       case 'confirmed':
       case 'preparing':
+      case 'ready':
         return <Package className="h-4 w-4" />;
       case 'shipped':
         return <Truck className="h-4 w-4" />;
@@ -58,6 +85,8 @@ const BuyerOrders = () => {
         return 'Confirmée';
       case 'preparing':
         return 'En préparation';
+      case 'ready':
+        return 'Prête';
       case 'shipped':
         return 'Expédiée';
       case 'delivered':
@@ -69,10 +98,28 @@ const BuyerOrders = () => {
     }
   };
 
+  const handleCancelOrder = async (orderId: string) => {
+    try {
+      await updateOrderStatus(orderId, 'cancelled', 'Annulée par le client');
+      toast({
+        title: "Commande annulée",
+        description: "Votre commande a été annulée avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'annuler la commande",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
       </div>
     );
   }
@@ -177,17 +224,30 @@ const BuyerOrders = () => {
                       </p>
                     )}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedOrderId(order.id);
-                      setDetailsOpen(true);
-                    }}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Voir détails
-                  </Button>
+                  <div className="flex gap-2">
+                    {order.status === 'pending' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCancelOrder(order.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Annuler
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedOrderId(order.id);
+                        setDetailsOpen(true);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Voir détails
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
