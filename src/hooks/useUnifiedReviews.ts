@@ -33,10 +33,7 @@ export const useUnifiedReviews = () => {
       setLoading(true);
       let query = supabase
         .from('reviews')
-        .select(`
-          *,
-          user:profiles!reviews_user_id_fkey(id, email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (productId) {
@@ -62,10 +59,10 @@ export const useUnifiedReviews = () => {
         not_helpful_count: item.not_helpful_count || 0,
         created_at: item.created_at,
         updated_at: item.updated_at,
-        user: item.user ? {
-          id: item.user.id,
-          email: item.user.email
-        } : undefined
+        user: {
+          id: item.user_id,
+          email: 'user@example.com' // Placeholder since we don't have user profiles yet
+        }
       }));
       
       setReviews(transformedData);
@@ -99,10 +96,7 @@ export const useUnifiedReviews = () => {
           ...reviewData,
           user_id: user.id
         }])
-        .select(`
-          *,
-          user:profiles!reviews_user_id_fkey(id, email)
-        `)
+        .select()
         .single();
       
       if (error) throw error;
@@ -119,10 +113,10 @@ export const useUnifiedReviews = () => {
         not_helpful_count: data.not_helpful_count || 0,
         created_at: data.created_at,
         updated_at: data.updated_at,
-        user: data.user ? {
-          id: data.user.id,
-          email: data.user.email
-        } : undefined
+        user: {
+          id: data.user_id,
+          email: user.email || 'user@example.com'
+        }
       };
       
       setReviews(prev => [transformedReview, ...prev]);
