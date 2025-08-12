@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -93,48 +94,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log('Fetching profile for user:', userId);
       
-      // Fetch profile directly from user_profiles table
+      // Fetch profile from profiles table
       const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
+        .from('profiles')
+        .select('id, first_name, last_name, phone_number, role')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
-        // If no profile exists, create a default buyer profile
-        if (error.code === 'PGRST116') {
-          console.log('No profile found, creating default profile');
-          const { data: newProfile, error: createError } = await supabase
-            .from('user_profiles')
-            .insert([
-              {
-                id: userId,
-                role: 'buyer',
-                first_name: '',
-                last_name: '',
-                phone_number: ''
-              }
-            ])
-            .select()
-            .single();
-
-          if (createError) {
-            console.error('Error creating profile:', createError);
-            setProfile(null);
-          } else {
-            console.log('Created new profile:', newProfile);
-            setProfile(newProfile as UserProfile);
-          }
-        } else {
-          setProfile(null);
-        }
-      } else if (data) {
-        console.log('Profile fetched successfully:', data);
-        setProfile(data as UserProfile);
-      } else {
-        console.log('No profile data returned');
         setProfile(null);
+        return;
+      }
+
+      if (data) {
+        console.log('Profile fetched successfully:', data);
+        // Map the profile data to our UserProfile type
+        const userProfile: UserProfile = {
+          id: data.id,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          phone_number: data.phone_number,
+          role: (data.role as UserRole) || 'buyer'
+        };
+        setProfile(userProfile);
+      } else {
+        console.log('No profile found, creating default profile');
+        // Create a default buyer profile
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: userId,
+              role: 'buyer',
+              first_name: '',
+              last_name: '',
+              phone_number: ''
+            }
+          ])
+          .select('id, first_name, last_name, phone_number, role')
+          .single();
+
+        if (createError) {
+          console.error('Error creating profile:', createError);
+          setProfile(null);
+        } else if (newProfile) {
+          console.log('Created new profile:', newProfile);
+          const userProfile: UserProfile = {
+            id: newProfile.id,
+            first_name: newProfile.first_name,
+            last_name: newProfile.last_name,
+            phone_number: newProfile.phone_number,
+            role: (newProfile.role as UserRole) || 'buyer'
+          };
+          setProfile(userProfile);
+        }
       }
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
@@ -231,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const { error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .update(data)
         .eq('id', user.id);
 
