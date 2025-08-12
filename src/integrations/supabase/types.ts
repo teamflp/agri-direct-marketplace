@@ -549,6 +549,48 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          handled_at: string | null
+          handled_by: string | null
+          id: string
+          ip: string | null
+          message: string
+          name: string
+          status: Database["public"]["Enums"]["contact_status"]
+          subject: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          ip?: string | null
+          message: string
+          name: string
+          status?: Database["public"]["Enums"]["contact_status"]
+          subject: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          ip?: string | null
+          message?: string
+          name?: string
+          status?: Database["public"]["Enums"]["contact_status"]
+          subject?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       daily_challenges: {
         Row: {
           challenge_data: Json
@@ -753,6 +795,7 @@ export type Database = {
         Row: {
           address: string | null
           created_at: string
+          created_by: string
           email: string
           first_name: string
           id: string
@@ -763,6 +806,7 @@ export type Database = {
         Insert: {
           address?: string | null
           created_at?: string
+          created_by: string
           email: string
           first_name: string
           id?: string
@@ -773,6 +817,7 @@ export type Database = {
         Update: {
           address?: string | null
           created_at?: string
+          created_by?: string
           email?: string
           first_name?: string
           id?: string
@@ -7748,7 +7793,8 @@ export type Database = {
           max_attempts: number
           signature_id: string
           status: Database["public"]["Enums"]["signature_link_status"]
-          token: string
+          token: string | null
+          token_hash: string | null
           used_at: string | null
         }
         Insert: {
@@ -7762,7 +7808,8 @@ export type Database = {
           max_attempts?: number
           signature_id: string
           status?: Database["public"]["Enums"]["signature_link_status"]
-          token: string
+          token?: string | null
+          token_hash?: string | null
           used_at?: string | null
         }
         Update: {
@@ -7776,7 +7823,8 @@ export type Database = {
           max_attempts?: number
           signature_id?: string
           status?: Database["public"]["Enums"]["signature_link_status"]
-          token?: string
+          token?: string | null
+          token_hash?: string | null
           used_at?: string | null
         }
         Relationships: [
@@ -8991,6 +9039,7 @@ export type Database = {
       }
     }
     Enums: {
+      contact_status: "new" | "processing" | "handled" | "spam"
       contract_type: "CDI" | "CDD" | "Interim" | "Stagiaire" | "Vacations"
       deletion_status:
         | "pending"
@@ -9141,6 +9190,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      contact_status: ["new", "processing", "handled", "spam"],
       contract_type: ["CDI", "CDD", "Interim", "Stagiaire", "Vacations"],
       deletion_status: [
         "pending",
