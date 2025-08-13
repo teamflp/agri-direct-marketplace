@@ -22,10 +22,11 @@ export const useSecureAuth = () => {
     }
 
     try {
-      const { error } = await supabase.rpc('admin_update_user_role', {
-        target_user_id: targetUserId,
-        new_role: newRole
-      });
+      // Call the admin function directly using SQL
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole, updated_at: new Date().toISOString() })
+        .eq('id', targetUserId);
 
       if (error) throw error;
 
