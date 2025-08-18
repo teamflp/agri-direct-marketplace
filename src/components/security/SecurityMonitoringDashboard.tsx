@@ -51,7 +51,7 @@ const SecurityMonitoringDashboard = () => {
   const loadSecurityData = async () => {
     setIsLoading(true);
     try {
-      // Charger les événements de sécurité
+      // Charger les événements de sécurité avec mapping des colonnes
       const { data: events } = await supabase
         .from('security_audit_log')
         .select('*')
@@ -65,7 +65,18 @@ const SecurityMonitoringDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(100);
 
-      setSecurityEvents(events || []);
+      // Mapper les événements pour correspondre à l'interface SecurityEvent
+      const mappedEvents = (events || []).map(event => ({
+        id: event.id,
+        event_type: event.event_type,
+        created_at: event.created_at,
+        user_email: event.user_email,
+        table_name: event.table_name,
+        old_values: event.old_values,
+        new_values: event.new_values
+      }));
+
+      setSecurityEvents(mappedEvents);
       setLoginAttempts(attempts || []);
 
       // Calculer les statistiques

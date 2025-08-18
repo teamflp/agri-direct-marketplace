@@ -101,7 +101,7 @@ export const useAdvancedRateLimit = (key: string, config: RateLimitConfig) => {
     }
   };
 
-  const getRemainingTime = (): number => {
+  const getRemainingTimeValue = (): number => {
     const attemptData = attempts[key];
     if (!attemptData?.blocked || !attemptData.blockUntil) return 0;
     
@@ -126,7 +126,7 @@ export const useAdvancedRateLimit = (key: string, config: RateLimitConfig) => {
   useEffect(() => {
     const interval = setInterval(() => {
       const blocked = checkRateLimit();
-      const remaining = getRemainingTime();
+      const remaining = getRemainingTimeValue();
       
       setIsBlocked(blocked);
       setRemainingTime(remaining);
@@ -152,7 +152,7 @@ export const useAdvancedRateLimit = (key: string, config: RateLimitConfig) => {
     isRateLimited: checkRateLimit(),
     isBlocked,
     recordAttempt,
-    getRemainingTime: getRemainingTime(),
+    getRemainingTime: getRemainingTimeValue(),
     remainingTime,
     resetRateLimit: () => {
       const newAttempts = { ...attempts };

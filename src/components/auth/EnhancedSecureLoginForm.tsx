@@ -74,7 +74,7 @@ const EnhancedSecureLoginForm = () => {
     if (rateLimit.isRateLimited) {
       toast({
         title: 'Trop de tentatives',
-        description: `Veuillez attendre ${rateLimit.getRemainingTime()} secondes avant de réessayer`,
+        description: `Veuillez attendre ${rateLimit.getRemainingTime} secondes avant de réessayer`,
         variant: 'destructive',
       });
       return;
@@ -167,7 +167,7 @@ const EnhancedSecureLoginForm = () => {
             <AlertDescription>
               <strong>Compte temporairement bloqué</strong>
               <br />
-              Trop de tentatives de connexion. Réessayez dans {rateLimit.getRemainingTime()} secondes.
+              Trop de tentatives de connexion. Réessayez dans {rateLimit.getRemainingTime} secondes.
             </AlertDescription>
           </Alert>
         )}
