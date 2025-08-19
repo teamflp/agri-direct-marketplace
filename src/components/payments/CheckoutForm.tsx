@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,19 +28,41 @@ export const CheckoutForm = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Handle success/cancel from Stripe
+  // Handle success/cancel from Stripe with improved status checking
   React.useEffect(() => {
     const status = searchParams.get('status');
+    const sessionId = searchParams.get('session_id');
     const orderId = searchParams.get('order_id');
 
-    if (status === 'success' && orderId) {
-      updatePaymentStatus(orderId, 'paid');
-      toast.success('Paiement réussi ! Votre commande a été confirmée.');
-      navigate('/buyer/orders');
+    const checkPaymentStatus = async () => {
+      if (sessionId || orderId) {
+        try {
+          const { data, error } = await supabase.functions.invoke('check-payment-status', {
+            body: { sessionId, orderId }
+          });
+
+          if (error) throw error;
+
+          if (data.paymentStatus === 'paid') {
+            await clearCart();
+            toast.success('Paiement réussi ! Votre commande a été confirmée.');
+            navigate('/buyer/orders');
+          } else if (data.paymentStatus === 'unpaid' || data.paymentStatus === 'failed') {
+            toast.error('Le paiement n\'a pas pu être finalisé. Veuillez réessayer.');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la vérification du paiement:', error);
+          toast.error('Erreur lors de la vérification du paiement');
+        }
+      }
+    };
+
+    if (status === 'success') {
+      checkPaymentStatus();
     } else if (status === 'canceled') {
       toast.error('Paiement annulé');
     }
-  }, [searchParams]);
+  }, [searchParams, clearCart, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,12 +92,13 @@ export const CheckoutForm = () => {
       const order = await createOrder(orderData);
       
       if (paymentMethod === 'card') {
-        // Create Stripe checkout session
+        // Create Stripe checkout session with improved data
         const stripeItems = cartItems.map(item => ({
           name: item.product?.name || 'Produit',
-          description: `${item.quantity} ${item.product?.unit || 'unité(s)'}`,
+          description: `${item.quantity} ${item.product?.unit || 'unité(s)'} - ${item.product?.farmer?.farm_name || 'AgriMarket'}`,
           unit_price: item.product?.price || 0,
-          quantity: item.quantity
+          quantity: item.quantity,
+          image_url: item.product?.image_url
         }));
 
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
@@ -84,18 +106,26 @@ export const CheckoutForm = () => {
             amount: getTotalPrice(),
             currency: 'eur',
             orderId: order.id,
-            items: stripeItems
+            items: stripeItems,
+            metadata: {
+              delivery_method: deliveryMethod,
+              delivery_address: deliveryAddress,
+              delivery_date: deliveryDate
+            }
           }
         });
 
         if (error) {
-          throw new Error(error.message);
+          console.error('Stripe error:', error);
+          throw new Error(error.message || 'Erreur lors de la création de la session de paiement');
         }
 
         if (data?.url) {
           // Open Stripe checkout in the same tab
           window.location.href = data.url;
           return;
+        } else {
+          throw new Error('URL de paiement non reçue');
         }
       } else {
         // For cash/transfer payments, clear cart and redirect
@@ -104,8 +134,8 @@ export const CheckoutForm = () => {
         navigate('/buyer/orders');
       }
     } catch (error) {
-      toast.error('Erreur lors de la commande');
-      console.error('Erreur:', error);
+      console.error('Erreur lors de la commande:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la commande');
     } finally {
       setLoading(false);
     }

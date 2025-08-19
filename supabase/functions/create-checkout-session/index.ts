@@ -8,6 +8,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper function for logging
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CHECKOUT-SESSION] ${step}${detailsStr}`);
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -15,9 +21,12 @@ serve(async (req) => {
   }
 
   try {
+    logStep("Function started");
+
     // Get Stripe secret key
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
+      logStep("ERROR: STRIPE_SECRET_KEY not configured");
       throw new Error("STRIPE_SECRET_KEY not configured");
     }
 
@@ -30,6 +39,7 @@ serve(async (req) => {
     // Get authenticated user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
+      logStep("ERROR: No authorization header");
       throw new Error("No authorization header");
     }
 
@@ -37,15 +47,21 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     
     if (userError || !userData.user?.email) {
+      logStep("ERROR: User not authenticated", { userError });
       throw new Error("User not authenticated");
     }
 
+    logStep("User authenticated", { userId: userData.user.id, email: userData.user.email });
+
     // Parse request body
-    const { amount, currency = "eur", orderId, items } = await req.json();
+    const { amount, currency = "eur", orderId, items, metadata = {} } = await req.json();
 
     if (!amount || !orderId) {
+      logStep("ERROR: Missing required fields", { amount, orderId });
       throw new Error("Amount and orderId are required");
     }
+
+    logStep("Request parsed", { amount, currency, orderId, itemsCount: items?.length });
 
     // Initialize Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
@@ -59,6 +75,17 @@ serve(async (req) => {
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
+      logStep("Existing customer found", { customerId });
+    } else {
+      // Create new customer
+      const customer = await stripe.customers.create({
+        email: userData.user.email,
+        metadata: {
+          userId: userData.user.id
+        }
+      });
+      customerId = customer.id;
+      logStep("New customer created", { customerId });
     }
 
     // Create line items for Stripe
@@ -68,6 +95,7 @@ serve(async (req) => {
         product_data: {
           name: item.name,
           description: item.description || '',
+          images: item.image_url ? [item.image_url] : [],
         },
         unit_amount: Math.round(item.unit_price * 100), // Convert to cents
       },
@@ -83,19 +111,35 @@ serve(async (req) => {
       quantity: 1,
     }];
 
+    logStep("Line items prepared", { lineItemsCount: lineItems.length });
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : userData.user.email,
       line_items: lineItems,
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/checkout?status=success&order_id=${orderId}`,
+      success_url: `${req.headers.get("origin")}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
       cancel_url: `${req.headers.get("origin")}/checkout?status=canceled&order_id=${orderId}`,
+      payment_intent_data: {
+        metadata: {
+          orderId: orderId,
+          userId: userData.user.id,
+          ...metadata
+        },
+      },
       metadata: {
         orderId: orderId,
         userId: userData.user.id,
+        ...metadata
+      },
+      automatic_tax: { enabled: false },
+      billing_address_collection: 'auto',
+      shipping_address_collection: {
+        allowed_countries: ['CI', 'FR', 'BE', 'CH'] // Côte d'Ivoire, France, etc.
       },
     });
+
+    logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
     return new Response(
       JSON.stringify({ 
@@ -108,10 +152,12 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logStep("ERROR in create-checkout-session", { message: errorMessage, stack: error instanceof Error ? error.stack : undefined });
+    
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Unknown error" 
+        error: errorMessage 
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
