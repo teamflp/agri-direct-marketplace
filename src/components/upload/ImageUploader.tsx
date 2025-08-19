@@ -3,7 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -24,7 +24,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 }) => {
   const [images, setImages] = useState<string[]>(existingImages);
   const [uploading, setUploading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileExt = file.name.split('.').pop();
@@ -96,35 +95,33 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       'image/*': ['.jpeg', '.jpg', '.png', '.webp']
     },
     multiple: true,
-    disabled: uploading || images.length >= maxImages,
-    onDragEnter: () => setDragActive(true),
-    onDragLeave: () => setDragActive(false)
+    disabled: uploading || images.length >= maxImages
   });
 
   return (
     <div className="space-y-4">
       {/* Zone de drop */}
       <Card className={`border-2 border-dashed transition-colors ${
-        isDragActive ? 'border-agrimarket-green bg-green-50' : 'border-gray-300'
-      } ${images.length >= maxImages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-agrimarket-green'}`}>
+        isDragActive ? 'border-primary bg-primary/10' : 'border-muted-foreground/25'
+      } ${images.length >= maxImages ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary'}`}>
         <CardContent className="p-6">
           <div {...getRootProps()} className="text-center">
             <input {...getInputProps()} />
             {uploading ? (
               <div className="flex flex-col items-center space-y-2">
-                <Loader2 className="h-8 w-8 animate-spin text-agrimarket-green" />
-                <p className="text-sm text-gray-600">Téléchargement en cours...</p>
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">Téléchargement en cours...</p>
               </div>
             ) : (
               <div className="flex flex-col items-center space-y-2">
-                <Upload className="h-8 w-8 text-gray-400" />
-                <p className="text-sm text-gray-600">
+                <Upload className="h-8 w-8 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
                   {images.length >= maxImages 
                     ? `Limite de ${maxImages} images atteinte`
                     : 'Glissez-déposez vos images ici ou cliquez pour sélectionner'
                   }
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   Formats acceptés: JPEG, PNG, WebP (max 5MB par image)
                 </p>
               </div>
@@ -149,7 +146,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                       target.src = '/placeholder.svg';
                     }}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-200 flex items-center justify-center">
                     <Button
                       variant="destructive"
                       size="icon"
@@ -160,7 +157,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                     </Button>
                   </div>
                   {index === 0 && (
-                    <div className="absolute top-2 left-2 bg-agrimarket-green text-white px-2 py-1 text-xs rounded">
+                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 text-xs rounded">
                       Principal
                     </div>
                   )}
@@ -172,7 +169,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       )}
 
       {/* Informations supplémentaires */}
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-muted-foreground">
         {images.length > 0 && (
           <p>{images.length}/{maxImages} image(s) téléchargée(s)</p>
         )}
