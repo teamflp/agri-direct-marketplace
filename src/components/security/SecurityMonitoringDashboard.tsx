@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -69,7 +68,7 @@ const SecurityMonitoringDashboard = () => {
       const mappedEvents = (events || []).map(event => ({
         id: event.id,
         event_type: event.event_type,
-        created_at: event.created_at,
+        created_at: event.created_at || event.timestamp, // Utiliser created_at ou timestamp comme fallback
         user_email: event.user_email,
         table_name: event.table_name,
         old_values: event.old_values,
