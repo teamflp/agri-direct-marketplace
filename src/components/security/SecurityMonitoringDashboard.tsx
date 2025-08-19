@@ -54,7 +54,7 @@ const SecurityMonitoringDashboard = () => {
       const { data: events } = await supabase
         .from('security_audit_log')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('timestamp', { ascending: false })
         .limit(50);
 
       // Charger les tentatives de connexion
@@ -68,7 +68,7 @@ const SecurityMonitoringDashboard = () => {
       const mappedEvents = (events || []).map(event => ({
         id: event.id,
         event_type: event.event_type,
-        created_at: event.created_at || event.timestamp, // Utiliser created_at ou timestamp comme fallback
+        created_at: event.timestamp, // Utiliser timestamp de la base de données
         user_email: event.user_email,
         table_name: event.table_name,
         old_values: event.old_values,
