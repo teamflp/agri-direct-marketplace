@@ -1972,6 +1972,288 @@ export type Database = {
           },
         ]
       }
+      nc_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      nc_prestataires: {
+        Row: {
+          active: boolean | null
+          address: string | null
+          availability_hours: Json | null
+          certifications: string[] | null
+          city: string | null
+          company_name: string | null
+          created_at: string
+          description: string | null
+          experience_years: number | null
+          hourly_rate: number | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          phone: string | null
+          rating: number | null
+          reviews_count: number | null
+          specialties: string[] | null
+          updated_at: string
+          user_id: string
+          verified: boolean | null
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          address?: string | null
+          availability_hours?: Json | null
+          certifications?: string[] | null
+          city?: string | null
+          company_name?: string | null
+          created_at?: string
+          description?: string | null
+          experience_years?: number | null
+          hourly_rate?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          specialties?: string[] | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          address?: string | null
+          availability_hours?: Json | null
+          certifications?: string[] | null
+          city?: string | null
+          company_name?: string | null
+          created_at?: string
+          description?: string | null
+          experience_years?: number | null
+          hourly_rate?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          specialties?: string[] | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean | null
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      nc_profiles: {
+        Row: {
+          address: string | null
+          avatar_url: string | null
+          city: string | null
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          role: string
+          updated_at: string
+          user_id: string
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          role?: string
+          updated_at?: string
+          user_id: string
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          role?: string
+          updated_at?: string
+          user_id?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      nc_reservations: {
+        Row: {
+          address: string | null
+          city: string | null
+          client_id: string
+          created_at: string
+          duration: number
+          id: string
+          notes: string | null
+          prestataire_id: string
+          reservation_date: string
+          reservation_time: string
+          service_id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          total_price: number
+          updated_at: string
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          client_id: string
+          created_at?: string
+          duration: number
+          id?: string
+          notes?: string | null
+          prestataire_id: string
+          reservation_date: string
+          reservation_time: string
+          service_id: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          total_price: number
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          client_id?: string
+          created_at?: string
+          duration?: number
+          id?: string
+          notes?: string | null
+          prestataire_id?: string
+          reservation_date?: string
+          reservation_time?: string
+          service_id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          total_price?: number
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nc_reservations_prestataire_id_fkey"
+            columns: ["prestataire_id"]
+            isOneToOne: false
+            referencedRelation: "nc_prestataires"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nc_reservations_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "nc_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nc_services: {
+        Row: {
+          active: boolean | null
+          category_id: string
+          created_at: string
+          description: string | null
+          duration: number
+          id: string
+          images: string[] | null
+          location_type: string
+          name: string
+          prestataire_id: string
+          price: number
+          requirements: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          category_id: string
+          created_at?: string
+          description?: string | null
+          duration: number
+          id?: string
+          images?: string[] | null
+          location_type?: string
+          name: string
+          prestataire_id: string
+          price: number
+          requirements?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          duration?: number
+          id?: string
+          images?: string[] | null
+          location_type?: string
+          name?: string
+          prestataire_id?: string
+          price?: number
+          requirements?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nc_services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "nc_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nc_services_prestataire_id_fkey"
+            columns: ["prestataire_id"]
+            isOneToOne: false
+            referencedRelation: "nc_prestataires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       news_events: {
         Row: {
           content: string
@@ -2089,6 +2371,44 @@ export type Database = {
           },
         ]
       }
+      order_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string | null
+          id: string
+          new_status: string
+          notes: string | null
+          old_status: string | null
+          order_id: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_status: string
+          notes?: string | null
+          old_status?: string | null
+          order_id?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_status?: string
+          notes?: string | null
+          old_status?: string | null
+          order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           buyer_id: string | null
@@ -2099,9 +2419,12 @@ export type Database = {
           farmer_id: string | null
           id: string
           notes: string | null
+          payment_metadata: Json | null
           payment_method: string | null
           payment_status: string | null
           status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
           total: number
           updated_at: string | null
         }
@@ -2114,9 +2437,12 @@ export type Database = {
           farmer_id?: string | null
           id?: string
           notes?: string | null
+          payment_metadata?: Json | null
           payment_method?: string | null
           payment_status?: string | null
           status: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           total: number
           updated_at?: string | null
         }
@@ -2129,9 +2455,12 @@ export type Database = {
           farmer_id?: string | null
           id?: string
           notes?: string | null
+          payment_metadata?: Json | null
           payment_method?: string | null
           payment_status?: string | null
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
           total?: number
           updated_at?: string | null
         }
@@ -2663,10 +2992,12 @@ export type Database = {
           free_delivery: boolean | null
           id: string
           image_url: string | null
+          images: Json | null
           is_organic: boolean | null
           is_seasonal: boolean | null
           name: string
           price: number
+          primary_image_url: string | null
           quantity: number
           rating: number | null
           reviews_count: number | null
@@ -2685,10 +3016,12 @@ export type Database = {
           free_delivery?: boolean | null
           id?: string
           image_url?: string | null
+          images?: Json | null
           is_organic?: boolean | null
           is_seasonal?: boolean | null
           name: string
           price: number
+          primary_image_url?: string | null
           quantity: number
           rating?: number | null
           reviews_count?: number | null
@@ -2707,10 +3040,12 @@ export type Database = {
           free_delivery?: boolean | null
           id?: string
           image_url?: string | null
+          images?: Json | null
           is_organic?: boolean | null
           is_seasonal?: boolean | null
           name?: string
           price?: number
+          primary_image_url?: string | null
           quantity?: number
           rating?: number | null
           reviews_count?: number | null
@@ -10481,6 +10816,10 @@ export type Database = {
       update_elo_ratings: {
         Args: { is_draw?: boolean; loser_id: string; winner_id: string }
         Returns: undefined
+      }
+      update_order_status: {
+        Args: { new_status: string; notes?: string; order_id: string }
+        Returns: boolean
       }
       update_room_occupancy: {
         Args: { p_room_number: string }

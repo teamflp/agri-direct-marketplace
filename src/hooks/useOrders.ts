@@ -14,6 +14,9 @@ export interface Order {
   delivery_method: string;
   payment_status: string;
   payment_method?: string;
+  stripe_session_id?: string;
+  stripe_payment_intent_id?: string;
+  payment_metadata?: Record<string, any>;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -35,11 +38,12 @@ export interface OrderItem {
     id: string;
     name: string;
     image_url?: string;
+    images?: string[];
+    primary_image_url?: string;
     unit: string;
   };
 }
 
-// New: type for status history entries
 export interface OrderStatusHistory {
   id: string;
   order_id: string;
@@ -75,6 +79,8 @@ export const useOrders = () => {
               id,
               name,
               image_url,
+              images,
+              primary_image_url,
               unit
             )
           ),
@@ -108,6 +114,8 @@ export const useOrders = () => {
               id,
               name,
               image_url,
+              images,
+              primary_image_url,
               unit
             )
           ),
@@ -155,7 +163,8 @@ export const useOrders = () => {
           delivery_method: orderData.delivery_method,
           payment_method: orderData.payment_method,
           notes: orderData.notes,
-          status: 'pending'
+          status: 'pending',
+          payment_status: 'pending'
         }])
         .select()
         .single();
@@ -168,7 +177,6 @@ export const useOrders = () => {
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.unit_price
-        // NOTE: We intentionally avoid inserting total_price to stay compatible with existing schema
       }));
 
       const { error: itemsError } = await supabase
@@ -184,34 +192,45 @@ export const useOrders = () => {
     }
   };
 
-  // Updated: use Supabase RPC to update status and log history
   const updateOrderStatus = async (orderId: string, status: string, notes?: string) => {
-    // Utiliser un cast temporaire car le type généré n'inclut pas encore la fonction RPC
-    const { error } = await (supabase as any).rpc('update_order_status', {
-      order_id: orderId,
-      new_status: status,
-      notes: notes ?? null
-    });
+    try {
+      // Utiliser la fonction RPC pour mettre à jour avec historique
+      const { error } = await supabase.rpc('update_order_status', {
+        order_id: orderId,
+        new_status: status,
+        notes: notes || null
+      });
 
-    if (error) {
-      // Fallback: direct update si la RPC est indisponible
-      const { error: directError } = await supabase
-        .from('orders')
-        .update({ status })
-        .eq('id', orderId);
-      if (directError) {
-        throw directError;
+      if (error) {
+        // Fallback: mise à jour directe si la RPC échoue
+        const { error: directError } = await supabase
+          .from('orders')
+          .update({ status, updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+        
+        if (directError) throw directError;
       }
+
+      await fetchOrders();
+      return true;
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Erreur lors de la mise à jour');
     }
-    await fetchOrders();
-    return true;
   };
 
-  const updatePaymentStatus = async (orderId: string, paymentStatus: string) => {
+  const updatePaymentStatus = async (orderId: string, paymentStatus: string, sessionId?: string, paymentIntentId?: string) => {
     try {
+      const updateData: any = { 
+        payment_status: paymentStatus,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (sessionId) updateData.stripe_session_id = sessionId;
+      if (paymentIntentId) updateData.stripe_payment_intent_id = paymentIntentId;
+
       const { data, error } = await supabase
         .from('orders')
-        .update({ payment_status: paymentStatus })
+        .update(updateData)
         .eq('id', orderId)
         .select()
         .single();
@@ -224,16 +243,33 @@ export const useOrders = () => {
     }
   };
 
-  // New: fetch status history for an order (timeline)
-  const getOrderStatusHistory = async (orderId: string) => {
-    // Utiliser un cast temporaire car la table peut ne pas être présente dans les types générés
-    const { data, error } = await (supabase as any)
-      .from('order_status_history')
-      .select('*')
-      .eq('order_id', orderId)
-      .order('created_at', { ascending: true });
-    if (error) throw error;
-    return (data || []) as OrderStatusHistory[];
+  const getOrderStatusHistory = async (orderId: string): Promise<OrderStatusHistory[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('order_status_history')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('Error fetching status history:', err);
+      return [];
+    }
+  };
+
+  const checkPaymentStatus = async (sessionId?: string, orderId?: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-payment-status', {
+        body: { sessionId, orderId }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Erreur lors de la vérification');
+    }
   };
 
   useEffect(() => {
@@ -249,6 +285,7 @@ export const useOrders = () => {
     createOrder,
     updateOrderStatus,
     updatePaymentStatus,
-    getOrderStatusHistory, // expose new method
+    getOrderStatusHistory,
+    checkPaymentStatus
   };
 };

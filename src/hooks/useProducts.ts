@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -10,6 +11,8 @@ export interface Product {
   farmer_id?: string;
   category_id?: string;
   image_url?: string;
+  images?: string[];
+  primary_image_url?: string;
   unit: string;
   stock: number;
   rating: number;
@@ -55,7 +58,10 @@ export const useProducts = () => {
       
       const transformedData: Product[] = (data || []).map(product => ({
         ...product,
-        farmer: Array.isArray(product.farmer) ? product.farmer[0] : product.farmer
+        farmer: Array.isArray(product.farmer) ? product.farmer[0] : product.farmer,
+        // Assurer la compatibilité avec l'ancien système d'images
+        images: product.images || (product.image_url ? [product.image_url] : []),
+        primary_image_url: product.primary_image_url || product.image_url
       }));
       
       setProducts(transformedData);
@@ -86,7 +92,9 @@ export const useProducts = () => {
       
       return {
         ...data,
-        farmer: Array.isArray(data.farmer) ? data.farmer[0] : data.farmer
+        farmer: Array.isArray(data.farmer) ? data.farmer[0] : data.farmer,
+        images: data.images || (data.image_url ? [data.image_url] : []),
+        primary_image_url: data.primary_image_url || data.image_url
       };
     } catch (err) {
       throw err instanceof Error ? err : new Error('Erreur lors du chargement');
@@ -100,7 +108,7 @@ export const useProducts = () => {
     quantity: number;
     farmer_id?: string;
     category_id?: string;
-    image_url?: string;
+    images?: string[];
     unit: string;
     stock: number;
     is_organic: boolean;
@@ -112,9 +120,18 @@ export const useProducts = () => {
     tags?: string[];
   }) => {
     try {
+      // Préparer les données avec le nouveau système d'images
+      const insertData = {
+        ...productData,
+        images: productData.images || [],
+        primary_image_url: productData.images?.[0] || null,
+        // Maintenir la compatibilité avec l'ancien champ
+        image_url: productData.images?.[0] || null
+      };
+
       const { data, error } = await supabase
         .from('products')
-        .insert([productData])
+        .insert([insertData])
         .select()
         .single();
       
@@ -128,9 +145,17 @@ export const useProducts = () => {
 
   const updateProduct = async (id: string, productData: Partial<Product>) => {
     try {
+      // Préparer les données avec le nouveau système d'images
+      const updateData = {
+        ...productData,
+        primary_image_url: productData.images?.[0] || productData.primary_image_url,
+        // Maintenir la compatibilité avec l'ancien champ
+        image_url: productData.images?.[0] || productData.image_url
+      };
+
       const { data, error } = await supabase
         .from('products')
-        .update(productData)
+        .update(updateData)
         .eq('id', id)
         .select()
         .single();
