@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { parseJsonField } from '@/types/database';
 
 export interface Order {
   id: string;
@@ -94,7 +95,14 @@ export const useOrders = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setOrders(data || []);
+
+      // Convertir les données avec les bons types
+      const convertedOrders: Order[] = (data || []).map(order => ({
+        ...order,
+        payment_metadata: parseJsonField<Record<string, any>>(order.payment_metadata)
+      }));
+
+      setOrders(convertedOrders);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {
@@ -129,7 +137,11 @@ export const useOrders = () => {
         .single();
       
       if (error) throw error;
-      return data;
+      
+      return {
+        ...data,
+        payment_metadata: parseJsonField<Record<string, any>>(data.payment_metadata)
+      };
     } catch (err) {
       throw err instanceof Error ? err : new Error('Erreur lors du chargement');
     }
@@ -185,6 +197,17 @@ export const useOrders = () => {
       
       if (itemsError) throw itemsError;
 
+      // Créer une entrée de suivi de livraison
+      const { error: deliveryError } = await supabase
+        .from('delivery_tracking')
+        .insert({
+          order_id: order.id,
+          status: 'pending',
+          notes: 'Commande créée, en attente de traitement'
+        });
+
+      if (deliveryError) console.warn('Erreur création tracking:', deliveryError);
+
       await fetchOrders();
       return order;
     } catch (err) {
@@ -211,6 +234,16 @@ export const useOrders = () => {
         if (directError) throw directError;
       }
 
+      // Mettre à jour le suivi de livraison aussi
+      await supabase
+        .from('delivery_tracking')
+        .upsert({
+          order_id: orderId,
+          status: status,
+          notes: notes || `Statut mis à jour: ${status}`,
+          updated_at: new Date().toISOString()
+        });
+
       await fetchOrders();
       return true;
     } catch (err) {
@@ -236,6 +269,18 @@ export const useOrders = () => {
         .single();
       
       if (error) throw error;
+
+      // Si le paiement est confirmé, mettre à jour le statut de livraison
+      if (paymentStatus === 'paid') {
+        await supabase
+          .from('delivery_tracking')
+          .upsert({
+            order_id: orderId,
+            status: 'confirmed',
+            notes: 'Paiement confirmé, commande en cours de préparation'
+          });
+      }
+
       await fetchOrders();
       return data;
     } catch (err) {

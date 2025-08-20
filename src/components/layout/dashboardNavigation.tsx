@@ -15,7 +15,8 @@ import {
   TrendingUp,
   ShieldAlert,
   Building,
-  DollarSign
+  DollarSign,
+  Truck
 } from 'lucide-react';
 
 export interface DashboardMenuItem {
@@ -40,6 +41,7 @@ export const farmerMenuItems: DashboardMenuItem[] = [
   { title: "Tableau de bord", path: "/farmer", icon: <BarChart2 size={20} />, translationKey: "farmer.dashboard" },
   { title: "Produits", path: "/farmer/products", icon: <Package size={20} />, translationKey: "farmer.products" },
   { title: "Commandes", path: "/farmer/orders", icon: <ShoppingCart size={20} />, translationKey: "farmer.orders" },
+  { title: "Livraisons", path: "/farmer/delivery", icon: <Truck size={20} />, translationKey: "farmer.delivery" },
   { title: "Inventaire", path: "/farmer/inventory", icon: <Package size={20} />, translationKey: "farmer.inventory" },
   { title: "Analytics", path: "/farmer/analytics", icon: <TrendingUp size={20} />, translationKey: "farmer.analytics" },
   { title: "Factures", path: "/farmer/invoices", icon: <FileText size={20} />, translationKey: "farmer.invoices" },

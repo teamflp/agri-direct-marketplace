@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOrders, Order } from './useOrders';
+import { parseJsonField } from '@/types/database';
 
 export const useFarmerOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -54,7 +55,14 @@ export const useFarmerOrders = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setOrders(data || []);
+
+      // Convertir les données avec les bons types
+      const convertedOrders: Order[] = (data || []).map(order => ({
+        ...order,
+        payment_metadata: parseJsonField<Record<string, any>>(order.payment_metadata)
+      }));
+
+      setOrders(convertedOrders);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {
