@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -95,7 +96,7 @@ export const CheckoutForm = () => {
         // Create Stripe checkout session with improved data
         const stripeItems = cartItems.map(item => ({
           name: item.product?.name || 'Produit',
-          description: `${item.quantity} ${item.product?.unit || 'unité(s)'} - ${item.product?.farmer?.farm_name || 'AgriMarket'}`,
+          description: `${item.quantity} ${item.product?.unit || 'unité(s)'} - ${item.product?.farmer?.name || 'AgriMarket'}`,
           unit_price: item.product?.price || 0,
           quantity: item.quantity,
           image_url: item.product?.image_url
