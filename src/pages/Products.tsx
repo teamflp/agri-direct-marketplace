@@ -36,7 +36,7 @@ const Products = () => {
                          product.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = filters.categories.length === 0 || 
-                           filters.categories.includes(product.category_id || '');
+                           filters.categories.includes(product.category || '');
     const matchesPrice = product.price >= filters.priceRange[0] && 
                         product.price <= filters.priceRange[1];
     const matchesOrganic = !filters.organic || product.is_organic;
@@ -187,14 +187,14 @@ const Products = () => {
                   image={product.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43'}
                   price={product.price}
                   unit={product.unit}
-                  rating={product.rating}
-                  reviews={product.reviews_count}
+                  rating={product.rating || 0}
+                  reviews={product.reviews_count || 0}
                   farmerName={product.farmer?.name || 'Producteur'}
                   farmerId={product.farmer?.id || '1'}
                   distance={product.farmer?.distance}
-                  organic={product.is_organic}
-                  freeDelivery={product.free_delivery}
-                  farmPickup={product.farm_pickup}
+                  organic={product.is_organic || false}
+                  freeDelivery={product.free_delivery || false}
+                  farmPickup={product.farm_pickup || false}
                 />
               ))}
             </div>

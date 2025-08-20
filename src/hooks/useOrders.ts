@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { parseJsonField } from '@/types/database';
+import { parseJsonField, parseJsonArray } from '@/types/database';
 
 export interface Order {
   id: string;
@@ -99,7 +98,19 @@ export const useOrders = () => {
       // Convertir les données avec les bons types
       const convertedOrders: Order[] = (data || []).map(order => ({
         ...order,
-        payment_metadata: parseJsonField<Record<string, any>>(order.payment_metadata)
+        buyer_id: order.buyer_id || user.id,
+        delivery_method: order.delivery_method || 'standard',
+        payment_status: order.payment_status || 'pending',
+        created_at: order.created_at || new Date().toISOString(),
+        updated_at: order.updated_at || order.created_at || new Date().toISOString(),
+        payment_metadata: parseJsonField<Record<string, any>>(order.payment_metadata),
+        order_items: order.order_items?.map((item: any) => ({
+          ...item,
+          product: item.product ? {
+            ...item.product,
+            images: parseJsonArray(item.product.images)
+          } : undefined
+        })) || []
       }));
 
       setOrders(convertedOrders);
@@ -140,7 +151,19 @@ export const useOrders = () => {
       
       return {
         ...data,
-        payment_metadata: parseJsonField<Record<string, any>>(data.payment_metadata)
+        buyer_id: data.buyer_id || '',
+        delivery_method: data.delivery_method || 'standard',
+        payment_status: data.payment_status || 'pending',
+        created_at: data.created_at || new Date().toISOString(),
+        updated_at: data.updated_at || data.created_at || new Date().toISOString(),
+        payment_metadata: parseJsonField<Record<string, any>>(data.payment_metadata),
+        order_items: data.order_items?.map((item: any) => ({
+          ...item,
+          product: item.product ? {
+            ...item.product,
+            images: parseJsonArray(item.product.images)
+          } : undefined
+        })) || []
       };
     } catch (err) {
       throw err instanceof Error ? err : new Error('Erreur lors du chargement');
