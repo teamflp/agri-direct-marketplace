@@ -35,6 +35,60 @@ export interface Product {
   };
 }
 
+// Type for raw database response
+interface DatabaseProduct {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  unit?: string;
+  category?: string;
+  category_id?: string;
+  farmer_id: string;
+  image_url?: string;
+  images?: any;
+  primary_image_url?: string;
+  in_stock?: boolean;
+  stock_quantity?: number;
+  created_at: string;
+  updated_at?: string;
+  available_from?: string;
+  available_until?: string;
+  available_to?: string;
+  is_organic?: boolean;
+  free_delivery?: boolean;
+  farm_pickup?: boolean;
+  rating?: number;
+  reviews_count?: number;
+  farmer?: Array<{
+    id: string;
+    name: string;
+    location: string;
+    distance: number;
+  }>;
+}
+
+const convertDatabaseProduct = (dbProduct: DatabaseProduct): Product => {
+  return {
+    ...dbProduct,
+    images: parseJsonArray(dbProduct.images),
+    unit: dbProduct.unit || '',
+    category: dbProduct.category || dbProduct.category_id || '',
+    category_id: dbProduct.category_id || dbProduct.category || '',
+    available_from: dbProduct.available_from || undefined,
+    available_until: dbProduct.available_until || dbProduct.available_to || undefined,
+    available_to: dbProduct.available_to || dbProduct.available_until || undefined,
+    is_organic: dbProduct.is_organic || false,
+    free_delivery: dbProduct.free_delivery || false,
+    farm_pickup: dbProduct.farm_pickup || false,
+    rating: dbProduct.rating || 0,
+    reviews_count: dbProduct.reviews_count || 0,
+    in_stock: dbProduct.in_stock ?? true,
+    updated_at: dbProduct.updated_at || dbProduct.created_at,
+    farmer: dbProduct.farmer && dbProduct.farmer.length > 0 ? dbProduct.farmer[0] : undefined
+  };
+};
+
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,24 +134,9 @@ export const useProducts = () => {
 
       if (error) throw error;
 
-      // Convertir les données avec les bons types
-      const convertedProducts: Product[] = (data || []).map(product => ({
-        ...product,
-        images: parseJsonArray(product.images),
-        unit: product.unit || '',
-        category: product.category || product.category_id || '',
-        category_id: product.category_id || product.category || '',
-        available_from: product.available_from || undefined,
-        available_until: product.available_until || product.available_to || undefined,
-        available_to: product.available_to || product.available_until || undefined,
-        is_organic: product.is_organic || false,
-        free_delivery: product.free_delivery || false,
-        farm_pickup: product.farm_pickup || false,
-        rating: product.rating || 0,
-        reviews_count: product.reviews_count || 0,
-        in_stock: product.in_stock ?? true,
-        updated_at: product.updated_at || product.created_at
-      }));
+      const convertedProducts: Product[] = (data || []).map((dbProduct: DatabaseProduct) => 
+        convertDatabaseProduct(dbProduct)
+      );
 
       setProducts(convertedProducts);
     } catch (err) {
@@ -125,23 +164,7 @@ export const useProducts = () => {
 
       if (error) throw error;
 
-      return {
-        ...data,
-        images: parseJsonArray(data.images),
-        unit: data.unit || '',
-        category: data.category || data.category_id || '',
-        category_id: data.category_id || data.category || '',
-        available_from: data.available_from || undefined,
-        available_until: data.available_until || data.available_to || undefined,
-        available_to: data.available_to || data.available_until || undefined,
-        is_organic: data.is_organic || false,
-        free_delivery: data.free_delivery || false,
-        farm_pickup: data.farm_pickup || false,
-        rating: data.rating || 0,
-        reviews_count: data.reviews_count || 0,
-        in_stock: data.in_stock ?? true,
-        updated_at: data.updated_at || data.created_at
-      };
+      return convertDatabaseProduct(data as DatabaseProduct);
     } catch (err) {
       console.error('Error fetching product:', err);
       return null;
