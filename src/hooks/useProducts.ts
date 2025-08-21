@@ -35,60 +35,6 @@ export interface Product {
   };
 }
 
-// Type for raw database response
-interface DatabaseProduct {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  unit?: string;
-  category?: string;
-  category_id?: string;
-  farmer_id: string;
-  image_url?: string;
-  images?: any;
-  primary_image_url?: string;
-  in_stock?: boolean;
-  stock_quantity?: number;
-  created_at: string;
-  updated_at?: string;
-  available_from?: string;
-  available_until?: string;
-  available_to?: string;
-  is_organic?: boolean;
-  free_delivery?: boolean;
-  farm_pickup?: boolean;
-  rating?: number;
-  reviews_count?: number;
-  farmer?: Array<{
-    id: string;
-    name: string;
-    location: string;
-    distance: number;
-  }>;
-}
-
-const convertDatabaseProduct = (dbProduct: DatabaseProduct): Product => {
-  return {
-    ...dbProduct,
-    images: parseJsonArray(dbProduct.images),
-    unit: dbProduct.unit || '',
-    category: dbProduct.category || dbProduct.category_id || '',
-    category_id: dbProduct.category_id || dbProduct.category || '',
-    available_from: dbProduct.available_from || undefined,
-    available_until: dbProduct.available_until || dbProduct.available_to || undefined,
-    available_to: dbProduct.available_to || dbProduct.available_until || undefined,
-    is_organic: dbProduct.is_organic || false,
-    free_delivery: dbProduct.free_delivery || false,
-    farm_pickup: dbProduct.farm_pickup || false,
-    rating: dbProduct.rating || 0,
-    reviews_count: dbProduct.reviews_count || 0,
-    in_stock: dbProduct.in_stock ?? true,
-    updated_at: dbProduct.updated_at || dbProduct.created_at,
-    farmer: dbProduct.farmer && dbProduct.farmer.length > 0 ? dbProduct.farmer[0] : undefined
-  };
-};
-
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,9 +80,32 @@ export const useProducts = () => {
 
       if (error) throw error;
 
-      const convertedProducts: Product[] = (data || []).map((dbProduct: DatabaseProduct) => 
-        convertDatabaseProduct(dbProduct)
-      );
+      const convertedProducts: Product[] = (data || []).map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        unit: item.unit || '',
+        category: item.category || item.category_id || '',
+        category_id: item.category_id || item.category,
+        farmer_id: item.farmer_id,
+        image_url: item.image_url,
+        images: parseJsonArray(item.images),
+        primary_image_url: item.primary_image_url,
+        in_stock: item.in_stock ?? true,
+        stock_quantity: item.stock_quantity,
+        created_at: item.created_at,
+        updated_at: item.updated_at || item.created_at,
+        available_from: item.available_from,
+        available_until: item.available_until || item.available_to,
+        available_to: item.available_to || item.available_until,
+        is_organic: item.is_organic || false,
+        free_delivery: item.free_delivery || false,
+        farm_pickup: item.farm_pickup || false,
+        rating: item.rating || 0,
+        reviews_count: item.reviews_count || 0,
+        farmer: item.farmer && item.farmer.length > 0 ? item.farmer[0] : undefined
+      }));
 
       setProducts(convertedProducts);
     } catch (err) {
@@ -164,7 +133,32 @@ export const useProducts = () => {
 
       if (error) throw error;
 
-      return convertDatabaseProduct(data as DatabaseProduct);
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        unit: data.unit || '',
+        category: data.category || data.category_id || '',
+        category_id: data.category_id || data.category,
+        farmer_id: data.farmer_id,
+        image_url: data.image_url,
+        images: parseJsonArray(data.images),
+        primary_image_url: data.primary_image_url,
+        in_stock: data.in_stock ?? true,
+        stock_quantity: data.stock_quantity,
+        created_at: data.created_at,
+        updated_at: data.updated_at || data.created_at,
+        available_from: data.available_from,
+        available_until: data.available_until || data.available_to,
+        available_to: data.available_to || data.available_until,
+        is_organic: data.is_organic || false,
+        free_delivery: data.free_delivery || false,
+        farm_pickup: data.farm_pickup || false,
+        rating: data.rating || 0,
+        reviews_count: data.reviews_count || 0,
+        farmer: data.farmer && data.farmer.length > 0 ? data.farmer[0] : undefined
+      };
     } catch (err) {
       console.error('Error fetching product:', err);
       return null;

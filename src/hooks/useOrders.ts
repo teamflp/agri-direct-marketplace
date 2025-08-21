@@ -96,21 +96,39 @@ export const useOrders = () => {
       if (error) throw error;
 
       // Convertir les données avec les bons types
-      const convertedOrders: Order[] = (data || []).map(order => ({
-        ...order,
-        buyer_id: order.buyer_id || user.id,
-        delivery_method: order.delivery_method || 'standard',
-        payment_status: order.payment_status || 'pending',
-        created_at: order.created_at || new Date().toISOString(),
-        updated_at: order.updated_at || order.created_at || new Date().toISOString(),
-        payment_metadata: parseJsonField<Record<string, any>>(order.payment_metadata),
-        order_items: order.order_items?.map((item: any) => ({
-          ...item,
-          product: item.product ? {
-            ...item.product,
-            images: parseJsonArray(item.product.images)
+      const convertedOrders: Order[] = (data || []).map((item: any) => ({
+        id: item.id,
+        buyer_id: item.buyer_id || user.id,
+        farmer_id: item.farmer_id,
+        status: item.status,
+        total: item.total,
+        delivery_address: item.delivery_address,
+        delivery_date: item.delivery_date,
+        delivery_method: item.delivery_method || 'standard',
+        payment_status: item.payment_status || 'pending',
+        payment_method: item.payment_method,
+        stripe_session_id: item.stripe_session_id,
+        stripe_payment_intent_id: item.stripe_payment_intent_id,
+        payment_metadata: parseJsonField<Record<string, any>>(item.payment_metadata),
+        notes: item.notes,
+        created_at: item.created_at || new Date().toISOString(),
+        updated_at: item.updated_at || item.created_at || new Date().toISOString(),
+        order_items: item.order_items?.map((orderItem: any) => ({
+          id: orderItem.id,
+          order_id: orderItem.order_id,
+          product_id: orderItem.product_id,
+          quantity: orderItem.quantity,
+          unit_price: orderItem.unit_price,
+          product: orderItem.product ? {
+            id: orderItem.product.id,
+            name: orderItem.product.name,
+            image_url: orderItem.product.image_url,
+            images: parseJsonArray(orderItem.product.images),
+            primary_image_url: orderItem.product.primary_image_url,
+            unit: orderItem.product.unit
           } : undefined
-        })) || []
+        })) || [],
+        farmer: item.farmer && item.farmer.length > 0 ? item.farmer[0] : undefined
       }));
 
       setOrders(convertedOrders);
@@ -150,20 +168,38 @@ export const useOrders = () => {
       if (error) throw error;
       
       return {
-        ...data,
+        id: data.id,
         buyer_id: data.buyer_id || '',
+        farmer_id: data.farmer_id,
+        status: data.status,
+        total: data.total,
+        delivery_address: data.delivery_address,
+        delivery_date: data.delivery_date,
         delivery_method: data.delivery_method || 'standard',
         payment_status: data.payment_status || 'pending',
+        payment_method: data.payment_method,
+        stripe_session_id: data.stripe_session_id,
+        stripe_payment_intent_id: data.stripe_payment_intent_id,
+        payment_metadata: parseJsonField<Record<string, any>>(data.payment_metadata),
+        notes: data.notes,
         created_at: data.created_at || new Date().toISOString(),
         updated_at: data.updated_at || data.created_at || new Date().toISOString(),
-        payment_metadata: parseJsonField<Record<string, any>>(data.payment_metadata),
-        order_items: data.order_items?.map((item: any) => ({
-          ...item,
-          product: item.product ? {
-            ...item.product,
-            images: parseJsonArray(item.product.images)
+        order_items: data.order_items?.map((orderItem: any) => ({
+          id: orderItem.id,
+          order_id: orderItem.order_id,
+          product_id: orderItem.product_id,
+          quantity: orderItem.quantity,
+          unit_price: orderItem.unit_price,
+          product: orderItem.product ? {
+            id: orderItem.product.id,
+            name: orderItem.product.name,
+            image_url: orderItem.product.image_url,
+            images: parseJsonArray(orderItem.product.images),
+            primary_image_url: orderItem.product.primary_image_url,
+            unit: orderItem.product.unit
           } : undefined
-        })) || []
+        })) || [],
+        farmer: data.farmer && data.farmer.length > 0 ? data.farmer[0] : undefined
       };
     } catch (err) {
       throw err instanceof Error ? err : new Error('Erreur lors du chargement');
