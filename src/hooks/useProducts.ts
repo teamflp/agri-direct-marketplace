@@ -81,7 +81,7 @@ export const useProducts = () => {
       if (error) throw error;
 
       // Conversion avec gestion sécurisée des types
-      const convertedProducts: Product[] = (data || []).map((item: any) => {
+      const convertedProducts: Product[] = (data || []).map((item) => {
         // Gestion sécurisée du farmer (peut être un objet ou un tableau)
         let farmerData = undefined;
         if (item.farmer) {
@@ -98,7 +98,7 @@ export const useProducts = () => {
           description: item.description,
           price: item.price,
           unit: item.unit || '',
-          category: item.category || item.category_id || '',
+          category: item.category_id || item.category || '',
           category_id: item.category_id || item.category,
           farmer_id: item.farmer_id,
           image_url: item.image_url,
@@ -109,8 +109,8 @@ export const useProducts = () => {
           created_at: item.created_at,
           updated_at: item.updated_at || item.created_at,
           available_from: item.available_from,
-          available_until: item.available_to || item.available_until, // Utiliser available_to en priorité
-          available_to: item.available_to || item.available_until,
+          available_until: item.available_to,
+          available_to: item.available_to,
           is_organic: item.is_organic || false,
           free_delivery: item.free_delivery || false,
           farm_pickup: item.farm_pickup || false,
@@ -142,7 +142,7 @@ export const useProducts = () => {
           )
         `)
         .eq('id', id)
-        .maybeSingle(); // Utilisation de maybeSingle() pour éviter les erreurs
+        .maybeSingle();
 
       if (error) throw error;
       if (!data) return null;
@@ -163,7 +163,7 @@ export const useProducts = () => {
         description: data.description,
         price: data.price,
         unit: data.unit || '',
-        category: data.category || data.category_id || '',
+        category: data.category_id || data.category || '',
         category_id: data.category_id || data.category,
         farmer_id: data.farmer_id,
         image_url: data.image_url,
@@ -174,8 +174,8 @@ export const useProducts = () => {
         created_at: data.created_at,
         updated_at: data.updated_at || data.created_at,
         available_from: data.available_from,
-        available_until: data.available_to || data.available_until,
-        available_to: data.available_to || data.available_until,
+        available_until: data.available_to,
+        available_to: data.available_to,
         is_organic: data.is_organic || false,
         free_delivery: data.free_delivery || false,
         farm_pickup: data.farm_pickup || false,
