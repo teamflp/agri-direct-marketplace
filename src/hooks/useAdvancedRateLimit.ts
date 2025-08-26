@@ -1,163 +1,151 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-interface RateLimitConfig {
+interface RateLimitOptions {
   maxAttempts: number;
   windowMs: number;
   blockDurationMs?: number;
   exponentialBackoff?: boolean;
 }
 
-interface AttemptData {
-  count: number;
+interface RateLimitState {
+  attempts: number;
   firstAttempt: number;
-  lastAttempt: number;
-  blocked: boolean;
-  blockUntil?: number;
+  blockedUntil?: number;
+  currentBlockDuration: number;
 }
 
-export const useAdvancedRateLimit = (key: string, config: RateLimitConfig) => {
-  const [attempts, setAttempts] = useState<Record<string, AttemptData>>({});
-  const [isBlocked, setIsBlocked] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(0);
-
+export const useAdvancedRateLimit = (key: string, options: RateLimitOptions) => {
   const {
     maxAttempts,
     windowMs,
-    blockDurationMs = 15 * 60 * 1000, // 15 minutes par défaut
-    exponentialBackoff = true
-  } = config;
+    blockDurationMs = 5 * 60 * 1000, // 5 minutes par défaut
+    exponentialBackoff = false
+  } = options;
 
-  const checkRateLimit = (now: number = Date.now()): boolean => {
-    const attemptData = attempts[key];
+  const [state, setState] = useState<RateLimitState>(() => {
+    try {
+      const stored = localStorage.getItem(`rateLimit_${key}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          attempts: parsed.attempts || 0,
+          firstAttempt: parsed.firstAttempt || Date.now(),
+          blockedUntil: parsed.blockedUntil,
+          currentBlockDuration: parsed.currentBlockDuration || blockDurationMs
+        };
+      }
+    } catch (error) {
+      console.error('Error loading rate limit state:', error);
+    }
     
-    if (!attemptData) return false;
+    return {
+      attempts: 0,
+      firstAttempt: Date.now(),
+      currentBlockDuration: blockDurationMs
+    };
+  });
 
-    // Vérifier si toujours bloqué
-    if (attemptData.blocked && attemptData.blockUntil && now < attemptData.blockUntil) {
+  // Sauvegarder l'état dans localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(`rateLimit_${key}`, JSON.stringify(state));
+    } catch (error) {
+      console.error('Error saving rate limit state:', error);
+    }
+  }, [key, state]);
+
+  // Nettoyer l'état expiré
+  useEffect(() => {
+    const now = Date.now();
+    
+    // Si la fenêtre de temps est expirée, réinitialiser
+    if (now - state.firstAttempt > windowMs) {
+      setState(prev => ({
+        attempts: 0,
+        firstAttempt: now,
+        currentBlockDuration: blockDurationMs
+      }));
+    }
+    
+    // Si le blocage est expiré, débloquer
+    if (state.blockedUntil && now > state.blockedUntil) {
+      setState(prev => ({
+        ...prev,
+        blockedUntil: undefined
+      }));
+    }
+  }, [windowMs, blockDurationMs, state.firstAttempt, state.blockedUntil]);
+
+  const isRateLimited = useCallback(() => {
+    const now = Date.now();
+    
+    // Vérifier si actuellement bloqué
+    if (state.blockedUntil && now < state.blockedUntil) {
       return true;
     }
-
-    // Réinitialiser si la fenêtre a expiré
-    if (now - attemptData.firstAttempt > windowMs) {
-      const newAttempts = { ...attempts };
-      delete newAttempts[key];
-      setAttempts(newAttempts);
-      return false;
-    }
-
-    return attemptData.count >= maxAttempts;
-  };
-
-  const recordAttempt = (success: boolean = false): void => {
-    const now = Date.now();
-    const currentAttempt = attempts[key];
-
-    if (!currentAttempt || now - currentAttempt.firstAttempt > windowMs) {
-      // Nouvelle fenêtre ou première tentative
-      setAttempts(prev => ({
-        ...prev,
-        [key]: {
-          count: 1,
-          firstAttempt: now,
-          lastAttempt: now,
-          blocked: false
-        }
-      }));
-    } else {
-      // Incrémenter dans la fenêtre existante
-      const newCount = currentAttempt.count + 1;
-      let blocked = false;
-      let blockUntil: number | undefined;
-
-      if (!success && newCount >= maxAttempts) {
-        blocked = true;
-        let duration = blockDurationMs;
-        
-        // Backoff exponentiel basé sur le nombre de blocages précédents
-        if (exponentialBackoff) {
-          const previousBlocks = Math.floor(newCount / maxAttempts) - 1;
-          duration = blockDurationMs * Math.pow(2, Math.min(previousBlocks, 5)); // Max 32x
-        }
-        
-        blockUntil = now + duration;
-      }
-
-      setAttempts(prev => ({
-        ...prev,
-        [key]: {
-          ...currentAttempt,
-          count: newCount,
-          lastAttempt: now,
-          blocked,
-          blockUntil
-        }
-      }));
-    }
-
-    // Log des tentatives suspectes
-    if (!success && currentAttempt && currentAttempt.count >= maxAttempts - 1) {
-      logSuspiciousActivity(key, currentAttempt.count + 1);
-    }
-  };
-
-  const getRemainingTimeValue = (): number => {
-    const attemptData = attempts[key];
-    if (!attemptData?.blocked || !attemptData.blockUntil) return 0;
     
-    const remaining = attemptData.blockUntil - Date.now();
-    return Math.max(0, Math.ceil(remaining / 1000));
-  };
+    // Vérifier si le nombre max de tentatives est atteint
+    return state.attempts >= maxAttempts;
+  }, [state.attempts, state.blockedUntil, maxAttempts]);
 
-  const logSuspiciousActivity = async (identifier: string, attemptCount: number) => {
-    try {
-      const { logSecurityEvent } = await import('@/utils/securityValidation');
-      await logSecurityEvent('suspicious_login_attempts', {
-        identifier,
-        attempt_count: attemptCount,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Failed to log suspicious activity:', error);
-    }
-  };
+  const getRemainingTime = useCallback(() => {
+    if (!state.blockedUntil) return 0;
+    
+    const remaining = Math.max(0, Math.ceil((state.blockedUntil - Date.now()) / 1000));
+    return remaining;
+  }, [state.blockedUntil]);
 
-  // Mise à jour du timer
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const blocked = checkRateLimit();
-      const remaining = getRemainingTimeValue();
-      
-      setIsBlocked(blocked);
-      setRemainingTime(remaining);
-      
-      // Nettoyer les tentatives expirées
-      if (remaining === 0 && blocked) {
-        const newAttempts = { ...attempts };
-        if (newAttempts[key]) {
-          newAttempts[key] = {
-            ...newAttempts[key],
-            blocked: false,
-            blockUntil: undefined
-          };
-        }
-        setAttempts(newAttempts);
+  const recordAttempt = useCallback((success: boolean = false) => {
+    const now = Date.now();
+    
+    setState(prev => {
+      // Si succès, réinitialiser complètement
+      if (success) {
+        return {
+          attempts: 0,
+          firstAttempt: now,
+          currentBlockDuration: blockDurationMs
+        };
       }
-    }, 1000);
+      
+      const newAttempts = prev.attempts + 1;
+      let newBlockedUntil = prev.blockedUntil;
+      let newBlockDuration = prev.currentBlockDuration;
+      
+      // Si on atteint le max, bloquer
+      if (newAttempts >= maxAttempts) {
+        newBlockedUntil = now + newBlockDuration;
+        
+        // Backoff exponentiel si activé
+        if (exponentialBackoff) {
+          newBlockDuration = Math.min(newBlockDuration * 2, 24 * 60 * 60 * 1000); // Max 24h
+        }
+      }
+      
+      return {
+        attempts: newAttempts,
+        firstAttempt: prev.firstAttempt,
+        blockedUntil: newBlockedUntil,
+        currentBlockDuration: newBlockDuration
+      };
+    });
+  }, [maxAttempts, blockDurationMs, exponentialBackoff]);
 
-    return () => clearInterval(interval);
-  }, [attempts, key, windowMs, blockDurationMs]);
+  const reset = useCallback(() => {
+    setState({
+      attempts: 0,
+      firstAttempt: Date.now(),
+      currentBlockDuration: blockDurationMs
+    });
+  }, [blockDurationMs]);
 
   return {
-    isRateLimited: checkRateLimit(),
-    isBlocked,
+    isRateLimited: isRateLimited(),
+    getRemainingTime: getRemainingTime(),
     recordAttempt,
-    getRemainingTime: getRemainingTimeValue(),
-    remainingTime,
-    resetRateLimit: () => {
-      const newAttempts = { ...attempts };
-      delete newAttempts[key];
-      setAttempts(newAttempts);
-    }
+    reset,
+    attemptCount: state.attempts,
+    maxAttempts
   };
 };

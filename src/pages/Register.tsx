@@ -1,290 +1,42 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import AgrimarketLogo from "@/components/logo/AgrimarketLogo";
-import { useAuth } from "@/contexts/AuthContext";
-
-const registerFormSchema = z.object({
-  firstName: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
-  lastName: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères" }),
-  email: z.string().email({ message: "Email invalide" }),
-  phoneNumber: z.string().min(8, { message: "Numéro de téléphone invalide" }),
-  password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères" }),
-  confirmPassword: z.string(),
-  userType: z.enum(["buyer", "farmer"], { 
-    required_error: "Veuillez sélectionner un type de compte" 
-  }),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "Vous devez accepter les conditions d'utilisation" }),
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Les mots de passe ne correspondent pas",
-  path: ["confirmPassword"],
-});
-
-type RegisterFormValues = z.infer<typeof registerFormSchema>;
+import React from 'react';
+import { Link } from 'react-router-dom';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import EnhancedSecureRegisterForm from '@/components/auth/EnhancedSecureRegisterForm';
 
 const Register = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("buyer");
-  const { signUp } = useAuth();
-
-  const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerFormSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-      confirmPassword: "",
-      userType: "buyer",
-      termsAccepted: false as any, // Cast to any to fix type error since it will be set to true when checked
-    },
-  });
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    form.setValue("userType", value as "buyer" | "farmer");
-  };
-
-  const onSubmit = async (values: RegisterFormValues) => {
-    setIsLoading(true);
-    
-    const { error } = await signUp({
-      email: values.email,
-      password: values.password,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      phoneNumber: values.phoneNumber,
-      userType: values.userType,
-    });
-    
-    setIsLoading(false);
-  };
-
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="container mx-auto px-4 pt-32 pb-16">
-        <div className="flex justify-center items-center">
-          <Card className="w-full max-w-xl shadow-lg border-t-4 border-t-agrimarket-orange">
-            <CardHeader className="space-y-1">
-              <div className="flex justify-center mb-4">
-                <AgrimarketLogo size="lg" />
-              </div>
-              <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
-              <CardDescription className="text-center">
-                Rejoignez AgriMarket et profitez de produits frais directement des agriculteurs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger 
-                    value="buyer"
-                    className="data-[state=active]:bg-agrimarket-orange data-[state=active]:text-white"
-                  >
-                    Je suis Acheteur
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="farmer"
-                    className="data-[state=active]:bg-agrimarket-green data-[state=active]:text-white"
-                  >
-                    Je suis Agriculteur
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="buyer">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Créez un compte pour acheter des produits frais directement auprès des agriculteurs locaux.
-                  </p>
-                </TabsContent>
-                <TabsContent value="farmer">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Créez un compte pour vendre vos produits directement aux consommateurs et professionnels.
-                  </p>
-                </TabsContent>
-              </Tabs>
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Prénom</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Prénom" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nom</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nom" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="exemple@email.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Numéro de téléphone</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+225 XX XX XX XX XX" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Mot de passe</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Confirmer le mot de passe</FormLabel>
-                          <FormControl>
-                            <Input type="password" placeholder="••••••••" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="userType"
-                    render={({ field }) => (
-                      <FormItem className="hidden">
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="buyer" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Acheteur
-                              </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                              <FormControl>
-                                <RadioGroupItem value="farmer" />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                Agriculteur
-                              </FormLabel>
-                            </FormItem>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="termsAccepted"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="data-[state=checked]:bg-agrimarket-orange data-[state=checked]:border-agrimarket-orange"
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="text-sm cursor-pointer">
-                            J'accepte les <Link to="/terms" className="text-agrimarket-orange hover:underline">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-agrimarket-orange hover:underline">politique de confidentialité</Link>
-                          </FormLabel>
-                          <FormMessage />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-agrimarket-orange hover:bg-agrimarket-brown"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Création du compte..." : "Créer mon compte"}
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-2">
-              <div className="text-sm text-center">
-                Vous avez déjà un compte?{" "}
-                <Link to="/login" className="text-agrimarket-orange hover:underline">
+      <main className="flex-1 bg-gray-50 py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Rejoignez AgriMarket</h1>
+              <p className="text-gray-600">
+                Créez votre compte pour accéder aux meilleurs produits locaux
+              </p>
+            </div>
+            
+            <EnhancedSecureRegisterForm />
+            
+            <div className="text-center mt-6">
+              <p className="text-gray-600">
+                Vous avez déjà un compte ?{' '}
+                <Link 
+                  to="/login" 
+                  className="text-agrimarket-orange hover:text-agrimarket-brown font-medium"
+                >
                   Se connecter
                 </Link>
-              </div>
-            </CardFooter>
-          </Card>
+              </p>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

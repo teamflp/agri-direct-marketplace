@@ -1999,6 +1999,143 @@ export type Database = {
         }
         Relationships: []
       }
+      nc_chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          message_type: string | null
+          metadata: Json | null
+          room_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          metadata?: Json | null
+          room_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          metadata?: Json | null
+          room_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nc_chat_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "nc_chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nc_chat_rooms: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_private: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_private?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_private?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      nc_loyalty_points: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          points: number
+          source: string
+          source_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points?: number
+          source: string
+          source_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          points?: number
+          source?: string
+          source_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      nc_loyalty_rewards: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean | null
+          name: string
+          points_required: number
+          reward_type: string
+          reward_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points_required: number
+          reward_type: string
+          reward_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points_required?: number
+          reward_type?: string
+          reward_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       nc_prestataires: {
         Row: {
           active: boolean | null
@@ -2129,8 +2266,10 @@ export type Database = {
           id: string
           notes: string | null
           prestataire_id: string
+          rating: number | null
           reservation_date: string
           reservation_time: string
+          review_comment: string | null
           service_id: string
           status: string
           stripe_payment_intent_id: string | null
@@ -2147,8 +2286,10 @@ export type Database = {
           id?: string
           notes?: string | null
           prestataire_id: string
+          rating?: number | null
           reservation_date: string
           reservation_time: string
+          review_comment?: string | null
           service_id: string
           status?: string
           stripe_payment_intent_id?: string | null
@@ -2165,8 +2306,10 @@ export type Database = {
           id?: string
           notes?: string | null
           prestataire_id?: string
+          rating?: number | null
           reservation_date?: string
           reservation_time?: string
+          review_comment?: string | null
           service_id?: string
           status?: string
           stripe_payment_intent_id?: string | null
@@ -2250,6 +2393,44 @@ export type Database = {
             columns: ["prestataire_id"]
             isOneToOne: false
             referencedRelation: "nc_prestataires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nc_user_rewards: {
+        Row: {
+          claimed_at: string | null
+          expires_at: string | null
+          id: string
+          reward_id: string | null
+          status: string | null
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          claimed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          reward_id?: string | null
+          status?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          claimed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          reward_id?: string | null
+          status?: string | null
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nc_user_rewards_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "nc_loyalty_rewards"
             referencedColumns: ["id"]
           },
         ]
@@ -10744,6 +10925,10 @@ export type Database = {
           email: string
           id: string
         }[]
+      }
+      get_user_total_points: {
+        Args: { user_uuid: string }
+        Returns: number
       }
       increment_plan_usage: {
         Args: { p_amount?: number; p_feature: string; p_user_id: string }
