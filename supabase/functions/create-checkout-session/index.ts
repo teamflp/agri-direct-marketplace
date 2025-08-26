@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 // Helper function for logging
-const logStep = (step: string, details?: any) => {
+const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CHECKOUT-SESSION] ${step}${detailsStr}`);
 };
@@ -53,8 +53,25 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: userData.user.id, email: userData.user.email });
 
+    // Define types for request body
+    interface LineItem {
+      name: string;
+      description?: string;
+      image_url?: string;
+      unit_price: number;
+      quantity: number;
+    }
+
+    interface RequestBody {
+      amount: number;
+      currency?: string;
+      orderId: string;
+      items: LineItem[];
+      metadata?: Record<string, unknown>;
+    }
+
     // Parse request body
-    const { amount, currency = "eur", orderId, items, metadata = {} } = await req.json();
+    const { amount, currency = "eur", orderId, items, metadata = {} } = await req.json() as RequestBody;
 
     if (!amount || !orderId) {
       logStep("ERROR: Missing required fields", { amount, orderId });
@@ -89,7 +106,7 @@ serve(async (req) => {
     }
 
     // Create line items for Stripe
-    const lineItems = items?.map((item: any) => ({
+    const lineItems = items?.map((item) => ({
       price_data: {
         currency: currency,
         product_data: {
@@ -132,8 +149,8 @@ serve(async (req) => {
         userId: userData.user.id,
         ...metadata
       },
-      automatic_tax: { enabled: false },
-      billing_address_collection: 'auto',
+      automatic_tax: { enabled: true },
+      billing_address_collection: 'required',
       shipping_address_collection: {
         allowed_countries: ['CI', 'FR', 'BE', 'CH'] // Côte d'Ivoire, France, etc.
       },
