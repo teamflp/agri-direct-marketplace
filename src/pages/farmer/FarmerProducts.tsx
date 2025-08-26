@@ -1,11 +1,16 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { ShoppingBag, Package, BarChart2, MessageSquare, Settings } from 'lucide-react';
+import { ShoppingBag, Package, BarChart2, MessageSquare, Settings, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProductsHeader from './components/ProductsHeader';
 import ProductsOverview from './components/ProductsOverview';
-import { ProductType } from './components/ProductDeleteDialog';
+import AddProductDialog from './components/AddProductDialog';
+import { useFarmerProducts, useAddProduct } from '@/hooks/useProducts';
+import { TablesInsert } from '@/integrations/supabase/types';
+
+// NOTE: The old ProductType is now replaced by the types from useProducts.ts
+// We might need to update ProductDeleteDialog etc. later.
+import { Product } from '@/hooks/useProducts';
 import ProductDeleteDialog from './components/ProductDeleteDialog';
 import ProductEditDialog from './components/ProductEditDialog';
 import ProductViewDialog from './components/ProductViewDialog';
@@ -13,13 +18,18 @@ import ProductViewDialog from './components/ProductViewDialog';
 const FarmerProducts = () => {
   const { user, profile } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  // Dialog states for other actions
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
-  const [mockProducts, setMockProducts] = useState<ProductType[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Menu items for the sidebar
+  // Data fetching using React Query hooks
+  const { data: products, isLoading, error } = useFarmerProducts();
+  const { mutate: addProduct, isPending: isAddingProduct } = useAddProduct();
+
   const menuItems = [
     { title: "Tableau de bord", path: "/farmer", icon: <BarChart2 size={20} /> },
     { title: "Produits", path: "/farmer/products", icon: <Package size={20} /> },
@@ -30,124 +40,40 @@ const FarmerProducts = () => {
     { title: "Paramètres", path: "/farmer/profile", icon: <Settings size={20} /> },
   ];
 
-  // Mock data initialization
-  useEffect(() => {
-    const products: ProductType[] = [
-      {
-        id: 1,
-        name: 'Tomates Bio',
-        description: 'Tomates fraîches cultivées sans pesticides',
-        price: 2.99,
-        inventory: 45,
-        category: 'Légumes',
-        unit: 'kg',
-        organic: true,
-        published: true,
-        image: 'https://images.unsplash.com/photo-1592924357177-333f73b4c1dd?w=500&h=500&fit=crop',
+  const handleAddProduct = (
+    productData: TablesInsert<'products'>,
+    variantsData: Omit<TablesInsert<'product_variants'>, 'product_id'>[]
+  ) => {
+    addProduct({ productData, variantsData }, {
+      onSuccess: () => {
+        setIsAddDialogOpen(false);
+        // Optionally, show a success toast
       },
-      {
-        id: 2,
-        name: 'Carottes',
-        description: 'Carottes fraîches de saison',
-        price: 1.49,
-        inventory: 30,
-        category: 'Légumes',
-        unit: 'kg',
-        organic: false,
-        published: true,
-        image: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=500&h=500&fit=crop',
-      },
-      {
-        id: 3,
-        name: 'Fraises',
-        description: 'Fraises sucrées et juteuses',
-        price: 3.99,
-        inventory: 15,
-        category: 'Fruits',
-        unit: 'barquette',
-        organic: true,
-        published: true,
-        image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=500&h=500&fit=crop',
-      },
-      {
-        id: 4,
-        name: 'Lait de Ferme',
-        description: 'Lait entier frais',
-        price: 1.29,
-        inventory: 20,
-        category: 'Produits laitiers',
-        unit: 'l',
-        organic: false,
-        published: false,
-        image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&h=500&fit=crop',
+      onError: (e) => {
+        console.error("Error adding product from component:", e);
+        // Optionally, show an error toast
       }
-    ];
-    setMockProducts(products);
-  }, []);
+    });
+  };
 
-  // Filtered products based on search term
-  const filteredProducts = mockProducts.filter(product => 
+  const filteredProducts = products?.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    product.category_id?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
-  // Event handlers
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+  // TODO: Wire these up to the backend using mutation hooks
+  const handleTogglePublish = (productId: string, currentStatus: boolean) => {
+    console.log("Toggling publish status for", productId, !currentStatus);
   };
-
-  const handleAddProduct = () => {
-    // This would open an add product dialog in a real app
-    alert('Fonctionnalité à venir: Ajouter un nouveau produit');
-  };
-
-  const handleTogglePublish = (productId: number, currentStatus: boolean) => {
-    setMockProducts(prevProducts => 
-      prevProducts.map(product => 
-        product.id === productId 
-          ? { ...product, published: !currentStatus } 
-          : product
-      )
-    );
-  };
-
-  const handleDeleteClick = (product: ProductType) => {
-    setSelectedProduct(product);
-    setShowDeleteDialog(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    if (selectedProduct) {
-      setMockProducts(prevProducts => 
-        prevProducts.filter(product => product.id !== selectedProduct.id)
-      );
-    }
-    setShowDeleteDialog(false);
-  };
-
-  const handleViewClick = (product: ProductType) => {
-    setSelectedProduct(product);
-    setShowViewDialog(true);
-  };
-
-  const handleEditClick = (product: ProductType) => {
-    setSelectedProduct(product);
-    setShowEditDialog(true);
-  };
-
-  const handleEditConfirm = (updatedProduct: ProductType) => {
-    setMockProducts(prevProducts => 
-      prevProducts.map(product => 
-        product.id === updatedProduct.id ? updatedProduct : product
-      )
-    );
-    setShowEditDialog(false);
-  };
+  const handleDeleteClick = (product: Product) => setSelectedProduct(product);
+  const handleViewClick = (product: Product) => setSelectedProduct(product);
+  const handleEditClick = (product: Product) => setSelectedProduct(product);
+  const handleDeleteConfirm = () => console.log("Deleting", selectedProduct?.id);
+  const handleEditConfirm = (updatedProduct: any) => console.log("Editing", updatedProduct);
 
   const name = profile?.first_name && profile?.last_name 
     ? `${profile.first_name} ${profile.last_name}` 
     : 'Jean Dupont';
-    
   const email = user?.email || 'jean.dupont@fermelocale.fr';
 
   return (
@@ -158,27 +84,36 @@ const FarmerProducts = () => {
       menuItems={menuItems}
     >
       <div className="space-y-6">
-        {/* Header with title, search and add button */}
         <ProductsHeader 
           searchTerm={searchTerm} 
-          onSearchChange={handleSearchChange} 
-          onAddClick={handleAddProduct} 
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          onAddClick={() => setIsAddDialogOpen(true)}
         />
         
-        {/* Products table */}
-        <ProductsOverview 
-          products={mockProducts}
-          filteredProducts={filteredProducts}
-          onTogglePublish={handleTogglePublish}
-          onDeleteClick={handleDeleteClick}
-          onViewClick={handleViewClick}
-          onEditClick={handleEditClick}
-        />
+        {isLoading && <div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /> Chargement des produits...</div>}
+        {error && <div className="text-red-600 bg-red-100 p-4 rounded-md">Erreur: {error.message}</div>}
+
+        {!isLoading && !error && products && (
+          <ProductsOverview
+            products={products}
+            filteredProducts={filteredProducts}
+            onTogglePublish={handleTogglePublish}
+            onDeleteClick={handleDeleteClick}
+            onViewClick={handleViewClick}
+            onEditClick={handleEditClick}
+          />
+        )}
         
-        {/* Dialogs */}
+        <AddProductDialog
+          open={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
+          onAddProduct={handleAddProduct}
+        />
+
+        {/* TODO: Update these dialogs to work with the new data structure and hooks */}
         {selectedProduct && (
           <>
-            <ProductDeleteDialog 
+            {/* <ProductDeleteDialog
               open={showDeleteDialog} 
               onOpenChange={setShowDeleteDialog}
               product={selectedProduct}
@@ -195,8 +130,8 @@ const FarmerProducts = () => {
             <ProductViewDialog 
               open={showViewDialog} 
               onOpenChange={setShowViewDialog}
-              product={selectedProduct}
-            />
+              product={selected.product}
+            /> */}
           </>
         )}
       </div>
