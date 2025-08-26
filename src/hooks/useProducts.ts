@@ -1,37 +1,35 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { parseJsonArray } from '@/types/database';
 
+// Interface simple pour éviter les problèmes de récursion
 export interface Product {
   id: string;
   name: string;
   description?: string;
   price: number;
-  unit: string;
-  category: string;
-  category_id?: string;
-  farmer_id: string;
   image_url?: string;
-  images?: string[];
-  primary_image_url?: string;
-  in_stock: boolean;
+  farmer_id: string;
+  category?: string;
+  category_id?: string;
+  in_stock?: boolean;
   stock_quantity?: number;
-  created_at: string;
-  updated_at: string;
+  unit?: string;
+  organic?: boolean;
+  local?: boolean;
+  seasonal?: boolean;
   available_from?: string;
-  available_until?: string;
   available_to?: string;
-  is_organic?: boolean;
-  free_delivery?: boolean;
+  available_until?: string;
   farm_pickup?: boolean;
-  rating?: number;
-  reviews_count?: number;
+  free_delivery?: boolean;
+  delivery_zones?: string[];
+  created_at?: string;
+  updated_at?: string;
   farmer?: {
     id: string;
     name: string;
     location: string;
-    distance: number;
   };
 }
 
@@ -40,89 +38,63 @@ export const useProducts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = async (filters?: {
-    category?: string;
-    search?: string;
-    farmer_id?: string;
-    in_stock?: boolean;
-  }) => {
+  const fetchProducts = async () => {
     try {
       setLoading(true);
-      let query = supabase
+      setError(null);
+      
+      const { data: rawData, error: fetchError } = await supabase
         .from('products')
         .select(`
           *,
-          farmer:farmers (
-            id,
-            name,
-            location,
-            distance
-          )
-        `);
-
-      if (filters?.category) {
-        query = query.eq('category', filters.category);
+          farmers!inner(id, name, location)
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) {
+        console.error('Error fetching products:', fetchError);
+        throw fetchError;
       }
 
-      if (filters?.search) {
-        query = query.ilike('name', `%${filters.search}%`);
-      }
-
-      if (filters?.farmer_id) {
-        query = query.eq('farmer_id', filters.farmer_id);
-      }
-
-      if (filters?.in_stock !== undefined) {
-        query = query.eq('in_stock', filters.in_stock);
-      }
-
-      const { data, error } = await query.order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      // Convert raw data to Product interface with explicit type casting
-      const convertedProducts: Product[] = (data || []).map((rawItem: any) => {
-        // Handle farmer data safely
-        let farmerData = undefined;
-        if (rawItem.farmer) {
-          if (Array.isArray(rawItem.farmer) && rawItem.farmer.length > 0) {
-            farmerData = rawItem.farmer[0];
-          } else if (typeof rawItem.farmer === 'object') {
-            farmerData = rawItem.farmer;
-          }
-        }
-
+      // Transformation simple sans récursion de type
+      const transformedProducts: Product[] = (rawData || []).map((item: any) => {
+        const farmer = Array.isArray(item.farmers) ? item.farmers[0] : item.farmers;
+        
         return {
-          id: rawItem.id,
-          name: rawItem.name,
-          description: rawItem.description,
-          price: rawItem.price,
-          unit: rawItem.unit || '',
-          category: rawItem.category || rawItem.category_id || '',
-          category_id: rawItem.category_id,
-          farmer_id: rawItem.farmer_id,
-          image_url: rawItem.image_url,
-          images: parseJsonArray(rawItem.images),
-          primary_image_url: rawItem.primary_image_url,
-          in_stock: rawItem.in_stock ?? true,
-          stock_quantity: rawItem.stock_quantity,
-          created_at: rawItem.created_at,
-          updated_at: rawItem.updated_at || rawItem.created_at,
-          available_from: rawItem.available_from,
-          available_until: rawItem.available_to, // Map available_to to available_until
-          available_to: rawItem.available_to,
-          is_organic: rawItem.is_organic || false,
-          free_delivery: rawItem.free_delivery || false,
-          farm_pickup: rawItem.farm_pickup || false,
-          rating: rawItem.rating || 0,
-          reviews_count: rawItem.reviews_count || 0,
-          farmer: farmerData
+          id: item.id,
+          name: item.name || '',
+          description: item.description || '',
+          price: Number(item.price) || 0,
+          image_url: item.image_url || '',
+          farmer_id: item.farmer_id || '',
+          category: item.category_name || 'Non classé',
+          category_id: item.category_id || '',
+          in_stock: Boolean(item.quantity > 0),
+          stock_quantity: Number(item.quantity) || 0,
+          unit: item.unit || 'pièce',
+          organic: Boolean(item.is_organic),
+          local: Boolean(item.is_local),
+          seasonal: Boolean(item.is_seasonal),
+          available_from: item.available_from || '',
+          available_to: item.available_to || '',
+          available_until: item.available_to || '',
+          farm_pickup: Boolean(item.farm_pickup),
+          free_delivery: Boolean(item.free_delivery),
+          delivery_zones: item.delivery_zones || [],
+          created_at: item.created_at || '',
+          updated_at: item.updated_at || '',
+          farmer: farmer ? {
+            id: farmer.id || '',
+            name: farmer.name || '',
+            location: farmer.location || ''
+          } : undefined
         };
       });
 
-      setProducts(convertedProducts);
+      setProducts(transformedProducts);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
+      console.error('Error in fetchProducts:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors du chargement des produits');
     } finally {
       setLoading(false);
     }
@@ -130,63 +102,118 @@ export const useProducts = () => {
 
   const getProductById = async (id: string): Promise<Product | null> => {
     try {
-      const { data, error } = await supabase
+      const { data: rawData, error: fetchError } = await supabase
         .from('products')
         .select(`
           *,
-          farmer:farmers (
-            id,
-            name,
-            location,
-            distance
-          )
+          farmers!inner(id, name, location)
         `)
         .eq('id', id)
         .maybeSingle();
-
-      if (error) throw error;
-      if (!data) return null;
-
-      // Handle farmer data safely with explicit type casting
-      const rawData: any = data;
-      let farmerData = undefined;
-      if (rawData.farmer) {
-        if (Array.isArray(rawData.farmer) && rawData.farmer.length > 0) {
-          farmerData = rawData.farmer[0];
-        } else if (typeof rawData.farmer === 'object') {
-          farmerData = rawData.farmer;
-        }
+      
+      if (fetchError) {
+        console.error('Error fetching product:', fetchError);
+        return null;
       }
 
+      if (!rawData) return null;
+
+      const farmer = Array.isArray(rawData.farmers) ? rawData.farmers[0] : rawData.farmers;
+      
       return {
         id: rawData.id,
-        name: rawData.name,
-        description: rawData.description,
-        price: rawData.price,
-        unit: rawData.unit || '',
-        category: rawData.category || rawData.category_id || '',
-        category_id: rawData.category_id,
-        farmer_id: rawData.farmer_id,
-        image_url: rawData.image_url,
-        images: parseJsonArray(rawData.images),
-        primary_image_url: rawData.primary_image_url,
-        in_stock: rawData.in_stock ?? true,
-        stock_quantity: rawData.stock_quantity,
-        created_at: rawData.created_at,
-        updated_at: rawData.updated_at || rawData.created_at,
-        available_from: rawData.available_from,
-        available_until: rawData.available_to, // Map available_to to available_until
-        available_to: rawData.available_to,
-        is_organic: rawData.is_organic || false,
-        free_delivery: rawData.free_delivery || false,
-        farm_pickup: rawData.farm_pickup || false,
-        rating: rawData.rating || 0,
-        reviews_count: rawData.reviews_count || 0,
-        farmer: farmerData
+        name: rawData.name || '',
+        description: rawData.description || '',
+        price: Number(rawData.price) || 0,
+        image_url: rawData.image_url || '',
+        farmer_id: rawData.farmer_id || '',
+        category: rawData.category_name || 'Non classé',
+        category_id: rawData.category_id || '',
+        in_stock: Boolean(rawData.quantity > 0),
+        stock_quantity: Number(rawData.quantity) || 0,
+        unit: rawData.unit || 'pièce',
+        organic: Boolean(rawData.is_organic),
+        local: Boolean(rawData.is_local),
+        seasonal: Boolean(rawData.is_seasonal),
+        available_from: rawData.available_from || '',
+        available_to: rawData.available_to || '',
+        available_until: rawData.available_to || '',
+        farm_pickup: Boolean(rawData.farm_pickup),
+        free_delivery: Boolean(rawData.free_delivery),
+        delivery_zones: rawData.delivery_zones || [],
+        created_at: rawData.created_at || '',
+        updated_at: rawData.updated_at || '',
+        farmer: farmer ? {
+          id: farmer.id || '',
+          name: farmer.name || '',
+          location: farmer.location || ''
+        } : undefined
       };
     } catch (err) {
-      console.error('Error fetching product:', err);
+      console.error('Error getting product by ID:', err);
       return null;
+    }
+  };
+
+  const searchProducts = async (searchTerm: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data: rawData, error: fetchError } = await supabase
+        .from('products')
+        .select(`
+          *,
+          farmers!inner(id, name, location)
+        `)
+        .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) {
+        console.error('Error searching products:', fetchError);
+        throw fetchError;
+      }
+
+      const transformedProducts: Product[] = (rawData || []).map((item: any) => {
+        const farmer = Array.isArray(item.farmers) ? item.farmers[0] : item.farmers;
+        
+        return {
+          id: item.id,
+          name: item.name || '',
+          description: item.description || '',
+          price: Number(item.price) || 0,
+          image_url: item.image_url || '',
+          farmer_id: item.farmer_id || '',
+          category: item.category_name || 'Non classé',
+          category_id: item.category_id || '',
+          in_stock: Boolean(item.quantity > 0),
+          stock_quantity: Number(item.quantity) || 0,
+          unit: item.unit || 'pièce',
+          organic: Boolean(item.is_organic),
+          local: Boolean(item.is_local),
+          seasonal: Boolean(item.is_seasonal),
+          available_from: item.available_from || '',
+          available_to: item.available_to || '',
+          available_until: item.available_to || '',
+          farm_pickup: Boolean(item.farm_pickup),
+          free_delivery: Boolean(item.free_delivery),
+          delivery_zones: item.delivery_zones || [],
+          created_at: item.created_at || '',
+          updated_at: item.updated_at || '',
+          farmer: farmer ? {
+            id: farmer.id || '',
+            name: farmer.name || '',
+            location: farmer.location || ''
+          } : undefined
+        };
+      });
+
+      setProducts(transformedProducts);
+    } catch (err) {
+      console.error('Error in searchProducts:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors de la recherche');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -198,7 +225,8 @@ export const useProducts = () => {
     products,
     loading,
     error,
-    fetchProducts,
+    refetch: fetchProducts,
     getProductById,
+    searchProducts
   };
 };
