@@ -80,42 +80,42 @@ export const useProducts = () => {
 
       if (error) throw error;
 
-      // Conversion avec gestion sécurisée des types
-      const convertedProducts: Product[] = (data || []).map((item) => {
-        // Gestion sécurisée du farmer (peut être un objet ou un tableau)
+      // Convert raw data to Product interface with explicit type casting
+      const convertedProducts: Product[] = (data || []).map((rawItem: any) => {
+        // Handle farmer data safely
         let farmerData = undefined;
-        if (item.farmer) {
-          if (Array.isArray(item.farmer) && item.farmer.length > 0) {
-            farmerData = item.farmer[0];
-          } else if (typeof item.farmer === 'object') {
-            farmerData = item.farmer;
+        if (rawItem.farmer) {
+          if (Array.isArray(rawItem.farmer) && rawItem.farmer.length > 0) {
+            farmerData = rawItem.farmer[0];
+          } else if (typeof rawItem.farmer === 'object') {
+            farmerData = rawItem.farmer;
           }
         }
 
         return {
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          unit: item.unit || '',
-          category: item.category || '',
-          category_id: item.category_id,
-          farmer_id: item.farmer_id,
-          image_url: item.image_url,
-          images: parseJsonArray(item.images),
-          primary_image_url: item.primary_image_url,
-          in_stock: item.in_stock ?? true,
-          stock_quantity: item.stock_quantity,
-          created_at: item.created_at,
-          updated_at: item.updated_at || item.created_at,
-          available_from: item.available_from,
-          available_until: item.available_until,
-          available_to: item.available_to,
-          is_organic: item.is_organic || false,
-          free_delivery: item.free_delivery || false,
-          farm_pickup: item.farm_pickup || false,
-          rating: item.rating || 0,
-          reviews_count: item.reviews_count || 0,
+          id: rawItem.id,
+          name: rawItem.name,
+          description: rawItem.description,
+          price: rawItem.price,
+          unit: rawItem.unit || '',
+          category: rawItem.category || rawItem.category_id || '',
+          category_id: rawItem.category_id,
+          farmer_id: rawItem.farmer_id,
+          image_url: rawItem.image_url,
+          images: parseJsonArray(rawItem.images),
+          primary_image_url: rawItem.primary_image_url,
+          in_stock: rawItem.in_stock ?? true,
+          stock_quantity: rawItem.stock_quantity,
+          created_at: rawItem.created_at,
+          updated_at: rawItem.updated_at || rawItem.created_at,
+          available_from: rawItem.available_from,
+          available_until: rawItem.available_to, // Map available_to to available_until
+          available_to: rawItem.available_to,
+          is_organic: rawItem.is_organic || false,
+          free_delivery: rawItem.free_delivery || false,
+          farm_pickup: rawItem.farm_pickup || false,
+          rating: rawItem.rating || 0,
+          reviews_count: rawItem.reviews_count || 0,
           farmer: farmerData
         };
       });
@@ -147,40 +147,41 @@ export const useProducts = () => {
       if (error) throw error;
       if (!data) return null;
 
-      // Gestion sécurisée du farmer
+      // Handle farmer data safely with explicit type casting
+      const rawData: any = data;
       let farmerData = undefined;
-      if (data.farmer) {
-        if (Array.isArray(data.farmer) && data.farmer.length > 0) {
-          farmerData = data.farmer[0];
-        } else if (typeof data.farmer === 'object') {
-          farmerData = data.farmer;
+      if (rawData.farmer) {
+        if (Array.isArray(rawData.farmer) && rawData.farmer.length > 0) {
+          farmerData = rawData.farmer[0];
+        } else if (typeof rawData.farmer === 'object') {
+          farmerData = rawData.farmer;
         }
       }
 
       return {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        unit: data.unit || '',
-        category: data.category || '',
-        category_id: data.category_id,
-        farmer_id: data.farmer_id,
-        image_url: data.image_url,
-        images: parseJsonArray(data.images),
-        primary_image_url: data.primary_image_url,
-        in_stock: data.in_stock ?? true,
-        stock_quantity: data.stock_quantity,
-        created_at: data.created_at,
-        updated_at: data.updated_at || data.created_at,
-        available_from: data.available_from,
-        available_until: data.available_until,
-        available_to: data.available_to,
-        is_organic: data.is_organic || false,
-        free_delivery: data.free_delivery || false,
-        farm_pickup: data.farm_pickup || false,
-        rating: data.rating || 0,
-        reviews_count: data.reviews_count || 0,
+        id: rawData.id,
+        name: rawData.name,
+        description: rawData.description,
+        price: rawData.price,
+        unit: rawData.unit || '',
+        category: rawData.category || rawData.category_id || '',
+        category_id: rawData.category_id,
+        farmer_id: rawData.farmer_id,
+        image_url: rawData.image_url,
+        images: parseJsonArray(rawData.images),
+        primary_image_url: rawData.primary_image_url,
+        in_stock: rawData.in_stock ?? true,
+        stock_quantity: rawData.stock_quantity,
+        created_at: rawData.created_at,
+        updated_at: rawData.updated_at || rawData.created_at,
+        available_from: rawData.available_from,
+        available_until: rawData.available_to, // Map available_to to available_until
+        available_to: rawData.available_to,
+        is_organic: rawData.is_organic || false,
+        free_delivery: rawData.free_delivery || false,
+        farm_pickup: rawData.farm_pickup || false,
+        rating: rawData.rating || 0,
+        reviews_count: rawData.reviews_count || 0,
         farmer: farmerData
       };
     } catch (err) {
