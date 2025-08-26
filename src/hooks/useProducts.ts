@@ -80,32 +80,45 @@ export const useProducts = () => {
 
       if (error) throw error;
 
-      const convertedProducts: Product[] = (data || []).map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        unit: item.unit || '',
-        category: item.category || item.category_id || '',
-        category_id: item.category_id || item.category,
-        farmer_id: item.farmer_id,
-        image_url: item.image_url,
-        images: parseJsonArray(item.images),
-        primary_image_url: item.primary_image_url,
-        in_stock: item.in_stock ?? true,
-        stock_quantity: item.stock_quantity,
-        created_at: item.created_at,
-        updated_at: item.updated_at || item.created_at,
-        available_from: item.available_from,
-        available_until: item.available_until || item.available_to,
-        available_to: item.available_to || item.available_until,
-        is_organic: item.is_organic || false,
-        free_delivery: item.free_delivery || false,
-        farm_pickup: item.farm_pickup || false,
-        rating: item.rating || 0,
-        reviews_count: item.reviews_count || 0,
-        farmer: item.farmer && item.farmer.length > 0 ? item.farmer[0] : undefined
-      }));
+      // Conversion avec gestion sécurisée des types
+      const convertedProducts: Product[] = (data || []).map((item: any) => {
+        // Gestion sécurisée du farmer (peut être un objet ou un tableau)
+        let farmerData = undefined;
+        if (item.farmer) {
+          if (Array.isArray(item.farmer) && item.farmer.length > 0) {
+            farmerData = item.farmer[0];
+          } else if (typeof item.farmer === 'object') {
+            farmerData = item.farmer;
+          }
+        }
+
+        return {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          unit: item.unit || '',
+          category: item.category || item.category_id || '',
+          category_id: item.category_id || item.category,
+          farmer_id: item.farmer_id,
+          image_url: item.image_url,
+          images: parseJsonArray(item.images),
+          primary_image_url: item.primary_image_url,
+          in_stock: item.in_stock ?? true,
+          stock_quantity: item.stock_quantity,
+          created_at: item.created_at,
+          updated_at: item.updated_at || item.created_at,
+          available_from: item.available_from,
+          available_until: item.available_to || item.available_until, // Utiliser available_to en priorité
+          available_to: item.available_to || item.available_until,
+          is_organic: item.is_organic || false,
+          free_delivery: item.free_delivery || false,
+          farm_pickup: item.farm_pickup || false,
+          rating: item.rating || 0,
+          reviews_count: item.reviews_count || 0,
+          farmer: farmerData
+        };
+      });
 
       setProducts(convertedProducts);
     } catch (err) {
@@ -129,9 +142,20 @@ export const useProducts = () => {
           )
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle(); // Utilisation de maybeSingle() pour éviter les erreurs
 
       if (error) throw error;
+      if (!data) return null;
+
+      // Gestion sécurisée du farmer
+      let farmerData = undefined;
+      if (data.farmer) {
+        if (Array.isArray(data.farmer) && data.farmer.length > 0) {
+          farmerData = data.farmer[0];
+        } else if (typeof data.farmer === 'object') {
+          farmerData = data.farmer;
+        }
+      }
 
       return {
         id: data.id,
@@ -150,14 +174,14 @@ export const useProducts = () => {
         created_at: data.created_at,
         updated_at: data.updated_at || data.created_at,
         available_from: data.available_from,
-        available_until: data.available_until || data.available_to,
+        available_until: data.available_to || data.available_until,
         available_to: data.available_to || data.available_until,
         is_organic: data.is_organic || false,
         free_delivery: data.free_delivery || false,
         farm_pickup: data.farm_pickup || false,
         rating: data.rating || 0,
         reviews_count: data.reviews_count || 0,
-        farmer: data.farmer && data.farmer.length > 0 ? data.farmer[0] : undefined
+        farmer: farmerData
       };
     } catch (err) {
       console.error('Error fetching product:', err);

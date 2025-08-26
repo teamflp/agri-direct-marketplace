@@ -128,7 +128,11 @@ export const useOrders = () => {
             unit: orderItem.product.unit
           } : undefined
         })) || [],
-        farmer: item.farmer && item.farmer.length > 0 ? item.farmer[0] : undefined
+        farmer: item.farmer ? {
+          id: item.farmer.id,
+          name: item.farmer.name,
+          location: item.farmer.location
+        } : undefined
       }));
 
       setOrders(convertedOrders);
@@ -199,7 +203,11 @@ export const useOrders = () => {
             unit: orderItem.product.unit
           } : undefined
         })) || [],
-        farmer: data.farmer && data.farmer.length > 0 ? data.farmer[0] : undefined
+        farmer: data.farmer ? {
+          id: data.farmer.id,
+          name: data.farmer.name,
+          location: data.farmer.location
+        } : undefined
       };
     } catch (err) {
       throw err instanceof Error ? err : new Error('Erreur lors du chargement');
