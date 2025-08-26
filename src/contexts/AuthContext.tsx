@@ -52,7 +52,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Auth state change:', event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-        setIsLoading(true);
 
         if (currentSession?.user) {
           await fetchUserProfile(currentSession.user.id);
@@ -214,13 +213,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error };
       }
 
+      if (!data.user) {
+        toast({
+          title: 'Erreur de connexion',
+          description: 'Utilisateur non trouvé après la connexion.',
+          variant: 'destructive',
+        });
+        return { error: new Error('Utilisateur non trouvé après la connexion.') };
+      }
+
+      // Fetch user role to redirect correctly
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        toast({
+          title: 'Erreur de connexion',
+          description: "Impossible de récupérer les informations de l'utilisateur.",
+          variant: 'destructive',
+        });
+        return { error: profileError };
+      }
+
       toast({
         title: 'Connexion réussie !',
         description: 'Bienvenue sur AgriMarket',
         variant: 'success',
       });
 
-      // The profile will be fetched automatically by the auth state change listener
+      // Redirect based on role
+      switch (profileData.role) {
+        case 'farmer':
+          navigate('/farmer');
+          break;
+        case 'admin':
+          navigate('/admin');
+          break;
+        case 'buyer':
+          navigate('/buyer');
+          break;
+        default:
+          navigate('/');
+          break;
+      }
+
       return { error: null };
     } catch (error: any) {
       toast({
