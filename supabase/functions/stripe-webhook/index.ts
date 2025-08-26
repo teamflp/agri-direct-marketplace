@@ -91,6 +91,16 @@ serve(async (req) => {
 
         logStep("Order updated successfully", { orderId, status: 'paid' });
 
+        // Deduct stock for the order
+        const { error: stockError } = await supabase.rpc('handle_stock_deduction', { p_order_id: orderId });
+        if (stockError) {
+          // Log the error but don't fail the webhook, as the payment is already processed.
+          // This requires manual intervention.
+          logStep("CRITICAL ERROR: Failed to deduct stock for order", { orderId, error: stockError });
+        } else {
+          logStep("Stock deduction successful", { orderId });
+        }
+
         // Send confirmation email (if email function exists)
         try {
           await supabase.functions.invoke('send-order-confirmation', {
