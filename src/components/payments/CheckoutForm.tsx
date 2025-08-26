@@ -19,7 +19,6 @@ export const CheckoutForm = () => {
   const [searchParams] = useSearchParams();
   const [deliveryMethod, setDeliveryMethod] = useState('delivery');
   const [paymentMethod, setPaymentMethod] = useState('card');
-  const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -83,7 +82,6 @@ export const CheckoutForm = () => {
       const orderData = {
         total: getTotalPrice(),
         delivery_method: deliveryMethod,
-        delivery_address: deliveryMethod === 'delivery' ? deliveryAddress : undefined,
         delivery_date: deliveryDate,
         payment_method: paymentMethod,
         notes,
@@ -110,7 +108,6 @@ export const CheckoutForm = () => {
             items: stripeItems,
             metadata: {
               delivery_method: deliveryMethod,
-              delivery_address: deliveryAddress,
               delivery_date: deliveryDate
             }
           }
@@ -183,15 +180,10 @@ export const CheckoutForm = () => {
             </div>
 
             {deliveryMethod === 'delivery' && (
-              <div>
-                <Label htmlFor="address">Adresse de livraison *</Label>
-                <Textarea 
-                  id="address"
-                  placeholder="Entrez votre adresse complète"
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  required
-                />
+              <div className="p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
+                <p>
+                  Votre adresse de livraison complète sera demandée lors de l'étape de paiement sécurisé.
+                </p>
               </div>
             )}
 
@@ -290,8 +282,12 @@ export const CheckoutForm = () => {
             ))}
             <Separator />
             <div className="flex justify-between items-center font-bold text-lg">
-              <span>Total</span>
+              <span>Total (hors taxes)</span>
               <span>{getTotalPrice().toFixed(2)}€</span>
+            </div>
+            <div className="flex justify-between items-center text-sm text-muted-foreground">
+              <span>Taxes et frais de livraison</span>
+              <span>Calculés à l'étape suivante</span>
             </div>
           </div>
         </CardContent>

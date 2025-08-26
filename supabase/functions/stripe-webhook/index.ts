@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 // Helper function for logging
-const logStep = (step: string, details?: any) => {
+const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
 };
@@ -106,6 +106,35 @@ serve(async (req) => {
           // Don't fail the webhook if email fails
         }
 
+        break;
+      }
+
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        logStep("Processing invoice.paid", { invoiceId: invoice.id });
+
+        if (invoice.payment_intent && typeof invoice.payment_intent === 'string') {
+          const paymentIntent = await stripe.paymentIntents.retrieve(invoice.payment_intent);
+          const orderId = paymentIntent.metadata?.orderId;
+
+          if (orderId && invoice.hosted_invoice_url) {
+            const { error: invoiceError } = await supabase
+              .from('orders')
+              .update({
+                invoice_url: invoice.hosted_invoice_url,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', orderId);
+
+            if (invoiceError) {
+              logStep("ERROR updating order with invoice URL", { orderId, error: invoiceError });
+            } else {
+              logStep("Order updated with invoice URL", { orderId, url: invoice.hosted_invoice_url });
+            }
+          } else {
+            logStep("WARNING: No orderId or invoice URL found for invoice.paid", { invoiceId: invoice.id });
+          }
+        }
         break;
       }
 

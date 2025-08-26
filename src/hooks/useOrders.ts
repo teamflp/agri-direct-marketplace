@@ -16,7 +16,8 @@ export interface Order {
   payment_method?: string;
   stripe_session_id?: string;
   stripe_payment_intent_id?: string;
-  payment_metadata?: Record<string, any>;
+  invoice_url?: string;
+  payment_metadata?: Record<string, unknown>;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -96,7 +97,7 @@ export const useOrders = () => {
       if (error) throw error;
 
       // Convertir les données avec les bons types
-      const convertedOrders: Order[] = (data || []).map((item: any) => ({
+      const convertedOrders: Order[] = (data || []).map((item: Record<string, any>) => ({
         id: item.id,
         buyer_id: item.buyer_id || user.id,
         farmer_id: item.farmer_id,
@@ -109,29 +110,30 @@ export const useOrders = () => {
         payment_method: item.payment_method,
         stripe_session_id: item.stripe_session_id,
         stripe_payment_intent_id: item.stripe_payment_intent_id,
-        payment_metadata: parseJsonField<Record<string, any>>(item.payment_metadata),
+        invoice_url: item.invoice_url,
+        payment_metadata: parseJsonField<Record<string, unknown>>(item.payment_metadata),
         notes: item.notes,
         created_at: item.created_at || new Date().toISOString(),
         updated_at: item.updated_at || item.created_at || new Date().toISOString(),
-        order_items: item.order_items?.map((orderItem: any) => ({
+        order_items: item.order_items?.map((orderItem: Record<string, any>) => ({
           id: orderItem.id,
           order_id: orderItem.order_id,
           product_id: orderItem.product_id,
           quantity: orderItem.quantity,
           unit_price: orderItem.unit_price,
           product: orderItem.product ? {
-            id: orderItem.product.id,
-            name: orderItem.product.name,
-            image_url: orderItem.product.image_url,
-            images: parseJsonArray(orderItem.product.images),
-            primary_image_url: orderItem.product.primary_image_url,
-            unit: orderItem.product.unit
+            id: (orderItem.product as Record<string, any>).id,
+            name: (orderItem.product as Record<string, any>).name,
+            image_url: (orderItem.product as Record<string, any>).image_url,
+            images: parseJsonArray((orderItem.product as Record<string, any>).images),
+            primary_image_url: (orderItem.product as Record<string, any>).primary_image_url,
+            unit: (orderItem.product as Record<string, any>).unit
           } : undefined
         })) || [],
         farmer: item.farmer ? {
-          id: item.farmer.id,
-          name: item.farmer.name,
-          location: item.farmer.location
+          id: (item.farmer as Record<string, any>).id,
+          name: (item.farmer as Record<string, any>).name,
+          location: (item.farmer as Record<string, any>).location
         } : undefined
       }));
 
@@ -171,42 +173,45 @@ export const useOrders = () => {
       
       if (error) throw error;
       
+      const orderData = data as Record<string, any>;
+
       return {
-        id: data.id,
-        buyer_id: data.buyer_id || '',
-        farmer_id: data.farmer_id,
-        status: data.status,
-        total: data.total,
-        delivery_address: data.delivery_address,
-        delivery_date: data.delivery_date,
-        delivery_method: data.delivery_method || 'standard',
-        payment_status: data.payment_status || 'pending',
-        payment_method: data.payment_method,
-        stripe_session_id: data.stripe_session_id,
-        stripe_payment_intent_id: data.stripe_payment_intent_id,
-        payment_metadata: parseJsonField<Record<string, any>>(data.payment_metadata),
-        notes: data.notes,
-        created_at: data.created_at || new Date().toISOString(),
-        updated_at: data.updated_at || data.created_at || new Date().toISOString(),
-        order_items: data.order_items?.map((orderItem: any) => ({
+        id: orderData.id,
+        buyer_id: orderData.buyer_id || '',
+        farmer_id: orderData.farmer_id,
+        status: orderData.status,
+        total: orderData.total,
+        delivery_address: orderData.delivery_address,
+        delivery_date: orderData.delivery_date,
+        delivery_method: orderData.delivery_method || 'standard',
+        payment_status: orderData.payment_status || 'pending',
+        payment_method: orderData.payment_method,
+        stripe_session_id: orderData.stripe_session_id,
+        stripe_payment_intent_id: orderData.stripe_payment_intent_id,
+        invoice_url: orderData.invoice_url,
+        payment_metadata: parseJsonField<Record<string, unknown>>(orderData.payment_metadata),
+        notes: orderData.notes,
+        created_at: orderData.created_at || new Date().toISOString(),
+        updated_at: orderData.updated_at || orderData.created_at || new Date().toISOString(),
+        order_items: orderData.order_items?.map((orderItem: Record<string, any>) => ({
           id: orderItem.id,
           order_id: orderItem.order_id,
           product_id: orderItem.product_id,
           quantity: orderItem.quantity,
           unit_price: orderItem.unit_price,
           product: orderItem.product ? {
-            id: orderItem.product.id,
-            name: orderItem.product.name,
-            image_url: orderItem.product.image_url,
-            images: parseJsonArray(orderItem.product.images),
-            primary_image_url: orderItem.product.primary_image_url,
-            unit: orderItem.product.unit
+            id: (orderItem.product as Record<string, any>).id,
+            name: (orderItem.product as Record<string, any>).name,
+            image_url: (orderItem.product as Record<string, any>).image_url,
+            images: parseJsonArray((orderItem.product as Record<string, any>).images),
+            primary_image_url: (orderItem.product as Record<string, any>).primary_image_url,
+            unit: (orderItem.product as Record<string, any>).unit
           } : undefined
         })) || [],
-        farmer: data.farmer ? {
-          id: data.farmer.id,
-          name: data.farmer.name,
-          location: data.farmer.location
+        farmer: orderData.farmer ? {
+          id: (orderData.farmer as Record<string, any>).id,
+          name: (orderData.farmer as Record<string, any>).name,
+          location: (orderData.farmer as Record<string, any>).location
         } : undefined
       };
     } catch (err) {
@@ -320,7 +325,14 @@ export const useOrders = () => {
 
   const updatePaymentStatus = async (orderId: string, paymentStatus: string, sessionId?: string, paymentIntentId?: string) => {
     try {
-      const updateData: any = { 
+      interface UpdateData {
+        payment_status: string;
+        updated_at: string;
+        stripe_session_id?: string;
+        stripe_payment_intent_id?: string;
+      }
+
+      const updateData: UpdateData = {
         payment_status: paymentStatus,
         updated_at: new Date().toISOString()
       };
