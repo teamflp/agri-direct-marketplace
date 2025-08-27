@@ -16,7 +16,7 @@ import FloatingChatButton from "@/components/chat/FloatingChatButton";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Header />
       <main className="flex-grow pt-16">
         <HeroBanner />

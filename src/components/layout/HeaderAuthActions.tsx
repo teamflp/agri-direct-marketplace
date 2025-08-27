@@ -10,8 +10,27 @@ import { useAuth } from "@/contexts/AuthContext";
 const HeaderAuthActions = () => {
   const { user, profile, signOut, isLoading } = useAuth();
 
+  // Forcer l'affichage des boutons même en cas de chargement
   if (isLoading) {
-    return <div className="w-[100px] h-[40px] animate-pulse bg-gray-200 rounded" />;
+    return (
+      <div className="flex items-center space-x-2">
+        <Button 
+          asChild 
+          variant="outline" 
+          size="sm" 
+          className="border-2 border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 font-semibold"
+        >
+          <Link to="/login">Connexion</Link>
+        </Button>
+        <Button 
+          asChild 
+          size="sm" 
+          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+        >
+          <Link to="/register">Inscription</Link>
+        </Button>
+      </div>
+    );
   }
 
   if (!user) {
@@ -21,14 +40,14 @@ const HeaderAuthActions = () => {
           asChild 
           variant="outline" 
           size="sm" 
-          className="border-2 border-agrimarket-orange text-agrimarket-orange hover:bg-agrimarket-orange/10 hover:text-agrimarket-orange font-semibold"
+          className="border-2 border-orange-500 text-orange-500 hover:bg-orange-50 hover:text-orange-600 font-semibold"
         >
           <Link to="/login">Connexion</Link>
         </Button>
         <Button 
           asChild 
           size="sm" 
-          className="bg-agrimarket-orange hover:bg-agrimarket-brown text-white font-semibold"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold"
         >
           <Link to="/register">Inscription</Link>
         </Button>

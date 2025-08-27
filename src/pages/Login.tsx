@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -13,6 +13,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AgrimarketLogo from "@/components/logo/AgrimarketLogo";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const loginFormSchema = z.object({
   email: z.string().email({ message: "Email invalide" }),
@@ -25,6 +26,7 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -38,16 +40,64 @@ const Login = () => {
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     
-    const { error } = await signIn(values.email, values.password);
-    
-    if (values.rememberMe) {
-      // Utiliser localStorage pour se souvenir de l'e-mail (pas du mot de passe)
-      localStorage.setItem('rememberedEmail', values.email);
-    } else {
-      localStorage.removeItem('rememberedEmail');
+    try {
+      // Connexion directe avec Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (error) {
+        console.error('Erreur de connexion:', error);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        console.error('Utilisateur non trouvé après la connexion');
+        setIsLoading(false);
+        return;
+      }
+
+      // Récupérer le profil utilisateur pour la redirection
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Erreur lors de la récupération du profil:', profileError);
+        setIsLoading(false);
+        return;
+      }
+
+      // Gérer "Se souvenir de moi"
+      if (values.rememberMe) {
+        localStorage.setItem('rememberedEmail', values.email);
+      } else {
+        localStorage.removeItem('rememberedEmail');
+      }
+
+      // Redirection basée sur le rôle
+      switch (profileData.role) {
+        case 'farmer':
+          navigate('/farmer');
+          break;
+        case 'admin':
+          navigate('/admin');
+          break;
+        case 'buyer':
+          navigate('/buyer');
+          break;
+        default:
+          navigate('/');
+          break;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   // Charger l'email sauvegardé si disponible

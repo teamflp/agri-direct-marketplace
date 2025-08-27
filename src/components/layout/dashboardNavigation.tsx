@@ -16,7 +16,8 @@ import {
   ShieldAlert,
   Building,
   DollarSign,
-  Truck
+  Truck,
+  MapPin
 } from 'lucide-react';
 
 export interface DashboardMenuItem {

@@ -62,7 +62,7 @@ const Header = () => {
           scrolled 
             ? 'bg-white shadow-md py-2' 
             : 'bg-white py-3'
-        } fixed w-full z-50 transition-all duration-300 top-0 left-0`}
+        } fixed w-full z-50 transition-all duration-300 top-0 left-0 right-0`}
       >
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
@@ -78,8 +78,8 @@ const Header = () => {
             
             {/* Actions à droite - visibles uniquement sur desktop */}
             <div className="flex items-center gap-3">
-              {/* Notification Center */}
-              <NotificationCenter />
+              {/* Notification Center - seulement si l'utilisateur est connecté */}
+              {profile && <NotificationCenter />}
               
               {/* Mini panier */}
               <MiniCart />
