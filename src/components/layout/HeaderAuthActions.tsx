@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings, ShoppingBag, Package } from "lucide-react";
+import { LogOut, User, Settings, ShoppingBag, Package, MessageSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const HeaderAuthActions = () => {
@@ -71,6 +71,12 @@ const HeaderAuthActions = () => {
           <Link to={userDashboardUrl} className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             <span>Tableau de bord</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/messages" className="cursor-pointer">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            <span>Messages</span>
           </Link>
         </DropdownMenuItem>
         {profile?.role === 'farmer' && (

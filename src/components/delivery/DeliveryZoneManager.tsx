@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -20,8 +20,34 @@ const DeliveryZoneManager: React.FC = () => {
   const draw = useRef<MapboxDraw | null>(null);
   const { user } = useAuth();
 
-  const [zones, setZones] = useState<any[]>([]);
   const [selectedZone, setSelectedZone] = useState<{ id: string; fee: number; name: string } | null>(null);
+
+  const fetchZones = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('delivery_zones')
+      .select('id, name, base_fee, zone_polygon')
+      .eq('profile_id', user.id);
+
+    if (error) {
+      toast.error("Erreur lors du chargement des zones.");
+      console.error(error);
+      return;
+    }
+
+    if (data && draw.current) {
+        const features = data.map(zone => ({
+            id: zone.id,
+            type: 'Feature',
+            properties: {
+                name: zone.name,
+                base_fee: zone.base_fee,
+            },
+            geometry: zone.zone_polygon,
+        }));
+      draw.current.set({ type: 'FeatureCollection', features });
+    }
+  }, [user]);
 
   // Initialize map and draw controls
   useEffect(() => {
@@ -57,46 +83,19 @@ const DeliveryZoneManager: React.FC = () => {
     return () => {
       map.current?.remove();
     };
-  }, []);
+  }, [fetchZones]);
 
-  const fetchZones = async () => {
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('delivery_zones')
-      .select('id, name, base_fee, zone_polygon')
-      .eq('profile_id', user.id);
-
-    if (error) {
-      toast.error("Erreur lors du chargement des zones.");
-      console.error(error);
-      return;
-    }
-
-    if (data && draw.current) {
-        const features = data.map(zone => ({
-            id: zone.id,
-            type: 'Feature',
-            properties: {
-                name: zone.name,
-                base_fee: zone.base_fee,
-            },
-            geometry: zone.zone_polygon,
-        }));
-      draw.current.set({ type: 'FeatureCollection', features });
-    }
-  };
-
-  const updateZones = (e: any) => {
+  const updateZones = (e: MapboxDraw.DrawCreateEvent | MapboxDraw.DrawDeleteEvent | MapboxDraw.DrawUpdateEvent) => {
     // This function will handle saving the drawn features to the database
     console.log('Zone action:', e.type, e.features);
     // Logic to save to DB will be added here
   };
 
-  const handleSelectionChange = (e: any) => {
+  const handleSelectionChange = (e: MapboxDraw.DrawSelectionChangeEvent) => {
       if (e.features.length > 0) {
           const feature = e.features[0];
           setSelectedZone({
-              id: feature.id,
+              id: feature.id as string,
               name: feature.properties.name || '',
               fee: feature.properties.base_fee || 0,
           });
