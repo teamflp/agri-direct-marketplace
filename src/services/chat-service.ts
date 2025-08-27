@@ -11,7 +11,14 @@ export interface ChatError {
   message: string;
   code?: 'MISSING_API_KEY' | 'INVALID_REQUEST' | 'RATE_LIMITED' | 'OPENAI_ERROR' | 'INTERNAL' | 'TIMEOUT' | 'NETWORK_ERROR';
   correlationId?: string;
-  details?: any;
+  details?: unknown;
+}
+
+const allowedErrorCodes = ['MISSING_API_KEY', 'INVALID_REQUEST', 'RATE_LIMITED', 'OPENAI_ERROR', 'INTERNAL', 'TIMEOUT', 'NETWORK_ERROR'] as const;
+type AllowedErrorCode = (typeof allowedErrorCodes)[number];
+
+function isAllowedErrorCode(code: string): code is AllowedErrorCode {
+    return (allowedErrorCodes as readonly string[]).includes(code);
 }
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -41,58 +48,71 @@ class ChatService {
     }
   }
 
-  private normalizeError(error: any, correlationId?: string): ChatError {
+  private normalizeError(error: unknown, correlationId?: string): ChatError {
     console.error("Chat service error:", error, "Correlation ID:", correlationId);
 
-    // Handle structured errors from Edge Function
-    if (error.error_code) {
-      return {
-        message: error.error || error.message || "Erreur inconnue",
-        code: error.error_code,
-        correlationId: error.correlation_id || correlationId,
-        details: error
-      };
+    if (typeof error === 'object' && error !== null) {
+        // Handle structured errors from Edge Function
+        if ('error_code' in error && typeof error.error_code === 'string') {
+          const structuredError = error as { error_code: string, error?: string, message?: string, correlation_id?: string };
+          const code = structuredError.error_code;
+          return {
+            message: structuredError.error || structuredError.message || "Erreur inconnue",
+            code: isAllowedErrorCode(code) ? code : 'INTERNAL',
+            correlationId: structuredError.correlation_id || correlationId,
+            details: error
+          };
+        }
+
+        // Handle timeout errors
+        if ('name' in error && error.name === 'AbortError') {
+          return {
+            message: "La requête a expiré. Veuillez réessayer.",
+            code: 'TIMEOUT',
+            correlationId
+          };
+        }
+
+        if ('message' in error && typeof error.message === 'string') {
+            // Handle network errors
+            if (error.message.includes('fetch') || error.message.includes('network')) {
+              return {
+                message: "Erreur de connexion. Vérifiez votre connection internet.",
+                code: 'NETWORK_ERROR',
+                correlationId
+              };
+            }
+
+            // Handle validation errors
+            if (error.message.includes('caractères') || error.message.includes('requis')) {
+              return {
+                message: error.message,
+                code: 'INVALID_REQUEST',
+                correlationId
+              };
+            }
+
+            // Handle API key errors
+            if (error.message.includes('OpenAI API key') || error.message.includes('OPENAI_API_KEY')) {
+              return {
+                message: "Clé API OpenAI non configurée. Veuillez configurer votre clé API dans les paramètres.",
+                code: 'MISSING_API_KEY',
+                correlationId
+              };
+            }
+
+            // Generic error from message
+            return {
+              message: error.message,
+              code: 'INTERNAL',
+              correlationId
+            };
+        }
     }
 
-    // Handle timeout errors
-    if (error.name === 'AbortError') {
-      return {
-        message: "La requête a expiré. Veuillez réessayer.",
-        code: 'TIMEOUT',
-        correlationId
-      };
-    }
-
-    // Handle network errors
-    if (error.message?.includes('fetch') || error.message?.includes('network')) {
-      return {
-        message: "Erreur de connexion. Vérifiez votre connection internet.",
-        code: 'NETWORK_ERROR',
-        correlationId
-      };
-    }
-
-    // Handle validation errors
-    if (error.message?.includes('caractères') || error.message?.includes('requis')) {
-      return {
-        message: error.message,
-        code: 'INVALID_REQUEST',
-        correlationId
-      };
-    }
-
-    // Handle API key errors
-    if (error.message?.includes('OpenAI API key') || error.message?.includes('OPENAI_API_KEY')) {
-      return {
-        message: "Clé API OpenAI non configurée. Veuillez configurer votre clé API dans les paramètres.",
-        code: 'MISSING_API_KEY',
-        correlationId
-      };
-    }
-
-    // Generic error
+    // Fallback for non-Error objects or primitives
     return {
-      message: error.message || "Erreur lors de la communication avec le service de chat",
+      message: "Erreur lors de la communication avec le service de chat",
       code: 'INTERNAL',
       correlationId
     };
@@ -109,7 +129,7 @@ class ChatService {
     const conversationHistory = messages.slice(0, -1); // Keep full ChatMessage objects
     this.validateConversationHistory(conversationHistory);
 
-    let lastError: any;
+    let lastError: unknown;
     
     // Retry logic with exponential backoff
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {

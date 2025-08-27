@@ -39,6 +39,7 @@ import Contact from "./pages/Contact";
 import SeasonalCalendar from "./pages/SeasonalCalendar";
 import Subscriptions from "./pages/Subscriptions";
 import Chat from "./pages/Chat";
+import MessagesPage from "./pages/MessagesPage";
 import NotificationsDemo from "./pages/NotificationsDemo";
 import NotFound from "./pages/NotFound";
 
@@ -174,6 +175,11 @@ function App() {
                               <Route path="/checkout-process" element={
                                 <ProtectedRoute>
                                   <CheckoutProcess />
+                                </ProtectedRoute>
+                              } />
+                              <Route path="/messages" element={
+                                <ProtectedRoute>
+                                  <MessagesPage />
                                 </ProtectedRoute>
                               } />
 

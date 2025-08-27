@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { parseJsonField, parseJsonArray } from '@/types/database';
+import { Tables } from '@/integrations/supabase/types';
+
+type OrderWithRelations = Tables<'orders'> & {
+  order_items: (Tables<'order_items'> & {
+    product: Pick<Tables<'products'>, 'id' | 'name' | 'image_url' | 'images' | 'primary_image_url' | 'unit'> | null;
+  })[];
+  farmer: Pick<Tables<'farmers'>, 'id' | 'name' | 'location'> | null;
+};
 
 export interface Order {
   id: string;
@@ -26,6 +34,12 @@ export interface Order {
     id: string;
     name: string;
     location: string;
+  };
+  buyer?: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
   };
 }
 
@@ -61,7 +75,7 @@ export const useOrders = () => {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!user) {
       setOrders([]);
       setLoading(false);
@@ -96,130 +110,69 @@ export const useOrders = () => {
       
       if (error) throw error;
 
-      // Convertir les données avec les bons types
-      const convertedOrders: Order[] = (data || []).map((item: Record<string, any>) => ({
-        id: item.id,
-        buyer_id: item.buyer_id || user.id,
-        farmer_id: item.farmer_id,
-        status: item.status,
-        total: item.total,
-        delivery_address: item.delivery_address,
-        delivery_date: item.delivery_date,
-        delivery_method: item.delivery_method || 'standard',
-        payment_status: item.payment_status || 'pending',
-        payment_method: item.payment_method,
-        stripe_session_id: item.stripe_session_id,
-        stripe_payment_intent_id: item.stripe_payment_intent_id,
-        invoice_url: item.invoice_url,
-        payment_metadata: parseJsonField<Record<string, unknown>>(item.payment_metadata),
-        notes: item.notes,
-        created_at: item.created_at || new Date().toISOString(),
-        updated_at: item.updated_at || item.created_at || new Date().toISOString(),
-        order_items: item.order_items?.map((orderItem: Record<string, any>) => ({
-          id: orderItem.id,
-          order_id: orderItem.order_id,
-          product_id: orderItem.product_id,
-          quantity: orderItem.quantity,
-          unit_price: orderItem.unit_price,
-          product: orderItem.product ? {
-            id: (orderItem.product as Record<string, any>).id,
-            name: (orderItem.product as Record<string, any>).name,
-            image_url: (orderItem.product as Record<string, any>).image_url,
-            images: parseJsonArray((orderItem.product as Record<string, any>).images),
-            primary_image_url: (orderItem.product as Record<string, any>).primary_image_url,
-            unit: (orderItem.product as Record<string, any>).unit
-          } : undefined
-        })) || [],
-        farmer: item.farmer ? {
-          id: (item.farmer as Record<string, any>).id,
-          name: (item.farmer as Record<string, any>).name,
-          location: (item.farmer as Record<string, any>).location
-        } : undefined
+      const typedData = (data as OrderWithRelations[]) || [];
+      const ordersWithParsedJson: Order[] = typedData.map(o => ({
+          ...o,
+          payment_metadata: parseJsonField<Record<string, unknown>>(o.payment_metadata),
+          order_items: o.order_items.map(oi => ({
+              ...oi,
+              product: oi.product ? {
+                  ...oi.product,
+                  images: parseJsonArray(oi.product.images)
+              } : undefined
+          }))
       }));
-
-      setOrders(convertedOrders);
+      setOrders(ordersWithParsedJson);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const getOrderById = async (orderId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
+  const getOrderById = useCallback(async (orderId: string): Promise<Order> => {
+    const { data, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
           *,
-          order_items (
-            *,
-            product:products (
-              id,
-              name,
-              image_url,
-              images,
-              primary_image_url,
-              unit
-            )
-          ),
-          farmer:farmers (
+          product:products (
             id,
             name,
-            location
+            image_url,
+            images,
+            primary_image_url,
+            unit
           )
-        `)
-        .eq('id', orderId)
-        .single();
-      
-      if (error) throw error;
-      
-      const orderData = data as Record<string, any>;
+        ),
+        farmer:farmers (
+          id,
+          name,
+          location
+        )
+      `)
+      .eq('id', orderId)
+      .single();
 
-      return {
-        id: orderData.id,
-        buyer_id: orderData.buyer_id || '',
-        farmer_id: orderData.farmer_id,
-        status: orderData.status,
-        total: orderData.total,
-        delivery_address: orderData.delivery_address,
-        delivery_date: orderData.delivery_date,
-        delivery_method: orderData.delivery_method || 'standard',
-        payment_status: orderData.payment_status || 'pending',
-        payment_method: orderData.payment_method,
-        stripe_session_id: orderData.stripe_session_id,
-        stripe_payment_intent_id: orderData.stripe_payment_intent_id,
-        invoice_url: orderData.invoice_url,
-        payment_metadata: parseJsonField<Record<string, unknown>>(orderData.payment_metadata),
-        notes: orderData.notes,
-        created_at: orderData.created_at || new Date().toISOString(),
-        updated_at: orderData.updated_at || orderData.created_at || new Date().toISOString(),
-        order_items: orderData.order_items?.map((orderItem: Record<string, any>) => ({
-          id: orderItem.id,
-          order_id: orderItem.order_id,
-          product_id: orderItem.product_id,
-          quantity: orderItem.quantity,
-          unit_price: orderItem.unit_price,
-          product: orderItem.product ? {
-            id: (orderItem.product as Record<string, any>).id,
-            name: (orderItem.product as Record<string, any>).name,
-            image_url: (orderItem.product as Record<string, any>).image_url,
-            images: parseJsonArray((orderItem.product as Record<string, any>).images),
-            primary_image_url: (orderItem.product as Record<string, any>).primary_image_url,
-            unit: (orderItem.product as Record<string, any>).unit
+    if (error) throw error;
+
+    const orderData = data as OrderWithRelations;
+
+    return {
+      ...orderData,
+      payment_metadata: parseJsonField<Record<string, unknown>>(orderData.payment_metadata),
+      order_items: orderData.order_items.map(oi => ({
+          ...oi,
+          product: oi.product ? {
+              ...oi.product,
+              images: parseJsonArray(oi.product.images)
           } : undefined
-        })) || [],
-        farmer: orderData.farmer ? {
-          id: (orderData.farmer as Record<string, any>).id,
-          name: (orderData.farmer as Record<string, any>).name,
-          location: (orderData.farmer as Record<string, any>).location
-        } : undefined
-      };
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erreur lors du chargement');
-    }
-  };
+      }))
+    };
+  }, []);
 
-  const createOrder = async (orderData: {
+  const createOrder = useCallback(async (orderData: {
     farmer_id?: string;
     total: number;
     delivery_address?: string;
@@ -232,177 +185,134 @@ export const useOrders = () => {
       quantity: number;
       unit_price: number;
     }>;
-  }) => {
+  }): Promise<Tables<'orders'>> => {
     if (!user) throw new Error('Utilisateur non connecté');
 
-    try {
-      const { data: order, error: orderError } = await supabase
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert([{
+        buyer_id: user.id,
+        farmer_id: orderData.farmer_id,
+        total: orderData.total,
+        delivery_address: orderData.delivery_address,
+        delivery_date: orderData.delivery_date,
+        delivery_method: orderData.delivery_method,
+        payment_method: orderData.payment_method,
+        notes: orderData.notes,
+        status: 'pending',
+        payment_status: 'pending'
+      }])
+      .select()
+      .single();
+
+    if (orderError) throw orderError;
+
+    const orderItems = orderData.items.map(item => ({
+      order_id: order.id,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.unit_price
+    }));
+
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+    if (itemsError) throw itemsError;
+
+    const { error: deliveryError } = await supabase.from('delivery_tracking').insert({
+      order_id: order.id,
+      status: 'pending',
+      notes: 'Commande créée, en attente de traitement'
+    });
+    if (deliveryError) console.warn('Erreur création tracking:', deliveryError);
+
+    await fetchOrders();
+    return order;
+  }, [user, fetchOrders]);
+
+  const updateOrderStatus = useCallback(async (orderId: string, status: string, notes?: string) => {
+    const { error } = await supabase.rpc('update_order_status', {
+      order_id: orderId,
+      new_status: status,
+      notes: notes || null
+    });
+
+    if (error) {
+      const { error: directError } = await supabase
         .from('orders')
-        .insert([{
-          buyer_id: user.id,
-          farmer_id: orderData.farmer_id,
-          total: orderData.total,
-          delivery_address: orderData.delivery_address,
-          delivery_date: orderData.delivery_date,
-          delivery_method: orderData.delivery_method,
-          payment_method: orderData.payment_method,
-          notes: orderData.notes,
-          status: 'pending',
-          payment_status: 'pending'
-        }])
-        .select()
-        .single();
-      
-      if (orderError) throw orderError;
-
-      // Créer les items de commande
-      const orderItems = orderData.items.map(item => ({
-        order_id: order.id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        unit_price: item.unit_price
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-      
-      if (itemsError) throw itemsError;
-
-      // Créer une entrée de suivi de livraison
-      const { error: deliveryError } = await supabase
-        .from('delivery_tracking')
-        .insert({
-          order_id: order.id,
-          status: 'pending',
-          notes: 'Commande créée, en attente de traitement'
-        });
-
-      if (deliveryError) console.warn('Erreur création tracking:', deliveryError);
-
-      await fetchOrders();
-      return order;
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erreur lors de la création');
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', orderId);
+      if (directError) throw directError;
     }
-  };
 
-  const updateOrderStatus = async (orderId: string, status: string, notes?: string) => {
-    try {
-      // Utiliser la fonction RPC pour mettre à jour avec historique
-      const { error } = await supabase.rpc('update_order_status', {
+    await supabase.from('delivery_tracking').upsert({
+      order_id: orderId,
+      status: status,
+      notes: notes || `Statut mis à jour: ${status}`,
+      updated_at: new Date().toISOString()
+    });
+
+    await fetchOrders();
+    return true;
+  }, [fetchOrders]);
+
+  const updatePaymentStatus = useCallback(async (orderId: string, paymentStatus: string, sessionId?: string, paymentIntentId?: string): Promise<Tables<'orders'>> => {
+    interface UpdateData {
+      payment_status: string;
+      updated_at: string;
+      stripe_session_id?: string;
+      stripe_payment_intent_id?: string;
+    }
+    const updateData: UpdateData = {
+      payment_status: paymentStatus,
+      updated_at: new Date().toISOString()
+    };
+    if (sessionId) updateData.stripe_session_id = sessionId;
+    if (paymentIntentId) updateData.stripe_payment_intent_id = paymentIntentId;
+
+    const { data, error } = await supabase
+      .from('orders')
+      .update(updateData)
+      .eq('id', orderId)
+      .select()
+      .single();
+    if (error) throw error;
+
+    if (paymentStatus === 'paid') {
+      await supabase.from('delivery_tracking').upsert({
         order_id: orderId,
-        new_status: status,
-        notes: notes || null
+        status: 'confirmed',
+        notes: 'Paiement confirmé, commande en cours de préparation'
       });
-
-      if (error) {
-        // Fallback: mise à jour directe si la RPC échoue
-        const { error: directError } = await supabase
-          .from('orders')
-          .update({ status, updated_at: new Date().toISOString() })
-          .eq('id', orderId);
-        
-        if (directError) throw directError;
-      }
-
-      // Mettre à jour le suivi de livraison aussi
-      await supabase
-        .from('delivery_tracking')
-        .upsert({
-          order_id: orderId,
-          status: status,
-          notes: notes || `Statut mis à jour: ${status}`,
-          updated_at: new Date().toISOString()
-        });
-
-      await fetchOrders();
-      return true;
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erreur lors de la mise à jour');
     }
-  };
 
-  const updatePaymentStatus = async (orderId: string, paymentStatus: string, sessionId?: string, paymentIntentId?: string) => {
-    try {
-      interface UpdateData {
-        payment_status: string;
-        updated_at: string;
-        stripe_session_id?: string;
-        stripe_payment_intent_id?: string;
-      }
+    await fetchOrders();
+    return data;
+  }, [fetchOrders]);
 
-      const updateData: UpdateData = {
-        payment_status: paymentStatus,
-        updated_at: new Date().toISOString()
-      };
-      
-      if (sessionId) updateData.stripe_session_id = sessionId;
-      if (paymentIntentId) updateData.stripe_payment_intent_id = paymentIntentId;
+  const getOrderStatusHistory = useCallback(async (orderId: string): Promise<OrderStatusHistory[]> => {
+    const { data, error } = await supabase
+      .from('order_status_history')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true });
 
-      const { data, error } = await supabase
-        .from('orders')
-        .update(updateData)
-        .eq('id', orderId)
-        .select()
-        .single();
-      
-      if (error) throw error;
+    if (error) throw error;
+    return data || [];
+  }, []);
 
-      // Si le paiement est confirmé, mettre à jour le statut de livraison
-      if (paymentStatus === 'paid') {
-        await supabase
-          .from('delivery_tracking')
-          .upsert({
-            order_id: orderId,
-            status: 'confirmed',
-            notes: 'Paiement confirmé, commande en cours de préparation'
-          });
-      }
+  const checkPaymentStatus = useCallback(async (sessionId?: string, orderId?: string) => {
+    const { data, error } = await supabase.functions.invoke('check-payment-status', {
+      body: { sessionId, orderId }
+    });
+    if (error) throw error;
+    return data;
+  }, []);
 
-      await fetchOrders();
-      return data;
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erreur lors de la mise à jour');
-    }
-  };
-
-  const getOrderStatusHistory = async (orderId: string): Promise<OrderStatusHistory[]> => {
-    try {
-      const { data, error } = await supabase
-        .from('order_status_history')
-        .select('*')
-        .eq('order_id', orderId)
-        .order('created_at', { ascending: true });
-      
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error('Error fetching status history:', err);
-      return [];
-    }
-  };
-
-  const checkPaymentStatus = async (sessionId?: string, orderId?: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('check-payment-status', {
-        body: { sessionId, orderId }
-      });
-
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      throw err instanceof Error ? err : new Error('Erreur lors de la vérification');
-    }
-  };
-
-  const fetchFarmerOrders = async () => {
+  const fetchFarmerOrders = useCallback(async () => {
     if (!user) {
       setOrders([]);
       setLoading(false);
       return;
     }
-
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -413,35 +323,30 @@ export const useOrders = () => {
             *,
             product:products (id, name, image_url)
           ),
-          buyer:profiles (id, full_name, email)
+          buyer:profiles (id, first_name, last_name, email)
         `)
         .eq('farmer_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      // Basic conversion for now, can be expanded like fetchOrders
-      setOrders(data || []);
+      setOrders((data as Order[]) || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
-    // This hook is used by both buyers and farmers, so we might need to
-    // decide which fetch to call, or have the component call it explicitly.
-    // For now, let's keep the original behavior.
     fetchOrders();
-  }, [user]);
+  }, [fetchOrders]);
 
   return {
     orders,
     loading,
     error,
     fetchOrders,
-    fetchFarmerOrders, // <-- Expose the new function
+    fetchFarmerOrders,
     getOrderById,
     createOrder,
     updateOrderStatus,

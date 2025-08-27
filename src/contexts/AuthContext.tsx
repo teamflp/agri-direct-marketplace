@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthError, PostgrestError } from '@supabase/supabase-js';
 
 type UserRole = 'buyer' | 'farmer' | 'admin';
 
@@ -20,10 +20,10 @@ interface AuthContextType {
   session: Session | null;
   profile: UserProfile | null;
   isLoading: boolean;
-  signUp: (data: SignUpData) => Promise<{ error: any | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: any | null }>;
+  signUp: (data: SignUpData) => Promise<{ error: AuthError | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | PostgrestError | null }>;
   signOut: () => Promise<void>;
-  updateProfile: (data: Partial<UserProfile>) => Promise<{ error: any | null }>;
+  updateProfile: (data: Partial<UserProfile>) => Promise<{ error: PostgrestError | null }>;
 }
 
 interface SignUpData {
@@ -187,13 +187,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       navigate('/email-verification', { state: { email } });
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue';
       toast({
         title: 'Erreur lors de l\'inscription',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
-      return { error };
+      return { error: error instanceof AuthError ? error : new AuthError(errorMessage) };
     }
   };
 
@@ -214,12 +215,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (!data.user) {
+        const err = new Error('Utilisateur non trouvé après la connexion.');
         toast({
           title: 'Erreur de connexion',
-          description: 'Utilisateur non trouvé après la connexion.',
+          description: err.message,
           variant: 'destructive',
         });
-        return { error: new Error('Utilisateur non trouvé après la connexion.') };
+        return { error: new AuthError(err.message) };
       }
 
       // Fetch user role to redirect correctly
@@ -261,13 +263,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue';
       toast({
         title: 'Erreur de connexion',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
-      return { error };
+      return { error: error instanceof AuthError ? error : new AuthError(errorMessage) };
     }
   };
 
@@ -280,7 +283,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateProfile = async (data: Partial<UserProfile>) => {
-    if (!user) return { error: new Error('Utilisateur non connecté') };
+    if (!user) return { error: new PostgrestError({ message: 'Utilisateur non connecté' }) };
 
     try {
       const { error } = await supabase
@@ -308,13 +311,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         variant: 'success',
       });
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur inconnue est survenue';
       toast({
         title: 'Erreur lors de la mise à jour du profil',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
-      return { error };
+      return { error: error instanceof PostgrestError ? error : new PostgrestError({ message: errorMessage }) };
     }
   };
 
