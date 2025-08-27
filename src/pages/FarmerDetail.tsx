@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import { useParams } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FarmerHero from '@/components/farmer/FarmerHero';
@@ -8,13 +8,27 @@ import ProductCard from '@/components/products/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
 
 const FarmerDetail = () => {
-  const router = useRouter();
-  const { farmerId } = router.query;
+  const { id } = useParams<{ id: string }>();
   const { products, loading, error } = useProducts();
+
+  // Si aucun ID de producteur n'est fourni dans l'URL
+  if (!id) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-600">Aucun producteur spécifié.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   // Placeholder data for farmer details
   const farmer = {
-    id: farmerId,
+    id,
     name: 'Ferme de Jean',
     description: 'Producteur local de fruits et légumes biologiques.',
     image: 'https://images.unsplash.com/photo-1497900304864-273dfb3aae33?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGZhcm1lcnxlbnwwfHwwfHx8MA%3D%3D',
@@ -22,8 +36,8 @@ const FarmerDetail = () => {
     reviews: 50,
   };
 
-  // Filter products based on farmerId
-  const farmerProducts = products.filter(product => product.farmerId === farmerId);
+  // Filter products based on farmer id from URL
+  const farmerProducts = products.filter(product => product.farmer_id === id);
 
   if (loading) {
     return (
