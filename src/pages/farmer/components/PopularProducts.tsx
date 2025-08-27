@@ -1,11 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-type PopularProductsProps = {
-  // In a real app, this would be fetched from an API
-  // For now, we'll keep it hardcoded as in the original component
-};
-
 const PopularProducts = () => {
   return (
     <Card>

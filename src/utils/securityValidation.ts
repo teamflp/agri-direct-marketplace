@@ -1,5 +1,6 @@
 
 import DOMPurify from 'dompurify';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface PasswordValidationResult {
   isValid: boolean;
@@ -144,7 +145,7 @@ export const validatePhoneNumber = (phone: string): { isValid: boolean; error?: 
     return { isValid: false, error: 'Le numéro de téléphone est requis' };
   }
   
-  const cleanPhone = phone.replace(/[\s\-\(\)\.]/g, '');
+  const cleanPhone = phone.replace(/[\s-().]/g, '');
   
   if (!phoneRegex.test(cleanPhone)) {
     return { isValid: false, error: 'Format de numéro de téléphone invalide' };
@@ -189,8 +190,6 @@ export const checkCompromisedPassword = (password: string): boolean => {
 
 export const logSecurityEvent = async (eventType: string, details: Record<string, any> = {}) => {
   try {
-    const { supabase } = await import('@/integrations/supabase/client');
-    
     await supabase.from('security_audit_log').insert({
       event_type: eventType,
       table_name: details.tableName || null,

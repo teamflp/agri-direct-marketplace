@@ -62,7 +62,9 @@ export const useNotifications = () => {
           size="sm" 
           variant="outline" 
           onClick={() => {
-            notification.action && notification.action();
+            if (notification.action) {
+              notification.action();
+            }
           }}
         >
           Voir
