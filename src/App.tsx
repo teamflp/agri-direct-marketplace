@@ -13,6 +13,7 @@ import { MessageProvider } from "@/contexts/MessageContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { DeliveryProvider } from "@/contexts/DeliveryContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import RoleGuard from "@/components/auth/RoleGuard";
 
@@ -63,6 +64,7 @@ import FarmerInvoices from "./pages/farmer/FarmerInvoices";
 import FarmerSubscription from "./pages/farmer/FarmerSubscription";
 import FarmerBlog from "./pages/farmer/FarmerBlog";
 import FarmerDelivery from "./pages/farmer/FarmerDelivery";
+import FarmerDeliveryRoute from "./pages/farmer/FarmerDeliveryRoute";
 
 // Admin Pages
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -116,9 +118,10 @@ function App() {
                       <NotificationProvider>
                         <DeliveryProvider>
                           <SubscriptionProvider>
-                            <Routes>
-                              {/* Public Routes */}
-                              <Route path="/" element={<Index />} />
+                            <CurrencyProvider>
+                              <Routes>
+                                {/* Public Routes */}
+                                <Route path="/" element={<Index />} />
                               <Route path="/login" element={<Login />} />
                               <Route path="/register" element={<Register />} />
                               <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -253,6 +256,13 @@ function App() {
                                   </RoleGuard>
                                 </ProtectedRoute>
                               } />
+                              <Route path="/farmer/delivery-route" element={
+                                <ProtectedRoute>
+                                  <RoleGuard allowedRoles={['farmer']}>
+                                    <FarmerDeliveryRoute />
+                                  </RoleGuard>
+                                </ProtectedRoute>
+                              } />
                               <Route path="/farmer/profile" element={
                                 <ProtectedRoute>
                                   <RoleGuard allowedRoles={['farmer']}>
@@ -370,7 +380,8 @@ function App() {
 
                               {/* 404 Route */}
                               <Route path="*" element={<NotFound />} />
-                            </Routes>
+                              </Routes>
+                            </CurrencyProvider>
                           </SubscriptionProvider>
                         </DeliveryProvider>
                       </NotificationProvider>

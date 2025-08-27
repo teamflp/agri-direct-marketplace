@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, MapPin, Truck, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import AddToCartButton from './AddToCartButton';
 import ProductSocialActions from './ProductSocialActions';
 import { ReviewSummary } from '@/components/reviews/ReviewSummary';
@@ -41,6 +42,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const { getProductReviews } = useUnifiedReviews();
   const productReviews = getProductReviews(id);
+  const { formatPrice, isLoading: isCurrencyLoading } = useCurrency();
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -84,7 +86,7 @@ const ProductCard = ({
           
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold text-agrimarket-orange">
-              {price.toFixed(2)}€
+              {isCurrencyLoading ? '...' : formatPrice(price)}
             </span>
             <span className="text-gray-500">
               /{unit}

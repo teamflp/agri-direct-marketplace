@@ -25,6 +25,7 @@ export type Product = {
   description: string | null;
   farmer_id: string;
   image_url: string | null;
+  weight?: number; // Poids en kg
   created_at: string;
   updated_at: string;
   product_variants: ProductVariant[];
@@ -65,6 +66,7 @@ const transformProductData = (rawProduct: any): Product => {
     description: rawProduct.description,
     farmer_id: rawProduct.farmer_id,
     image_url: rawProduct.image_url,
+    weight: rawProduct.weight || 0.5, // Poids par défaut de 0.5kg
     created_at: rawProduct.created_at,
     updated_at: rawProduct.updated_at || rawProduct.created_at,
     product_variants: Array.isArray(rawProduct.product_variants) ? rawProduct.product_variants : [],
