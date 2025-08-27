@@ -87,7 +87,7 @@ const SubscriptionPlans = ({
     
     // Get today's date and calculate next delivery date
     const today = new Date();
-    let nextDelivery = new Date(today);
+    const nextDelivery = new Date(today);
     
     if (frequency === 'weekly') {
       nextDelivery.setDate(today.getDate() + 7);

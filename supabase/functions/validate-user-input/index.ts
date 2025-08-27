@@ -98,7 +98,7 @@ function validatePhoneNumber(phone: string): { isValid: boolean; errors: string[
     return { isValid: false, errors };
   }
   
-  const cleanPhone = phone.replace(/[\s\-\(\)\.]/g, '');
+  const cleanPhone = phone.replace(/[\s-().]/g, '');
   const phoneRegex = /^(\+33|0)[1-9](\d{8})$|^\+[1-9]\d{1,14}$/;
   
   if (!phoneRegex.test(cleanPhone)) {

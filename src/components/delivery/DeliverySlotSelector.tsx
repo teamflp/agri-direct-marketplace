@@ -78,7 +78,9 @@ export function DeliverySlotSelector({ orderId, onSelect }: DeliverySlotSelector
       });
     }
     
-    onSelect && onSelect(selectedSlot);
+    if (onSelect) {
+      onSelect(selectedSlot);
+    }
   };
   
   const renderSlot = (slot: DeliverySlot) => (
