@@ -42,6 +42,7 @@ export const farmerMenuItems: DashboardMenuItem[] = [
   { title: "Produits", path: "/farmer/products", icon: <Package size={20} />, translationKey: "farmer.products" },
   { title: "Commandes", path: "/farmer/orders", icon: <ShoppingCart size={20} />, translationKey: "farmer.orders" },
   { title: "Livraisons", path: "/farmer/delivery", icon: <Truck size={20} />, translationKey: "farmer.delivery" },
+  { title: "Tournée", path: "/farmer/delivery-route", icon: <MapPin size={20} />, translationKey: "farmer.delivery-route" },
   { title: "Inventaire", path: "/farmer/inventory", icon: <Package size={20} />, translationKey: "farmer.inventory" },
   { title: "Analytics", path: "/farmer/analytics", icon: <TrendingUp size={20} />, translationKey: "farmer.analytics" },
   { title: "Factures", path: "/farmer/invoices", icon: <FileText size={20} />, translationKey: "farmer.invoices" },

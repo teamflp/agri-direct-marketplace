@@ -1,114 +1,100 @@
-
-import React, { useState } from 'react';
-import { useDelivery, DeliveryOption } from '@/contexts/DeliveryContext';
+import React, { useState, useEffect } from 'react';
+import { DeliveryOption } from '@/contexts/DeliveryContext';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck, Package, Home, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { useNotifications } from '@/components/ui/notifications';
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Truck, Package, Home, Calendar, Zap } from 'lucide-react';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface DeliveryMethodSelectorProps {
-  orderId: string;
-  onSelect?: (methodId: string) => void;
+  options: DeliveryOption[];
+  onSelect: (methodId: string) => void;
 }
 
-export function DeliveryMethodSelector({ orderId, onSelect }: DeliveryMethodSelectorProps) {
-  const { deliveryOptions, selectDeliveryMethod } = useDelivery();
-  const { toast } = useToast();
-  const { showNotification } = useNotifications();
-  const [selectedMethod, setSelectedMethod] = useState<string>(deliveryOptions[0]?.id || '');
+export function DeliveryMethodSelector({ options, onSelect }: DeliveryMethodSelectorProps) {
+  const [selectedMethod, setSelectedMethod] = useState<string>('');
+  const { formatPrice } = useCurrency();
+
+  useEffect(() => {
+    // Si les options changent et que la sélection actuelle n'est plus valide, on la réinitialise.
+    if (selectedMethod && !options.find(opt => opt.id === selectedMethod)) {
+      setSelectedMethod('');
+      onSelect('');
+    }
+  }, [options, selectedMethod, onSelect]);
+
+  const handleSelectionChange = (value: string) => {
+    setSelectedMethod(value);
+    onSelect(value);
+  };
 
   const getMethodIcon = (method: DeliveryOption['method']) => {
     switch (method) {
       case 'standard':
+      case 'colissimo':
         return <Truck className="h-5 w-5 text-blue-500" />;
       case 'express':
-        return <Package className="h-5 w-5 text-green-500" />;
+      case 'chronopost':
+        return <Zap className="h-5 w-5 text-purple-500" />;
       case 'pickup':
+      case 'local':
         return <Home className="h-5 w-5 text-amber-500" />;
       default:
-        return <Truck className="h-5 w-5" />;
+        return <Package className="h-5 w-5" />;
     }
   };
 
-  const handleSelect = () => {
-    if (!selectedMethod) return;
-    
-    selectDeliveryMethod(orderId, selectedMethod);
-    
-    const selectedOption = deliveryOptions.find(opt => opt.id === selectedMethod);
-    
-    if (selectedOption) {
-      toast({
-        title: "Méthode de livraison sélectionnée",
-        description: `${selectedOption.name} a été sélectionnée pour votre commande`,
-        variant: "success",
-      });
-      
-      showNotification({
-        type: 'delivery',
-        title: 'Méthode de livraison confirmée',
-        description: `Votre choix de livraison (${selectedOption.name}) a été enregistré`,
-      });
-    }
-    
-    onSelect && onSelect(selectedMethod);
-  };
+  if (!options || options.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        Aucune option de livraison disponible pour cette adresse.
+      </div>
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <>
+      <CardHeader className="pt-4 px-4 pb-2">
+        <CardTitle className="flex items-center gap-2 text-base">
           <Calendar className="h-5 w-5" />
           Options de livraison
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <RadioGroup 
-          value={selectedMethod} 
-          onValueChange={setSelectedMethod}
-          className="space-y-4"
+      <CardContent className="px-4">
+        <RadioGroup
+          value={selectedMethod}
+          onValueChange={handleSelectionChange}
+          className="space-y-3"
         >
-          {deliveryOptions.map((option) => (
-            <div 
+          {options.map((option) => (
+            <Label
               key={option.id}
-              className={`flex items-start p-4 border rounded-md cursor-pointer hover:border-gray-400 transition-colors ${
+              htmlFor={option.id}
+              className={`flex items-start p-3 border rounded-md cursor-pointer hover:border-gray-400 transition-colors ${
                 selectedMethod === option.id ? 'border-black bg-gray-50' : 'border-gray-200'
               }`}
-              onClick={() => setSelectedMethod(option.id)}
             >
               <RadioGroupItem value={option.id} id={option.id} className="mt-1" />
               <div className="ml-3 flex-1">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor={option.id} className="font-medium text-lg cursor-pointer">
+                  <span className="font-medium text-md">
                     {option.name}
-                  </Label>
+                  </span>
                   {getMethodIcon(option.method)}
                 </div>
-                <p className="text-gray-500 mt-1">
+                <p className="text-gray-500 text-sm mt-1">
                   {option.description}
                 </p>
-                <div className="mt-2 font-medium">
-                  {option.price === 0 
-                    ? <span className="text-green-600">Gratuit</span> 
-                    : `${option.price.toLocaleString()} FCFA`}
+                <div className="mt-2 font-semibold">
+                  {option.price === 0
+                    ? <span className="text-green-600">Gratuit</span>
+                    : formatPrice(option.price)}
                 </div>
               </div>
-            </div>
+            </Label>
           ))}
         </RadioGroup>
       </CardContent>
-      <CardFooter>
-        <Button 
-          disabled={!selectedMethod} 
-          onClick={handleSelect}
-          className="w-full"
-        >
-          Confirmer la méthode de livraison
-        </Button>
-      </CardFooter>
-    </Card>
+    </>
   );
 }

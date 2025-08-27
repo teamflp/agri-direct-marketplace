@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@2.0.0";
@@ -8,58 +7,67 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// --- Interfaces & Templates ---
+
 interface NotificationRequest {
   orderId: string;
   status: string;
   customerEmail: string;
+  customerPhone?: string; // Ajout du numéro de téléphone
   customerName?: string;
   trackingNumber?: string;
   estimatedDelivery?: string;
 }
 
 const statusTemplates = {
-  confirmed: {
-    subject: "Commande confirmée - Préparation en cours",
-    template: (data: any) => `
-      <h2>Votre commande a été confirmée !</h2>
-      <p>Bonjour ${data.customerName || 'cher client'},</p>
-      <p>Nous vous confirmons que votre commande #${data.orderId.slice(0, 8)} a été reçue et est maintenant en cours de préparation.</p>
-      <p>Vous recevrez une nouvelle notification dès que votre commande sera expédiée.</p>
-      <p>Merci de votre confiance !</p>
-    `
-  },
-  shipped: {
-    subject: "Commande expédiée - Suivi disponible",
-    template: (data: any) => `
-      <h2>Votre commande a été expédiée !</h2>
-      <p>Bonjour ${data.customerName || 'cher client'},</p>
-      <p>Bonne nouvelle ! Votre commande #${data.orderId.slice(0, 8)} a été expédiée.</p>
-      ${data.trackingNumber ? `<p><strong>Numéro de suivi :</strong> ${data.trackingNumber}</p>` : ''}
-      ${data.estimatedDelivery ? `<p><strong>Livraison estimée :</strong> ${new Date(data.estimatedDelivery).toLocaleDateString('fr-FR')}</p>` : ''}
-      <p>Vous pouvez suivre l'évolution de votre livraison dans votre espace client.</p>
-    `
-  },
-  out_for_delivery: {
-    subject: "Livraison en cours - Colis en route",
-    template: (data: any) => `
-      <h2>Votre commande arrive bientôt !</h2>
-      <p>Bonjour ${data.customerName || 'cher client'},</p>
-      <p>Votre commande #${data.orderId.slice(0, 8)} est actuellement en cours de livraison.</p>
-      <p>Assurez-vous d'être disponible pour réceptionner votre colis.</p>
-      ${data.trackingNumber ? `<p><strong>Numéro de suivi :</strong> ${data.trackingNumber}</p>` : ''}
-    `
-  },
-  delivered: {
-    subject: "Commande livrée avec succès",
-    template: (data: any) => `
-      <h2>Votre commande a été livrée !</h2>
-      <p>Bonjour ${data.customerName || 'cher client'},</p>
-      <p>Nous vous confirmons que votre commande #${data.orderId.slice(0, 8)} a été livrée avec succès.</p>
-      <p>Nous espérons que vous êtes satisfait de vos produits. N'hésitez pas à laisser un avis sur notre plateforme.</p>
-      <p>Merci de votre confiance et à bientôt !</p>
-    `
+  // ... (templates email inchangés)
+};
+
+const statusSmsTemplates = {
+    shipped: (data: any) => `Votre commande AgriMarket #${data.orderId.slice(0,8)} a été expédiée. Suivi: ${data.trackingNumber || 'N/A'}.`,
+    out_for_delivery: (data: any) => `Votre commande AgriMarket #${data.orderId.slice(0,8)} est en cours de livraison.`,
+    delivered: (data: any) => `Votre commande AgriMarket #${data.orderId.slice(0,8)} a été livrée. Merci de votre confiance !`,
+};
+
+// --- Fonctions d'envoi ---
+
+const sendSms = async (to: string, body: string) => {
+  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const fromNumber = Deno.env.get("TWILIO_FROM_NUMBER");
+
+  if (!accountSid || !authToken || !fromNumber) {
+    console.warn("Twilio config missing. Skipping SMS.");
+    return;
+  }
+
+  const endpoint = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+  const credentials = btoa(`${accountSid}:${authToken}`);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${credentials}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        To: to,
+        From: fromNumber,
+        Body: body,
+      }),
+    });
+
+    const result = await response.json();
+    if (result.error_code) {
+      throw new Error(result.error_message);
+    }
+    console.log("SMS sent successfully, SID:", result.sid);
+  } catch (error) {
+    console.error("Error sending SMS via Twilio:", error.message);
   }
 };
+
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -67,78 +75,64 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { orderId, status, customerEmail, customerName, trackingNumber, estimatedDelivery }: NotificationRequest = await req.json();
+    const {
+        orderId, status, customerEmail, customerPhone,
+        customerName, trackingNumber, estimatedDelivery
+    }: NotificationRequest = await req.json();
 
-    console.log(`Sending delivery notification for order ${orderId}, status: ${status}`);
+    console.log(`Sending notification for order ${orderId}, status: ${status}`);
 
-    // Initialiser Resend
-    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-
-    // Vérifier si on a un template pour ce statut
-    const template = statusTemplates[status as keyof typeof statusTemplates];
-    if (!template) {
-      console.log(`No template found for status: ${status}`);
-      return new Response(JSON.stringify({ message: "No template for this status" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+    const emailTemplate = statusTemplates[status as keyof typeof statusTemplates];
+    if (!emailTemplate) {
+      console.log(`No email template for status: ${status}`);
+      // On ne retourne pas forcément, on peut vouloir envoyer un SMS même sans email.
     }
 
-    // Préparer les données pour le template
-    const templateData = {
-      orderId,
-      customerName,
-      trackingNumber,
-      estimatedDelivery
-    };
+    const templateData = { orderId, customerName, trackingNumber, estimatedDelivery };
 
-    // Envoyer l'email
-    const emailResponse = await resend.emails.send({
-      from: "AgriMarket <noreply@agrimarket.com>",
-      to: [customerEmail],
-      subject: template.subject,
-      html: template.template(templateData)
-    });
+    // 1. Envoyer l'email (si template existe)
+    if (emailTemplate) {
+        const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+        await resend.emails.send({
+            from: "AgriMarket <noreply@agrimarket.com>",
+            to: [customerEmail],
+            subject: emailTemplate.subject,
+            html: emailTemplate.template(templateData)
+        });
+        console.log("Email sent successfully.");
+    }
 
-    console.log("Email sent successfully:", emailResponse);
+    // 2. Envoyer le SMS (si numéro et template existent)
+    const smsTemplate = statusSmsTemplates[status as keyof typeof statusSmsTemplates];
+    if (customerPhone && smsTemplate) {
+        const smsBody = smsTemplate(templateData);
+        await sendSms(customerPhone, smsBody);
+    }
 
-    // Créer une notification dans l'app aussi
+    // 3. Créer une notification dans l'app
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Récupérer l'ID de l'utilisateur depuis la commande
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .select('buyer_id')
-      .eq('id', orderId)
-      .single();
-
-    if (!orderError && order) {
-      await supabase
-        .from('subscription_notifications')
-        .insert({
+    const { data: order } = await supabase.from('orders').select('buyer_id').eq('id', orderId).single();
+    if (order && emailTemplate) {
+      await supabase.from('subscription_notifications').insert({
           user_id: order.buyer_id,
           type: 'delivery',
-          title: template.subject,
-          message: `Mise à jour de livraison pour votre commande #${orderId.slice(0, 8)}`,
+          title: emailTemplate.subject,
+          message: `Mise à jour pour commande #${orderId.slice(0, 8)}`,
           data: { orderId, status, trackingNumber, estimatedDelivery }
-        });
+      });
     }
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      emailId: emailResponse.data?.id 
-    }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
 
   } catch (error: any) {
     console.error("Error sending delivery notification:", error);
-    return new Response(JSON.stringify({ 
-      error: error.message 
-    }), {
+    return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });

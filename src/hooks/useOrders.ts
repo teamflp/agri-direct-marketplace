@@ -396,7 +396,43 @@ export const useOrders = () => {
     }
   };
 
+  const fetchFarmerOrders = async () => {
+    if (!user) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            *,
+            product:products (id, name, image_url)
+          ),
+          buyer:profiles (id, full_name, email)
+        `)
+        .eq('farmer_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Basic conversion for now, can be expanded like fetchOrders
+      setOrders(data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    // This hook is used by both buyers and farmers, so we might need to
+    // decide which fetch to call, or have the component call it explicitly.
+    // For now, let's keep the original behavior.
     fetchOrders();
   }, [user]);
 
@@ -405,6 +441,7 @@ export const useOrders = () => {
     loading,
     error,
     fetchOrders,
+    fetchFarmerOrders, // <-- Expose the new function
     getOrderById,
     createOrder,
     updateOrderStatus,
