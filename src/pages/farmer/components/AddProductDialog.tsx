@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -14,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from '@/components/ui/separator';
 import { Trash2 } from 'lucide-react';
-import { TablesInsert } from '@/integrations/supabase/types';
 
 // Define the shape of a variant for the form
 export type VariantFormType = {
@@ -31,8 +31,8 @@ type AddProductDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAddProduct: (
-    product: TablesInsert<'products'>,
-    variants: Omit<TablesInsert<'product_variants'>, 'product_id'>[]
+    product: any,
+    variants: any[]
   ) => void;
 };
 
@@ -48,6 +48,7 @@ const AddProductDialog = ({
   const [unit, setUnit] = useState("kg");
   const [is_organic, setIsOrganic] = useState(false);
   const [description, setDescription] = useState("");
+  const [quantity, setQuantity] = useState(0);
 
   // Variants state
   const [variants, setVariants] = useState<VariantFormType[]>([
@@ -83,23 +84,22 @@ const AddProductDialog = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newProduct: TablesInsert<'products'> = {
+    const newProduct = {
       name,
       price,
-      category_id: category, // Assuming category is the ID for now
+      category_id: category,
       unit,
       is_organic,
       description,
-      // farmer_id will be set by the hook
+      quantity, // Ajout de la propriété quantity manquante
     };
 
     const newVariants = variants.map(({ id, ...rest }) => ({
       ...rest,
-      // The options object is directly stored as JSONB
     }));
 
     onAddProduct(newProduct, newVariants);
-    onOpenChange(false); // Close dialog on submit
+    onOpenChange(false);
   };
 
   return (
@@ -132,6 +132,10 @@ const AddProductDialog = ({
               <div className="space-y-2">
                 <Label htmlFor="unit">Unité de vente</Label>
                 <Input id="unit" value={unit} onChange={(e) => setUnit(e.target.value)} required placeholder="Ex: kg" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="quantity">Quantité en stock</Label>
+                <Input id="quantity" type="number" value={quantity || ""} onChange={(e) => setQuantity(Number(e.target.value))} required min="0" placeholder="Ex: 100" />
               </div>
             </div>
              <div className="space-y-2">

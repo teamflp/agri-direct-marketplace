@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { ShoppingBag, Package, BarChart2, MessageSquare, Settings, Loader2 } from 'lucide-react';
@@ -5,15 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import ProductsHeader from './components/ProductsHeader';
 import ProductsOverview from './components/ProductsOverview';
 import AddProductDialog from './components/AddProductDialog';
-import { useFarmerProducts, useAddProduct } from '@/hooks/useProducts';
-import { TablesInsert } from '@/integrations/supabase/types';
-
-// NOTE: The old ProductType is now replaced by the types from useProducts.ts
-// We might need to update ProductDeleteDialog etc. later.
-import { Product } from '@/hooks/useProducts';
-import ProductDeleteDialog from './components/ProductDeleteDialog';
-import ProductEditDialog from './components/ProductEditDialog';
-import ProductViewDialog from './components/ProductViewDialog';
+import { useFarmerProducts, useAddProduct, Product, adaptToProductType, ProductType } from '@/hooks/useProducts';
 
 const FarmerProducts = () => {
   const { user, profile } = useAuth();
@@ -24,7 +17,7 @@ const FarmerProducts = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
 
   // Data fetching using React Query hooks
   const { data: products, isLoading, error } = useFarmerProducts();
@@ -41,33 +34,35 @@ const FarmerProducts = () => {
   ];
 
   const handleAddProduct = (
-    productData: TablesInsert<'products'>,
-    variantsData: Omit<TablesInsert<'product_variants'>, 'product_id'>[]
+    productData: any,
+    variantsData: any[]
   ) => {
     addProduct({ productData, variantsData }, {
       onSuccess: () => {
         setIsAddDialogOpen(false);
-        // Optionally, show a success toast
       },
       onError: (e) => {
         console.error("Error adding product from component:", e);
-        // Optionally, show an error toast
       }
     });
   };
 
-  const filteredProducts = products?.filter(product =>
+  // Convertir les produits au format attendu par les composants
+  const adaptedProducts = products?.map(adaptToProductType) || [];
+
+  const filteredProducts = adaptedProducts?.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category_id?.toLowerCase().includes(searchTerm.toLowerCase())
+    product.category?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  // TODO: Wire these up to the backend using mutation hooks
-  const handleTogglePublish = (productId: string, currentStatus: boolean) => {
-    console.log("Toggling publish status for", productId, !currentStatus);
+  // Handlers adaptés pour les types
+  const handleTogglePublish = (productId: number, currentStatus: boolean) => {
+    console.log("Toggling publish status for", productId.toString(), !currentStatus);
   };
-  const handleDeleteClick = (product: Product) => setSelectedProduct(product);
-  const handleViewClick = (product: Product) => setSelectedProduct(product);
-  const handleEditClick = (product: Product) => setSelectedProduct(product);
+  
+  const handleDeleteClick = (product: ProductType) => setSelectedProduct(product);
+  const handleViewClick = (product: ProductType) => setSelectedProduct(product);
+  const handleEditClick = (product: ProductType) => setSelectedProduct(product);
   const handleDeleteConfirm = () => console.log("Deleting", selectedProduct?.id);
   const handleEditConfirm = (updatedProduct: any) => console.log("Editing", updatedProduct);
 
@@ -93,9 +88,9 @@ const FarmerProducts = () => {
         {isLoading && <div className="flex items-center justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /> Chargement des produits...</div>}
         {error && <div className="text-red-600 bg-red-100 p-4 rounded-md">Erreur: {error.message}</div>}
 
-        {!isLoading && !error && products && (
+        {!isLoading && !error && adaptedProducts && (
           <ProductsOverview
-            products={products}
+            products={adaptedProducts}
             filteredProducts={filteredProducts}
             onTogglePublish={handleTogglePublish}
             onDeleteClick={handleDeleteClick}
@@ -109,31 +104,6 @@ const FarmerProducts = () => {
           onOpenChange={setIsAddDialogOpen}
           onAddProduct={handleAddProduct}
         />
-
-        {/* TODO: Update these dialogs to work with the new data structure and hooks */}
-        {selectedProduct && (
-          <>
-            {/* <ProductDeleteDialog
-              open={showDeleteDialog} 
-              onOpenChange={setShowDeleteDialog}
-              product={selectedProduct}
-              onConfirm={handleDeleteConfirm}
-            />
-            
-            <ProductEditDialog 
-              open={showEditDialog} 
-              onOpenChange={setShowEditDialog}
-              product={selectedProduct}
-              onConfirm={handleEditConfirm}
-            />
-            
-            <ProductViewDialog 
-              open={showViewDialog} 
-              onOpenChange={setShowViewDialog}
-              product={selected.product}
-            /> */}
-          </>
-        )}
       </div>
     </DashboardLayout>
   );

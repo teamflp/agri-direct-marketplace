@@ -91,7 +91,6 @@ const Products = () => {
     }
   };
 
-  // Count active filters
   const activeFiltersCount = Object.entries(filters).reduce((count, [key, value]) => {
     if (key === 'categories') return count + (value as string[]).length;
     if (key === 'priceRange') {
