@@ -1,4 +1,15 @@
 import React, { useState, useRef } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,19 +18,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { User, Mail, MapPin, Phone, CreditCard, Lock, Bell, Settings, Upload } from "lucide-react";
+import { User, Mail, MapPin, Phone, CreditCard, Lock, Bell, Settings, Upload, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import Papa from "papaparse";
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { getBuyerDashboardMenuItems } from '@/components/buyer/dashboard/BuyerDashboardMenu';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const BuyerProfile = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("profile");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.defaultTab || "profile");
   const [isEditing, setIsEditing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
 
   const dashboardMenuItems = getBuyerDashboardMenuItems();
   
@@ -65,6 +83,71 @@ const BuyerProfile = () => {
     }
   };
 
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("export-user-data");
+      if (error) throw error;
+
+      const allData: any[] = [];
+      for (const key in data) {
+        if (Array.isArray(data[key])) {
+          allData.push(...data[key]);
+        } else if (data[key]) {
+          allData.push(data[key]);
+        }
+      }
+
+      const csv = Papa.unparse(allData);
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "agrimarket_user_data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Exportation réussie",
+        description: "Vos données ont été exportées avec succès.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur d'exportation",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke("delete-user-account");
+      if (error) throw error;
+
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte a été supprimé avec succès. Vous allez être déconnecté.",
+      });
+
+      await signOut();
+      navigate('/');
+
+    } catch (error: any) {
+      toast({
+        title: "Erreur de suppression",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <DashboardLayout
       name={name}
@@ -96,7 +179,7 @@ const BuyerProfile = () => {
           )}
         </div>
 
-        <Tabs defaultValue="profile" className="w-full" onValueChange={setActiveTab}>
+        <Tabs value={activeTab} className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile">Informations personnelles</TabsTrigger>
             <TabsTrigger value="security">Sécurité</TabsTrigger>
@@ -207,6 +290,46 @@ const BuyerProfile = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <h3 className="font-medium text-lg">Gestion du compte</h3>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button variant="outline" onClick={handleExportData} disabled={isExporting}>
+                      {isExporting ? (
+                        <>
+                          <Download className="mr-2 h-4 w-4 animate-spin" />
+                          Exportation...
+                        </>
+                      ) : (
+                        "Exporter mes données"
+                      )}
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" disabled={isDeleting}>
+                          {isDeleting ? "Suppression..." : "Supprimer mon compte"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer votre compte ?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Cette action est irréversible. Toutes vos données, y compris votre profil, vos commandes et vos avis, seront définitivement supprimées.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annuler</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Confirmer la suppression
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    La suppression de votre compte est une action irréversible. Toutes vos données seront définitivement effacées.
+                  </p>
                 </div>
               </CardContent>
             </Card>
