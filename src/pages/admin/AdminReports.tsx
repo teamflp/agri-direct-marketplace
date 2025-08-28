@@ -8,7 +8,6 @@ import {
   Users,
   MessageSquare,
   FileText,
-  Settings,
   ShieldAlert,
   Landmark,
   CreditCard,
@@ -21,7 +20,8 @@ import {
   ChevronUp,
   Printer,
   Mail,
-  Share2
+  Share2,
+  AlertTriangle
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { 
