@@ -70,7 +70,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAdminReports } from '@/hooks/admin/useAdminReports';
 import { Skeleton } from '@/components/ui/skeleton';
-import { unparse } from 'papaparse';
+import Papa from 'papaparse';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
 
@@ -108,7 +108,7 @@ const AdminReports = () => {
           return;
         }
 
-        const csv = unparse(dataToExport, {
+        const csv = Papa.unparse(dataToExport, {
             header: true,
             delimiter: ";",
             quotes: true,
