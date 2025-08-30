@@ -101,6 +101,8 @@ import FarmerVisitPage from "./pages/farmers/FarmerVisitPage";
 
 // Subscriptions
 import SubscriptionsPage from "./pages/subscriptions/SubscriptionsPage";
+import HealthCheck from "./pages/HealthCheck";
+import SentryTest from "./pages/SentryTest";
 
 import "./App.css";
 
@@ -151,6 +153,8 @@ function App() {
                               <Route path="/subscriptions-page" element={<SubscriptionsPage />} />
                               <Route path="/chat" element={<Chat />} />
                               <Route path="/notifications-demo" element={<NotificationsDemo />} />
+                              <Route path="/health" element={<HealthCheck />} />
+                              <Route path="/sentry-test" element={<SentryTest />} />
 
                               {/* Legal Routes */}
                               <Route path="/legal/terms" element={<TermsOfService />} />
