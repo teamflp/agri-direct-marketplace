@@ -93,40 +93,37 @@ const ProductFilters = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      {/* Bouton pour afficher/masquer les filtres */}
-      <div className="flex justify-between items-center p-4">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={onToggle}
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-            Filtres
-            {activeFiltersCount > 0 && (
-              <Badge className="bg-agrimarket-green ml-1 h-5 w-5 p-0 flex items-center justify-center">
-                {activeFiltersCount}
-              </Badge>
-            )}
-          </Button>
-        </div>
+    <div className="bg-white rounded-lg shadow-sm border">
+      {/* Bouton pour afficher/masquer les filtres sur mobile */}
+      <div className="lg:hidden flex justify-between items-center p-4 border-b">
+        <Button
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2"
+          onClick={onToggle}
+        >
+          <SlidersHorizontal className="w-4 h-4" />
+          <span>Filtres</span>
+          {activeFiltersCount > 0 && (
+            <Badge className="bg-agrimarket-green ml-1 h-5 w-5 p-0 flex items-center justify-center">
+              {activeFiltersCount}
+            </Badge>
+          )}
+        </Button>
       </div>
 
       {/* Contenu des filtres */}
-      {isOpen && (
-        <div className="p-4 border-t">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-medium">Filtres avancés</h3>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onToggle}
-              className="text-gray-500"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
+      <div className={`p-4 ${isOpen ? 'block' : 'hidden'} lg:block`}>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-lg">Filtres avancés</h3>
+          <Button 
+            variant="ghost"
+            size="sm"
+            onClick={onToggle}
+            className="text-gray-500 lg:hidden"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
           
           <div className="space-y-4">
             <Accordion type="multiple" defaultValue={["categories", "price", "options"]}>

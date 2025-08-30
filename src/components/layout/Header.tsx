@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useIsMobile } from '@/hooks/use-mobile';
 import AgrimarketLogo from '@/components/logo/AgrimarketLogo';
 import HeaderNavigation from './HeaderNavigation';
 import HeaderAuthActions from './HeaderAuthActions';
@@ -17,7 +16,6 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCart, setShowCart] = useState(false);
-  const isMobile = useIsMobile();
   const { profile } = useAuth();
 
   // Navigation links with translated labels and icons
@@ -73,11 +71,13 @@ const Header = () => {
               </Link>
             </div>
             
-            {/* Navigation - centrée */}
-            <HeaderNavigation links={navLinks} />
+            {/* Navigation - centrée et cachée sur mobile */}
+            <div className="hidden md:flex flex-grow justify-center">
+              <HeaderNavigation links={navLinks} />
+            </div>
             
             {/* Actions à droite - visibles uniquement sur desktop */}
-            <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
               {/* Notification Center - seulement si l'utilisateur est connecté */}
               {profile && <NotificationCenter />}
               
@@ -89,7 +89,7 @@ const Header = () => {
             </div>
             
             {/* Menu hamburger sur mobile */}
-            {isMobile && (
+            <div className="md:hidden flex items-center">
               <button 
                 className="p-2 text-gray-600"
                 onClick={toggleMenu}
@@ -116,15 +116,15 @@ const Header = () => {
       </header>
       
       {/* Barre de navigation mobile en bas */}
-      {isMobile && (
+      <div className="md:hidden">
         <MobileBottomNav 
           onNotificationClick={handleNotificationClick} 
           onCartClick={handleCartClick} 
         />
-      )}
+      </div>
       
       {/* Ajout d'un espace en bas pour la barre de navigation mobile */}
-      {isMobile && <div className="pb-16"></div>}
+      <div className="pb-16 md:hidden"></div>
     </>
   );
 };
