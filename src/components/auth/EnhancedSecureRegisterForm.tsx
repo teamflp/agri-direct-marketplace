@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +14,7 @@ import { AlertTriangle, Loader2, Shield, UserPlus } from 'lucide-react';
 import SecurePasswordInput from '@/components/auth/SecurePasswordInput';
 
 const EnhancedSecureRegisterForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -111,6 +113,15 @@ const EnhancedSecureRegisterForm = () => {
       if (error) {
         throw error;
       }
+
+      // Sécurité: fournir un retour utilisateur même si le contexte n'a pas navigué
+      toast({
+        title: "Inscription réussie",
+        description: "Veuillez vérifier votre e-mail pour activer votre compte.",
+        variant: "success",
+      });
+      // Redirection explicite au cas où la navigation du contexte échoue
+      navigate('/email-verification', { state: { email: formData.email } });
     } catch (error: any) {
       console.error('Registration error:', error);
       toast({
