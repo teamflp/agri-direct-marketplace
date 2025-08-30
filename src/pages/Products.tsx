@@ -139,65 +139,69 @@ const Products = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Produits Locaux</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600">
             Découvrez nos produits frais directement des producteurs locaux
           </p>
-          
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <Input
-              type="text"
-              placeholder="Rechercher des produits..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <ProductFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onReset={clearFilters}
-            categories={categories}
-            isOpen={showFilters}
-            onToggle={() => setShowFilters(!showFilters)}
-            activeFiltersCount={activeFiltersCount}
-          />
-          
-          <ActiveFilters
-            filters={filters}
-            onRemoveFilter={removeFilter}
-            onResetAll={clearFilters}
-          />
         </div>
 
-        <div className="flex-1">
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Aucun produit trouvé avec ces critères.</p>
+        <div className="lg:flex lg:gap-8">
+          <aside className="lg:w-1/4 mb-8 lg:mb-0">
+            <ProductFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={clearFilters}
+              categories={categories}
+              isOpen={showFilters}
+              onToggle={() => setShowFilters(!showFilters)}
+              activeFiltersCount={activeFiltersCount}
+            />
+          </aside>
+
+          <div className="lg:w-3/4">
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Input
+                type="text"
+                placeholder="Rechercher des produits..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard 
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  image={product.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43'}
-                  price={product.price}
-                  unit={product.unit}
-                  rating={product.rating || 0}
-                  reviews={product.reviews_count || 0}
-                  farmerName={product.farmer?.name || 'Producteur'}
-                  farmerId={product.farmer?.id || '1'}
-                  distance={product.farmer?.distance}
-                  organic={product.is_organic || false}
-                  freeDelivery={product.free_delivery || false}
-                  farmPickup={product.farm_pickup || false}
-                />
-              ))}
-            </div>
-          )}
+
+            <ActiveFilters
+              filters={filters}
+              onRemoveFilter={removeFilter}
+              onResetAll={clearFilters}
+            />
+
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600">Aucun produit trouvé avec ces critères.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    image={product.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43'}
+                    price={product.price}
+                    unit={product.unit}
+                    rating={product.rating || 0}
+                    reviews={product.reviews_count || 0}
+                    farmerName={product.farmer?.name || 'Producteur'}
+                    farmerId={product.farmer?.id || '1'}
+                    distance={product.farmer?.distance}
+                    organic={product.is_organic || false}
+                    freeDelivery={product.free_delivery || false}
+                    farmPickup={product.farm_pickup || false}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
