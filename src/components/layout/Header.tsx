@@ -103,7 +103,6 @@ const Header = () => {
                   )}
                 </svg>
               </button>
-            )}
           </div>
           
           {/* Menu mobile */}
@@ -112,6 +111,7 @@ const Header = () => {
             links={navLinks} 
             onClose={() => setMenuOpen(false)} 
           />
+        </div>
         </div>
       </header>
       
