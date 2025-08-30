@@ -19,6 +19,8 @@ import {
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
+import { LogOut } from 'lucide-react';
 
 interface MenuItem {
   title: string;
@@ -38,6 +40,7 @@ const DashboardSidebar = ({ name, email, avatar, menuItems }: SidebarProps) => {
   const { state } = useSidebar();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { signOut } = useAuth();
 
   return (
     <Sidebar>
@@ -78,11 +81,17 @@ const DashboardSidebar = ({ name, email, avatar, menuItems }: SidebarProps) => {
       </SidebarContent>
       
       <SidebarFooter>
-        <Button variant="outline" className="w-full" asChild>
-          <Link to="/">
-            Retour au site
-          </Link>
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button variant="outline" className="w-full" asChild>
+            <Link to="/">
+              Retour au site
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full" onClick={signOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Déconnexion
+          </Button>
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
