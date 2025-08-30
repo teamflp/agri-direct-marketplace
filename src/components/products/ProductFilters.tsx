@@ -3,12 +3,10 @@ import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
   SlidersHorizontal, 
   X,
-  BadgeCheck,
   MapPin,
   Truck,
   Store,
@@ -275,7 +273,6 @@ const ProductFilters = ({
             </Button>
           </div>
         </div>
-      )}
     </div>
   );
 };
