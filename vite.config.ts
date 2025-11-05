@@ -10,6 +10,7 @@ const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: '/agri-direct-marketplace/',
   define: {
     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version),
   },
