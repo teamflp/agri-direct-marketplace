@@ -11,7 +11,7 @@ interface Notification {
   message: string;
   read: boolean;
   data?: any;
-  action_url?: string;
+  action_url?: string | null;
   created_at: string;
 }
 

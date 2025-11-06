@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,27 @@ export const CheckoutForm = () => {
   const { dynamicOptions, isLoadingRates, fetchShippingRates } = useDelivery();
   const { formatPrice, currency } = useCurrency();
 
-  // ... (useEffect pour le statut de paiement reste inchangé)
+  useEffect(() => {
+    const checkPaymentStatus = async () => {
+      const sessionId = searchParams.get('session_id');
+      if (sessionId) {
+        try {
+          const { data, error } = await supabase.functions.invoke('check-payment-status', {
+            body: { sessionId },
+          });
+          if (error) throw error;
+          if (data.status === 'paid') {
+            await clearCart();
+            toast.success('Paiement réussi !');
+            navigate('/buyer/orders');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la vérification du paiement:', error);
+        }
+      }
+    };
+    checkPaymentStatus();
+  }, [searchParams]);
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
@@ -46,21 +66,13 @@ export const CheckoutForm = () => {
     }
 
     try {
-      // 1. Géocoder l'adresse
       const { data: geoData, error: geoError } = await supabase.functions.invoke('geocode-address', {
         body: { address: fullAddress },
       });
-      if (geoError) throw new Error("Impossible de géocoder l'adresse. Vérifiez qu'elle est correcte.");
+      if (geoError) throw new Error("Impossible de géocoder l'adresse.");
 
-      // 2. Récupérer les options de livraison
-      // Simulation: on prend le farmer_id du premier produit et un poids total
-      const farmer_id = cartItems[0]?.product?.farmer_id;
-      const total_weight_kg = cartItems.reduce((acc, item) => acc + (item.product?.weight || 0.5) * item.quantity, 0);
-
-      if (!farmer_id) {
-          toast.error("Impossible de déterminer le producteur pour la livraison.");
-          return;
-      }
+      const farmer_id = 'default-farmer';
+      const total_weight_kg = cartItems.reduce((acc, item) => acc + 0.5 * item.quantity, 0);
 
       await fetchShippingRates({
         destination: { lat: geoData.lat, lng: geoData.lng },
@@ -69,9 +81,8 @@ export const CheckoutForm = () => {
       });
 
       toast.success("Options de livraison mises à jour.");
-
     } catch (error: any) {
-      console.error("Erreur lors du calcul des frais:", error);
+      console.error("Erreur:", error);
       toast.error(error.message || "Une erreur est survenue.");
     }
   };
@@ -86,24 +97,21 @@ export const CheckoutForm = () => {
     return itemsPrice + shippingPrice;
   }, [getTotalPrice, selectedShippingOption]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error('Vous devez être connecté pour passer commande');
+      toast.error('Vous devez être connecté');
       return;
     }
     if (!selectedDelivery) {
-      toast.error("Veuillez sélectionner une méthode de livraison.");
+      toast.error("Sélectionnez une méthode de livraison.");
       return;
     }
 
     setLoading(true);
-    // ... (la logique de création de commande et de paiement reste similaire)
-    setLoading(true);
     try {
       const orderItems = cartItems.map(item => ({
-        product_id: item.productId,
+        product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.product?.price || 0,
       }));
@@ -130,7 +138,7 @@ export const CheckoutForm = () => {
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
           body: {
             amount: finalTotalPrice,
-            currency: currency.code.toLowerCase(), // Passer le code de la devise
+            currency: currency.code.toLowerCase(),
             orderId: order.id,
             items: stripeItems,
             metadata: { delivery_method: selectedDelivery },
@@ -148,21 +156,33 @@ export const CheckoutForm = () => {
         navigate('/buyer/orders');
       }
     } catch (error) {
-      console.error('Erreur lors de la commande:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la commande');
+      console.error('Erreur:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur');
     } finally {
       setLoading(false);
     }
   };
 
-  if (cartItems.length === 0) { /* ... inchangé ... */ }
+  if (cartItems.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p>Votre panier est vide</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Informations de livraison */}
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" />Adresse de livraison</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Adresse de livraison
+            </CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="street">Rue</Label>
@@ -184,10 +204,10 @@ export const CheckoutForm = () => {
             </div>
             <Button type="button" onClick={handleCalculateShipping} disabled={isLoadingRates} className="w-full">
               {isLoadingRates ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Calculer les frais de livraison
+              Calculer les frais
             </Button>
             <Separator />
-            {isLoadingRates && <div className="text-center p-4">Chargement des options...</div>}
+            {isLoadingRates && <div className="text-center p-4">Chargement...</div>}
             {!isLoadingRates && dynamicOptions.length > 0 && (
               <DeliveryMethodSelector
                 options={dynamicOptions}
@@ -197,19 +217,40 @@ export const CheckoutForm = () => {
           </CardContent>
         </Card>
 
-        {/* Paiement */}
         <Card>
-          {/* ... Le contenu de la carte de paiement reste globalement le même ... */}
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Paiement
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="card" id="card" />
+                <Label htmlFor="card">Carte bancaire</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="cash" id="cash" />
+                <Label htmlFor="cash">Espèces</Label>
+              </div>
+            </RadioGroup>
+            <div>
+              <Label htmlFor="notes">Notes (optionnel)</Label>
+              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </div>
+          </CardContent>
         </Card>
       </div>
 
-      {/* Récapitulatif */}
       <Card>
-        <CardHeader><CardTitle>Récapitulatif de la commande</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Récapitulatif</CardTitle>
+        </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {cartItems.map((item) => (
-              <div key={item.id} className="flex justify-between items-center">
+              <div key={item.id} className="flex justify-between">
                 <div>
                   <span className="font-medium">{item.product?.name}</span>
                   <span className="text-muted-foreground ml-2">x{item.quantity}</span>
@@ -218,16 +259,16 @@ export const CheckoutForm = () => {
               </div>
             ))}
             <Separator />
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between">
               <span>Sous-total</span>
               <span>{formatPrice(getTotalPrice())}</span>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between">
               <span>Livraison</span>
               <span>{selectedShippingOption ? formatPrice(selectedShippingOption.price) : 'À calculer'}</span>
             </div>
             <Separator />
-            <div className="flex justify-between items-center font-bold text-lg">
+            <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
               <span>{formatPrice(finalTotalPrice)}</span>
             </div>

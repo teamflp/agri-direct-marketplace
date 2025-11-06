@@ -7,14 +7,14 @@ export interface CartItem {
   user_id: string;
   product_id: string;
   quantity: number;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   product?: {
     id: string;
     name: string;
     price: number;
-    image_url?: string;
-    unit: string;
+    image_url?: string | null;
+    unit: string | null;
     farmer?: {
       name: string;
     };

@@ -17,15 +17,15 @@ interface RecentOrder {
   id: string;
   total: number;
   status: string;
-  created_at: string;
-  buyer_id: string;
+  created_at: string | null;
+  buyer_id: string | null;
 }
 
 interface RecentFarmer {
   id: string;
   name: string;
   location: string;
-  created_at: string;
+  created_at: string | null;
 }
 
 export const useAdminAnalytics = () => {

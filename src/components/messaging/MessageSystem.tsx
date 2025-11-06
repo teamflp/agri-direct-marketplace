@@ -15,11 +15,11 @@ interface Message {
   id: string;
   sender_id: string;
   recipient_id: string;
-  subject?: string;
+  subject?: string | null;
   content: string;
-  read: boolean;
-  created_at: string;
-  updated_at: string;
+  read: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
   sender?: {
     email: string;
   };
@@ -69,8 +69,8 @@ export const MessageSystem: React.FC<MessageSystemProps> = ({ recipientId, recip
         .from('farmer_messages')
         .insert([{
           sender_id: user.id,
-          recipient_id: recipientId || selectedConversation,
-          subject: subject || undefined,
+          recipient_id: recipientId || selectedConversation || '',
+          subject: subject || null,
           content: newMessage,
         }]);
 
@@ -94,7 +94,7 @@ export const MessageSystem: React.FC<MessageSystemProps> = ({ recipientId, recip
         .from('farmer_messages')
         .update({ read: true })
         .eq('id', messageId)
-        .eq('recipient_id', user?.id);
+        .eq('recipient_id', user?.id || '');
 
       if (error) throw error;
       await fetchMessages();
@@ -212,7 +212,7 @@ export const MessageSystem: React.FC<MessageSystemProps> = ({ recipientId, recip
                       )}
                       <p className="text-sm">{message.content}</p>
                       <p className="text-xs opacity-70 mt-1">
-                        {new Date(message.created_at).toLocaleString()}
+                        {message.created_at ? new Date(message.created_at).toLocaleString() : 'Date inconnue'}
                       </p>
                     </div>
                   </div>

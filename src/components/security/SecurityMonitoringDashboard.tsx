@@ -13,9 +13,9 @@ import { fr } from 'date-fns/locale';
 interface SecurityEvent {
   id: string;
   event_type: string;
-  created_at: string;
-  user_email?: string;
-  table_name?: string;
+  created_at: string | null;
+  user_email?: string | null;
+  table_name?: string | null;
   old_values?: any;
   new_values?: any;
 }
@@ -24,9 +24,10 @@ interface LoginAttempt {
   id: string;
   email: string;
   success: boolean;
-  failure_reason?: string;
-  created_at: string;
-  user_agent?: string;
+  failure_reason?: string | null;
+  created_at: string | null;
+  user_agent?: string | null;
+  ip_address?: string | null;
 }
 
 const SecurityMonitoringDashboard = () => {
@@ -83,7 +84,7 @@ const SecurityMonitoringDashboard = () => {
       const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
       const failedLogins24h = (attempts || []).filter(
-        attempt => !attempt.success && new Date(attempt.created_at) > last24h
+        attempt => !attempt.success && attempt.created_at && new Date(attempt.created_at) > last24h
       ).length;
 
       const suspiciousActivities = (events || []).filter(
@@ -244,10 +245,10 @@ const SecurityMonitoringDashboard = () => {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-4 w-4" />
-                        {formatDistanceToNow(new Date(event.created_at), { 
+                        {event.created_at ? formatDistanceToNow(new Date(event.created_at), { 
                           addSuffix: true, 
                           locale: fr 
-                        })}
+                        }) : 'Date inconnue'}
                       </div>
                     </div>
                   ))
@@ -292,10 +293,10 @@ const SecurityMonitoringDashboard = () => {
                           {attempt.success ? 'Succès' : 'Échec'}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(attempt.created_at), { 
+                          {attempt.created_at ? formatDistanceToNow(new Date(attempt.created_at), { 
                             addSuffix: true, 
                             locale: fr 
-                          })}
+                          }) : 'Date inconnue'}
                         </span>
                       </div>
                     </div>
