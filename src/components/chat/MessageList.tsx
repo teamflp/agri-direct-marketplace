@@ -56,7 +56,7 @@ export const MessageList: React.FC<MessageListProps> = ({ conversationId }) => {
   }
 
   return (
-    <ScrollArea className="h-full" viewportRef={viewportRef}>
+    <ScrollArea className="h-full">
       <div className="p-4 space-y-4">
         {messages?.map((message) => (
           <div

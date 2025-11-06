@@ -283,7 +283,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateProfile = async (data: Partial<UserProfile>) => {
-    if (!user) return { error: new PostgrestError({ message: 'Utilisateur non connecté' }) };
+    if (!user) return { error: { message: 'Utilisateur non connecté', details: '', hint: '', code: '' } as PostgrestError };
 
     try {
       const { error } = await supabase
@@ -318,7 +318,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: errorMessage,
         variant: 'destructive',
       });
-      return { error: error instanceof PostgrestError ? error : new PostgrestError({ message: errorMessage }) };
+      return { error: error instanceof PostgrestError ? error : { message: errorMessage, details: '', hint: '', code: '' } as PostgrestError };
     }
   };
 

@@ -103,9 +103,9 @@ export const CheckoutForm = () => {
     setLoading(true);
     try {
       const orderItems = cartItems.map(item => ({
-        product_id: item.product.id,
+        product_id: item.productId,
         quantity: item.quantity,
-        unit_price: item.product.price || 0,
+        unit_price: item.product?.price || 0,
       }));
 
       const orderData = {
@@ -120,11 +120,11 @@ export const CheckoutForm = () => {
 
       if (paymentMethod === 'card') {
         const stripeItems = cartItems.map(item => ({
-          name: item.product.name,
-          description: item.product.description,
-          unit_price: item.product.price,
+          name: item.product?.name || '',
+          description: item.product?.unit || '',
+          unit_price: item.product?.price || 0,
           quantity: item.quantity,
-          image_url: item.product.image_url,
+          image_url: item.product?.image_url || '',
         }));
 
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
@@ -190,7 +190,6 @@ export const CheckoutForm = () => {
             {isLoadingRates && <div className="text-center p-4">Chargement des options...</div>}
             {!isLoadingRates && dynamicOptions.length > 0 && (
               <DeliveryMethodSelector
-                orderId="temp-order" // L'ID de commande n'est pas encore créé, on utilise une valeur temporaire
                 options={dynamicOptions}
                 onSelect={setSelectedDelivery}
               />

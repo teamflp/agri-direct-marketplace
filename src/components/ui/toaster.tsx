@@ -32,10 +32,10 @@ export function Toaster() {
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, variant, ...props }) {
-        const icon = getToastIcon(variant);
+        const icon = getToastIcon(variant || undefined);
         
         return (
-          <Toast key={id} {...props} variant={variant}>
+          <Toast key={id} {...props} variant={variant || undefined}>
             <div className="flex gap-3">
               {icon && <div className="flex-shrink-0 pt-1">{icon}</div>}
               <div className="grid gap-1">
