@@ -13,60 +13,60 @@ type OrderWithRelations = Tables<'orders'> & {
 
 export interface Order {
   id: string;
-  buyer_id: string;
-  farmer_id?: string;
-  status: string;
+  buyer_id: string | null;
+  farmer_id?: string | null;
+  status: string | null;
   total: number;
-  delivery_address?: string;
-  delivery_date?: string;
-  delivery_method: string;
-  payment_status: string;
-  payment_method?: string;
-  stripe_session_id?: string;
-  stripe_payment_intent_id?: string;
-  invoice_url?: string;
-  payment_metadata?: Record<string, unknown>;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
+  delivery_address?: string | null;
+  delivery_date?: string | null;
+  delivery_method: string | null;
+  payment_status: string | null;
+  payment_method?: string | null;
+  stripe_session_id?: string | null;
+  stripe_payment_intent_id?: string | null;
+  invoice_url?: string | null;
+  payment_metadata?: Record<string, unknown> | null;
+  notes?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   order_items?: OrderItem[];
   farmer?: {
     id: string;
     name: string;
     location: string;
-  };
+  } | null;
   buyer?: {
     id: string;
     first_name: string | null;
     last_name: string | null;
     email: string | null;
-  };
+  } | null;
 }
 
 export interface OrderItem {
   id: string;
-  order_id: string;
-  product_id: string;
+  order_id: string | null;
+  product_id: string | null;
   quantity: number;
   unit_price: number;
   product?: {
     id: string;
     name: string;
-    image_url?: string;
+    image_url?: string | null;
     images?: string[];
-    primary_image_url?: string;
-    unit: string;
-  };
+    primary_image_url?: string | null;
+    unit: string | null;
+  } | null;
 }
 
 export interface OrderStatusHistory {
   id: string;
-  order_id: string;
+  order_id: string | null;
   old_status: string | null;
   new_status: string;
   changed_by: string | null;
   notes: string | null;
-  created_at: string;
+  created_at: string | null;
 }
 
 export const useOrders = () => {
@@ -119,9 +119,9 @@ export const useOrders = () => {
               product: oi.product ? {
                   ...oi.product,
                   images: parseJsonArray(oi.product.images)
-              } : undefined
+              } : null
           }))
-      }));
+      })) as any;
       setOrders(ordersWithParsedJson);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
@@ -167,9 +167,9 @@ export const useOrders = () => {
           product: oi.product ? {
               ...oi.product,
               images: parseJsonArray(oi.product.images)
-          } : undefined
+          } : null
       }))
-    };
+    } as any;
   }, []);
 
   const createOrder = useCallback(async (orderData: {
@@ -192,13 +192,13 @@ export const useOrders = () => {
       .from('orders')
       .insert([{
         buyer_id: user.id,
-        farmer_id: orderData.farmer_id,
+        farmer_id: orderData.farmer_id || null,
         total: orderData.total,
-        delivery_address: orderData.delivery_address,
-        delivery_date: orderData.delivery_date,
+        delivery_address: orderData.delivery_address || null,
+        delivery_date: orderData.delivery_date || null,
         delivery_method: orderData.delivery_method,
-        payment_method: orderData.payment_method,
-        notes: orderData.notes,
+        payment_method: orderData.payment_method || null,
+        notes: orderData.notes || null,
         status: 'pending',
         payment_status: 'pending'
       }])
@@ -329,7 +329,7 @@ export const useOrders = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOrders((data as Order[]) || []);
+      setOrders(data as any || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {

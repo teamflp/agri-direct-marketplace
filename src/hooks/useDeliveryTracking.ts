@@ -8,13 +8,13 @@ export interface DeliveryTracking {
   id: string;
   order_id: string;
   status: string;
-  tracking_number?: string;
-  estimated_delivery?: string;
-  location?: string;
-  delivery_person?: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
+  tracking_number?: string | null;
+  estimated_delivery?: string | null;
+  location?: string | null;
+  delivery_person?: string | null;
+  notes?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export const useDeliveryTracking = () => {

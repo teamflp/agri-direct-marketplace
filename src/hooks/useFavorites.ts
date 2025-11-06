@@ -5,15 +5,15 @@ import { useAuth } from '@/contexts/AuthContext';
 export interface Favorite {
   id: string;
   user_id: string;
-  product_id?: string;
-  farmer_id?: string;
-  created_at: string;
+  product_id?: string | null;
+  farmer_id?: string | null;
+  created_at: string | null;
   product?: {
     id: string;
     name: string;
     price: number;
-    image_url?: string;
-    unit: string;
+    image_url?: string | null;
+    unit: string | null;
     farmer?: {
       name: string;
     };
@@ -22,7 +22,7 @@ export interface Favorite {
     id: string;
     name: string;
     location: string;
-    is_certified: boolean;
+    is_certified: boolean | null;
   };
 }
 

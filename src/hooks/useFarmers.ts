@@ -5,21 +5,21 @@ export interface Farmer {
   id: string;
   user_id: string;
   name: string;
-  farm_name?: string;
-  description?: string;
+  farm_name?: string | null;
+  description?: string | null;
   location: string;
-  address?: string;
-  phone?: string;
-  website?: string;
-  latitude?: number;
-  longitude?: number;
-  distance?: number;
-  is_certified: boolean;
-  rating: number;
-  reviews_count: number;
-  delivery_zones?: string[];
-  created_at: string;
-  updated_at: string;
+  address?: string | null;
+  phone?: string | null;
+  website?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  distance?: number | null;
+  is_certified: boolean | null;
+  rating: number | null;
+  reviews_count: number | null;
+  delivery_zones?: string[] | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export const useFarmers = () => {
@@ -36,7 +36,7 @@ export const useFarmers = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setFarmers(data || []);
+      setFarmers(data as any || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {

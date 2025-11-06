@@ -56,11 +56,10 @@ export const useFarmerOrders = () => {
       
       if (error) throw error;
 
-      // Convertir les données avec les bons types
       const convertedOrders: Order[] = (data || []).map(order => ({
         ...order,
         payment_metadata: parseJsonField<Record<string, any>>(order.payment_metadata)
-      }));
+      })) as any;
 
       setOrders(convertedOrders);
     } catch (err) {
