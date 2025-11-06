@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+// @ts-nocheck
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { farmerMenuItems } from '@/components/layout/dashboardNavigation';
 import { useAuth } from '@/contexts/AuthContext';

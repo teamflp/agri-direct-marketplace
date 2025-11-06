@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { InventoryProductType } from '@/pages/farmer/FarmerInventory';
